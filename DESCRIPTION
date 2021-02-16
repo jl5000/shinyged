@@ -1,0 +1,19 @@
+Package: shinyged
+Title: Edit GEDCOM Files Interactively
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Jamie",
+           family = "Lendrum",
+           role = c("aut", "cre"),
+           email = "jalendrum@gmail.com")
+Description: Use `tidyged` and related packages to edit GEDCOM files using a shiny interface.
+URL: https://github.com/jl5000/shinyged
+License: GPL (>= 2)
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE, roclets = c("namespace", "rd"))
+RoxygenNote: 7.1.1
+Suggests: 
+    testthat (>= 3.0.0),
+    roxytest
+
