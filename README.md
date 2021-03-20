@@ -15,6 +15,8 @@ representations of GEDCOM files), and the main package of this ecosystem
 is [`tidyged`](https://jl5000.github.io/tidyged/).
 
 <img src="man/figures/allhex.png" width="65%" style="display: block; margin: auto;" />
+<br> Please get in touch if you’d like to help create a shiny app. I
+have no experience and could do with some help.
 
 ## Installation
 

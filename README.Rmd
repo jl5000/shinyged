@@ -22,10 +22,11 @@ Edit GEDCOM files using a shiny interface. Coming (not so) soon!
 
 The package is part of the `gedcompendium` ecosystem of packages. This ecosystem enables the handling of `tidyged` objects (tibble representations of GEDCOM files), and the main package of this ecosystem is [`tidyged`](https://jl5000.github.io/tidyged/).
 
-
 ```{r, echo=FALSE, out.width="65%", fig.align='center'}
 knitr::include_graphics("man/figures/allhex.png")
 ```
+ <br>
+Please get in touch if you'd like to help create a shiny app. I have no experience and could do with some help.
 
 ## Installation
 
