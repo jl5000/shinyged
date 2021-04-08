@@ -3,12 +3,13 @@ library(shiny)
 
 
 shinyServer(function(input, output) {
-   observeEvent(input$read_file, {
-       gedcom <- tidyged.io::read_gedcom()
+    ged <- reactive({
+       req(input$read_file)
+       tidyged.io::read_gedcom(input$read_file$datapath)
    })
     
-    output$file_summary <- renderText({
-        summary(gedcom)
+    output$file_summary <- DT::renderDataTable({
+       ged()
     })
 
 })
