@@ -15,6 +15,7 @@ Roxygen: list(markdown = TRUE, roclets = c("namespace", "rd"))
 RoxygenNote: 7.1.1
 Imports: 
     shiny,
+    shinyBS,
     tidyged,
     tidyged.io,
     magrittr

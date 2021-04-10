@@ -1,55 +1,70 @@
 
 
 
-shinyUI(fluidPage(
-
+shiny::shinyUI(shiny::fluidPage(
+    
     # Application title
-    titlePanel("shinyged"),
-
-
-    sidebarLayout(
-        sidebarPanel(
-            selectInput("input_tab", "Choose tab", 
-                        choices = c("Overview","Individuals","Family Groups","Sources",
-                                    "Multimedia", "Repositories","Notes"),
-                        selected = "Overview"),
+    shiny::titlePanel("shinyged"),
+    
+    
+    shiny::sidebarLayout(
+        shiny::sidebarPanel(
+            shiny::selectInput("input_tab", "Choose tab", 
+                               choices = c("Overview","Individuals","Family Groups","Sources",
+                                           "Multimedia", "Repositories","Notes"),
+                               selected = "Overview"),
             
-            tags$hr(),
+            shiny::tags$hr(),
             
-            fileInput("read_file", "Import GEDCOM file",
-                      multiple = FALSE,
-                      accept = ".ged"),
-            tags$hr(),
+            shiny::fileInput("read_file", "Import GEDCOM file",
+                             multiple = FALSE,
+                             accept = ".ged"),
+            shiny::tags$hr(),
             
-            actionButton("create_gedcom", icon = icon("plus-square"), "Create GEDCOM file"),
-            tags$hr(),
-            downloadButton("export_gedcom", "Export to GEDCOM file")
+            shiny::actionButton("create_gedcom", icon = shiny::icon("plus-square"), "Create GEDCOM file"),
+            shiny::tags$hr(),
+            shiny::downloadButton("export_gedcom", "Export to GEDCOM file")
         ),
-
-        mainPanel(
-            textInput("subm_name", "Submitter name", width = "90%"),
-            #subm address, notes, media links
-            tags$hr(),
-            textAreaInput("ged_desc", "GEDCOM description", width = "90%", resize = "vertical") %>%
-                shiny::tagAppendAttributes(style = 'width: 100%;'),
-            textAreaInput("ged_copy", "GEDCOM copyright", width = "90%", resize = "vertical") %>%
-                shiny::tagAppendAttributes(style = 'width: 100%;'),
-            textAreaInput("ged_source_name", "Source data", width = "90%", resize = "vertical") %>%
-                shiny::tagAppendAttributes(style = 'width: 100%;'),
-            dateInput("ged_source_date", "Source data publication date"),
-            textAreaInput("ged_source_copy", "Source data copyright", width = "90%", resize = "vertical") %>%
-                shiny::tagAppendAttributes(style = 'width: 100%;'),
-            textInput("receiving_sys", "Receiving system", "tidyged", width = "90%"),
-            selectInput("language", "Language", 
-                        choices = c("Afrikaans", "Albanian", "Anglo-Saxon", "Catalan", "Catalan_Spn", "Czech", 
-                                    "Danish", "Dutch", "English", "Esperanto", "Estonian", "Faroese", "Finnish", 
-                                    "French", "German", "Hawaiian", "Hungarian", "Icelandic", "Indonesian", 
-                                    "Italian", "Latvian", "Lithuanian", "Navaho", "Norwegian", "Polish", 
-                                    "Portuguese", "Romanian", "Serbo_Croa", "Slovak", "Slovene", "Spanish", 
-                                    "Swedish", "Turkish", "Wendic"), selected = "English")
-            
-            # DT::DTOutput("file_summary"),
-            # textOutput("file_str")
+        
+        shiny::mainPanel(
+            shinyBS::bsCollapse(open = "GEDCOM file details",
+                                shinyBS::bsCollapsePanel("GEDCOM file details",
+                                                         shiny::textInput("receiving_sys", "Receiving system", "tidyged"),
+                                                         shiny::selectInput("language", "Language", 
+                                                                            choices = tidyged.internals::languages(), selected = "English"),
+                                                         shiny::textAreaInput("ged_desc", "Description", resize = "vertical") %>%
+                                                             shiny::tagAppendAttributes(style = 'width: 100%;'),
+                                                         shiny::textAreaInput("ged_copy", "Copyright statement", resize = "vertical") %>%
+                                                             shiny::tagAppendAttributes(style = 'width: 100%;')
+                                ),
+                                shinyBS::bsCollapsePanel("Submitter details",
+                                                         shiny::textInput("subm_name", "Name"),
+                                                         # I want to modularise this into a generic address structure to be used elsewhere
+                                                         shiny::splitLayout(
+                                                             shiny::textInput("adr1", "Address line 1"),
+                                                             shiny::textInput("state", "State")
+                                                         ),
+                                                         shiny::splitLayout(
+                                                             shiny::textInput("adr2", "Address line 2"),
+                                                             shiny::textInput("city", "City")
+                                                         ),
+                                                         shiny::splitLayout(
+                                                             shiny::textInput("adr3", "Address line 3"),
+                                                             shiny::textInput("postcode", "Postal code")
+                                                         ),
+                                                         shiny::textInput("country", "Country")
+                                                         # add ability to define up to 3 emails, phones, urls, and faxes
+                                                         #subm notes, media links
+                                ),
+                                shinyBS::bsCollapsePanel("Source data details",
+                                                         shiny::splitLayout(
+                                                             shiny::textInput("ged_source_name", "Source name"),
+                                                             shiny::textInput("ged_source_date", "Publication date (e.g. 6 APR 1983)")
+                                                         ),
+                                                         shiny::textAreaInput("ged_source_copy", "Copyright", resize = "vertical") %>%
+                                                             shiny::tagAppendAttributes(style = 'width: 100%;')
+                                )
+            )
         )
     )
 ))
