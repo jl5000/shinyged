@@ -11,5 +11,12 @@ shinyServer(function(input, output) {
     output$file_summary <- DT::renderDataTable({
        ged()
     })
+    
+    output$export_gedcom <- downloadHandler(
+        filename = "from_app.ged",
+        content = function(file) {
+            tidyged.io::write_gedcom(ged, file)
+        }
+    )
 
 })

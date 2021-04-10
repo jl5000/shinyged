@@ -16,7 +16,8 @@ RoxygenNote: 7.1.1
 Imports: 
     shiny,
     tidyged,
-    tidyged.io
+    tidyged.io,
+    magrittr
 Suggests: 
     testthat (>= 3.0.0),
     roxytest
