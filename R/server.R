@@ -7,9 +7,6 @@ shiny::shinyServer(function(input, output) {
        tidyged.io::read_gedcom(input$read_file$datapath)
    })
     
-    output$file_summary <- DT::renderDataTable({
-       ged()
-    })
     
     output$export_gedcom <- shiny::downloadHandler(
         filename = "from_app.ged",
