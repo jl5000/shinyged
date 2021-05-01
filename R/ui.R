@@ -2,7 +2,7 @@
 
 
 shiny::shinyUI(shiny::fluidPage(
-    
+    shinyjs::useShinyjs(),
     # Application title
     shiny::titlePanel("shinyged"),
     
@@ -17,22 +17,30 @@ shiny::shinyUI(shiny::fluidPage(
                       shiny::actionButton("create_gedcom", icon = shiny::icon("plus-square"), "Create GEDCOM file")
         ),
         shiny::column(4, shiny::tags$br(),
-                      shiny::downloadButton("export_gedcom", "Export to GEDCOM file")
+                      shinyjs::disabled(
+                          shiny::downloadButton("export_gedcom", "Export to GEDCOM file")
+                      )
         )
     ),
     
-    shiny::fluidRow(
-        shiny::column(12,
-                      shiny::tabsetPanel(
-                          tab_overview(),
-                          tab_indi(),
-                          tab_famg()
-                          
-                      )
+    shinyjs::hidden(
+        shiny::fluidRow(id = "tabs",
+            shiny::column(12,
+                          shiny::tabsetPanel(
+                              tab_overview(),
+                              tab_indi(),
+                              tab_famg(),
+                              tab_sour(),
+                              tab_repo(),
+                              tab_media(),
+                              tab_note()
+                              
+                          )
+            )
+            
+            
+            
         )
-        
-        
-        
     )
 )
 )
