@@ -12,17 +12,9 @@ shiny::shinyServer(function(input, output, session) {
         str(ged())
     })
     
-    indi_list <- shiny::reactive({
-        req(ged())
-        tidyged::xrefs_indi(ged()) %>% 
-            tidyged::describe_records(ged(), ., short_desc = TRUE)
-    })
+    individualServer("indi", ged())
+    familyServer("famg", ged())
     
-    famg_list <- shiny::reactive({
-        req(ged())
-        tidyged::xrefs_famg(ged()) %>% 
-            tidyged::describe_records(ged(), ., short_desc = TRUE)
-    })
     
     sour_list <- shiny::reactive({
         req(ged())
@@ -51,8 +43,6 @@ shiny::shinyServer(function(input, output, session) {
     observeEvent(input$read_file, {
         shinyjs::show("tabs")
         shinyjs::enable("export_gedcom")
-        shiny::updateSelectInput(session = session, inputId = "indi_list", choices = indi_list())
-        shiny::updateSelectInput(session = session, inputId = "famg_list", choices = famg_list())
         shiny::updateSelectInput(session = session, inputId = "sour_list", choices = sour_list())
         shiny::updateSelectInput(session = session, inputId = "repo_list", choices = repo_list())
         shiny::updateSelectInput(session = session, inputId = "note_list", choices = note_list())

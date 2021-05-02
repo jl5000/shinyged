@@ -28,8 +28,8 @@ shiny::shinyUI(shiny::fluidPage(
             shiny::column(12,
                           shiny::tabsetPanel(
                               tab_overview(),
-                              tab_indi(),
-                              tab_famg(),
+                              shiny::tabPanel("Individuals", individualUI("indi", ged())),
+                              shiny::tabPanel("Families", familyUI("famg", ged())),
                               tab_sour(),
                               tab_repo(),
                               tab_media(),
