@@ -1,6 +1,6 @@
 
-individualUI <- function(id, ged = NULL) {
-  tagList(
+individualUI <- function(id) {
+  shiny::tagList(
     shiny::tags$br(),
     shiny::fluidRow(
       shiny::column(6,
@@ -31,12 +31,16 @@ individualServer <- function(id, ged = NULL) {
     
     records <- shiny::reactive({
       req(ged)
-      tidyged::xrefs_indi(ged) %>% 
-        tidyged::describe_records(ged, ., short_desc = TRUE)
+      tidyged::xrefs_indi(ged()) %>% 
+        tidyged::describe_records(ged(), ., short_desc = TRUE)
     })
     
-    observeEvent(ged, {
-      shiny::updateSelectInput(session = session, inputId = "records", choices = records())
+    observeEvent(ged(), {
+      if(!is.null(records())) {
+        shiny::updateSelectInput(session = session, inputId = "records", choices = records())
+      } else {
+        shiny::updateSelectInput(session = session, inputId = "records", choices = character(), selected = character())
+      }
     })
     
   })
@@ -44,10 +48,10 @@ individualServer <- function(id, ged = NULL) {
 
 individualApp <- function(ged = NULL) {
   ui <- fluidPage(
-    individualUI("indi", ged)
+    individualUI("indi")
   )
   server <- function(input, output, session) {
-    individualServer("indi", ged)
+    individualServer("indi", shiny::reactive(ged))
   }
   shinyApp(ui, server)  
 }

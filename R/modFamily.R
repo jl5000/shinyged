@@ -1,7 +1,7 @@
 
 
-familyUI <- function(id, ged = NULL) {
-  tagList(
+familyUI <- function(id) {
+  shiny::tagList(
     shiny::tags$br(),
     shiny::fluidRow(
       shiny::column(6,
@@ -32,12 +32,16 @@ familyServer <- function(id, ged = NULL) {
     
     records <- shiny::reactive({
       req(ged)
-      tidyged::xrefs_famg(ged) %>% 
-        tidyged::describe_records(ged, ., short_desc = TRUE)
+      tidyged::xrefs_famg(ged()) %>% 
+        tidyged::describe_records(ged(), ., short_desc = TRUE)
     })
     
-    observeEvent(ged, {
-      shiny::updateSelectInput(session = session, inputId = "records", choices = records())
+    observeEvent(ged(), {
+      if(!is.null(records())) {
+        shiny::updateSelectInput(session = session, inputId = "records", choices = records())
+      } else {
+        shiny::updateSelectInput(session = session, inputId = "records", choices = character(), selected = character())
+      }
     })
     
   })
@@ -45,10 +49,10 @@ familyServer <- function(id, ged = NULL) {
 
 familyApp <- function(ged = NULL) {
   ui <- fluidPage(
-    familyUI("famg", ged)
+    familyUI("famg")
   )
   server <- function(input, output, session) {
-    familyServer("famg", ged)
+    familyServer("famg", shiny::reactive(ged))
   }
   shinyApp(ui, server)  
 }

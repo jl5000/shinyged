@@ -27,13 +27,13 @@ shiny::shinyUI(shiny::fluidPage(
         shiny::fluidRow(id = "tabs",
             shiny::column(12,
                           shiny::tabsetPanel(
-                              tab_overview(),
-                              shiny::tabPanel("Individuals", individualUI("indi", ged())),
-                              shiny::tabPanel("Families", familyUI("famg", ged())),
-                              tab_sour(),
-                              tab_repo(),
-                              tab_media(),
-                              tab_note()
+                              shiny::tabPanel("GEDCOM File", fileUI("file")),
+                              shiny::tabPanel("Individuals", individualUI("indi")),
+                              shiny::tabPanel("Families", familyUI("famg")),
+                              shiny::tabPanel("Sources", sourceUI("sour")),
+                              shiny::tabPanel("Repositories", repositoryUI("repo")),
+                              shiny::tabPanel("Multimedia", multimediaUI("media")),
+                              shiny::tabPanel("Notes", noteUI("note"))
                               
                           )
             )
