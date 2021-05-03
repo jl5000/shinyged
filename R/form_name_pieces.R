@@ -1,6 +1,7 @@
 
 
-form_name_pieces <- function(button_id,
+form_name_pieces <- function(trigger_id,
+                             namespace,
                              prefix = "",
                              given = "",
                              nick = "",
@@ -9,20 +10,20 @@ form_name_pieces <- function(button_id,
                              suffix = "") {
   
   shinyBS::bsModal(
-    "name",
+    shiny::NS(namespace, "name"),
     "Enter name pieces...",
-    button_id,
+    shiny::NS(namespace, trigger_id),
     
     shiny::fluidRow(
       shiny::column(6,
-             shiny::textInput("prefix", "Name prefix", prefix),
-             shiny::textInput("given", "Given name(s)", given),
-             shiny::textInput("nick", "Nickname", nick)
+             shiny::textInput(shiny::NS(namespace, "prefix"), "Name prefix", prefix),
+             shiny::textInput(shiny::NS(namespace, "given"), "Given name(s)", given),
+             shiny::textInput(shiny::NS(namespace, "nick"), "Nickname", nick)
       ),
       shiny::column(6,
-             shiny::textInput("surn_prefix", "Surname prefix", surn_prefix),
-             shiny::textInput("surname", "Surname", surname),
-             shiny::textInput("suffix", "Suffix (e.g. Jr.)", suffix)
+             shiny::textInput(shiny::NS(namespace, "surn_prefix"), "Surname prefix", surn_prefix),
+             shiny::textInput(shiny::NS(namespace, "surname"), "Surname", surname),
+             shiny::textInput(shiny::NS(namespace, "suffix"), "Suffix (e.g. Jr.)", suffix)
       )
       
     )
