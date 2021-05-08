@@ -9,13 +9,14 @@ shiny::shinyServer(function(input, output, session) {
     
     
     
-    fileServer("file", ged)
-    individualServer("indi", ged)
-    familyServer("famg", ged)
-    sourceServer("sour", ged)
-    repositoryServer("repo", ged)
-    noteServer("note", ged)
-    multimediaServer("media", ged)
+    file_server("file", ged)
+    submitter_server("subm", ged)
+    individual_server("indi", ged)
+    family_server("famg", ged)
+    source_server("sour", ged)
+    repository_server("repo", ged)
+    note_server("note", ged)
+    multimedia_server("media", ged)
     
     observeEvent(input$read_file, {
         shinyjs::show("tabs")

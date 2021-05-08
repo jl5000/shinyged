@@ -4,21 +4,23 @@
 
 
 
-file_dataUI <- function(id) {
+file_data_ui <- function(id) {
+  ns <- shiny::NS(id)
+  
   shiny::tagList(
     shinyjs::useShinyjs(),
     shiny::tags$br(),
     shiny::splitLayout(
-      shiny::textInput(shiny::NS(id, "ged_source_name"), "Source name"),
-      shiny::textInput(shiny::NS(id, "ged_source_date"), "Publication date (e.g. 6 APR 1983)")
+      shiny::textInput(ns("ged_source_name"), "Source name"),
+      shiny::textInput(ns("ged_source_date"), "Publication date (e.g. 6 APR 1983)")
     ),
-    shiny::textAreaInput(shiny::NS(id, "ged_source_copy"), "Copyright", resize = "vertical") %>%
+    shiny::textAreaInput(ns("ged_source_copy"), "Copyright", resize = "vertical") %>%
       shiny::tagAppendAttributes(style = 'width: 100%;')
     
   )
 }
 
-file_dataServer <- function(id, ged = NULL) {
+file_data_server <- function(id, ged = NULL) {
   moduleServer(id, function(input, output, session) {
     
     
@@ -40,12 +42,12 @@ file_dataServer <- function(id, ged = NULL) {
   })
 }
 
-file_dataApp <- function(ged = NULL) {
+file_data_app <- function(ged = NULL) {
   ui <- fluidPage(
-    file_dataUI("file_data")
+    file_data_ui("file_data")
   )
   server <- function(input, output, session) {
-    file_dataServer("file_data", shiny::reactive(ged))
+    file_data_server("file_data", shiny::reactive(ged))
   }
   shinyApp(ui, server)  
 }

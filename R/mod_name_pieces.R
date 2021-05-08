@@ -9,6 +9,9 @@ form_name_pieces <- function(trigger_id,
                              surname = "",
                              suffix = "") {
   
+  ns <- shiny::NS(id)
+  
+  
   shinyBS::bsModal(
     shiny::NS(namespace, "name"),
     "Enter name pieces...",

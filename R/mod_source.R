@@ -1,14 +1,16 @@
 
-multimediaUI <- function(id) {
+source_ui <- function(id) {
+  ns <- shiny::NS(id)
+  
   shiny::tagList(
     shiny::tags$br(),
     shiny::fluidRow(
       shiny::column(6,
-                    shiny::selectInput(shiny::NS(id, "records"), label = NULL, choices = NULL, width = "500px")
+                    shiny::selectInput(ns("records"), label = NULL, choices = NULL, width = "500px")
       ),
       shiny::column(6,
-                    shiny::actionButton(shiny::NS(id, "add"), "Add multimedia"),
-                    shiny::actionButton(shiny::NS(id, "delete"), "Delete multimedia")
+                    shiny::actionButton(ns("add"), "Add source"),
+                    shiny::actionButton(ns("delete"), "Delete source")
       )
       
     ),
@@ -20,12 +22,12 @@ multimediaUI <- function(id) {
   )
 }
 
-multimediaServer <- function(id, ged = NULL) {
+source_server <- function(id, ged = NULL) {
   moduleServer(id, function(input, output, session) {
     
     records <- shiny::reactive({
       req(ged)
-      tidyged::xrefs_media(ged()) %>% 
+      tidyged::xrefs_sour(ged()) %>% 
         tidyged::describe_records(ged(), ., short_desc = TRUE)
     })
     
@@ -40,12 +42,12 @@ multimediaServer <- function(id, ged = NULL) {
   })
 }
 
-multimediaApp <- function(ged = NULL) {
+source_app <- function(ged = NULL) {
   ui <- fluidPage(
-    multimediaUI("media")
+    source_ui("sour")
   )
   server <- function(input, output, session) {
-    multimediaServer("media", shiny::reactive(ged))
+    source_server("sour", shiny::reactive(ged))
   }
   shinyApp(ui, server)  
 }

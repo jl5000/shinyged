@@ -1,37 +1,40 @@
 
-individualUI <- function(id) {
+
+family_ui <- function(id) {
+  ns <- shiny::NS(id)
+  
   shiny::tagList(
     shiny::tags$br(),
     shiny::fluidRow(
       shiny::column(6,
-                    shiny::selectInput(shiny::NS(id, "records"), label = NULL, choices = NULL, width = "500px")
+                    shiny::selectInput(ns("records"), label = NULL, choices = NULL, width = "500px")
       ),
       shiny::column(6,
-                    shiny::actionButton(shiny::NS(id, "add"), "Add individual"),
-                    shiny::actionButton(shiny::NS(id, "delete"), "Delete individual")
+                    shiny::actionButton(ns("add"), "Add family group"),
+                    shiny::actionButton(ns("delete"), "Delete family group")
       )
       
     ),
     
     shiny::tabsetPanel(
-      shiny::tabPanel("Summary"),
-      shiny::tabPanel("Names"),
-      shiny::tabPanel("Facts"),
-      shiny::tabPanel("Links"),
+      shiny::tabPanel("Summary", family_summary_ui(ns("family_summary"))),
+      shiny::tabPanel("Members", family_members_ui(ns("family_members"))),
+      shiny::tabPanel("Events", family_events_ui(ns("family_events"))),
       shiny::tabPanel("Notes"),
       shiny::tabPanel("Citations"),
       shiny::tabPanel("Media")
+
       
     )
   )
 }
 
-individualServer <- function(id, ged = NULL) {
+family_server <- function(id, ged = NULL) {
   moduleServer(id, function(input, output, session) {
     
     records <- shiny::reactive({
       req(ged)
-      tidyged::xrefs_indi(ged()) %>% 
+      tidyged::xrefs_famg(ged()) %>% 
         tidyged::describe_records(ged(), ., short_desc = TRUE)
     })
     
@@ -43,15 +46,21 @@ individualServer <- function(id, ged = NULL) {
       }
     })
     
+    family_summary_server("family_summary", ged)
+    family_members_server("family_members", ged)
+    family_events_server("family_events", ged)
+    
   })
 }
 
-individualApp <- function(ged = NULL) {
+family_app <- function(ged = NULL) {
   ui <- fluidPage(
-    individualUI("indi")
+    family_ui("famg")
   )
   server <- function(input, output, session) {
-    individualServer("indi", shiny::reactive(ged))
+    family_server("famg", shiny::reactive(ged))
   }
   shinyApp(ui, server)  
 }
+
+

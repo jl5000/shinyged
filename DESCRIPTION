@@ -14,7 +14,7 @@ LazyData: true
 Roxygen: list(markdown = TRUE, roclets = c("namespace", "rd"))
 RoxygenNote: 7.1.1
 Imports: 
-    shiny,
+    shiny (>= 1.6.0),
     shinyBS,
     shinyjs,
     tidyged,
