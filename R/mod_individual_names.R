@@ -25,13 +25,13 @@ individual_names_server <- function(id, ged = NULL) {
 
 
 individual_names_app <- function(ged = NULL) {
-  ui <- fluidPage(
+  ui <- shiny::fluidPage(
     individual_names_ui("individual_names")
   )
   server <- function(input, output, session) {
     individual_names_server("individual_names", shiny::reactive(ged))
   }
-  shinyApp(ui, server)  
+  shiny::shinyApp(ui, server)  
 }
 
 

@@ -6,7 +6,8 @@ source_ui <- function(id) {
     shiny::tags$br(),
     shiny::fluidRow(
       shiny::column(6,
-                    shiny::selectInput(ns("records"), label = NULL, choices = NULL, width = "500px")
+                    shiny::selectizeInput(ns("records"), label = NULL, choices = NULL,
+                                          multiple = TRUE, width = "500px", options = list(maxItems = 1))
       ),
       shiny::column(6,
                     shiny::actionButton(ns("add"), "Add source"),
@@ -33,9 +34,9 @@ source_server <- function(id, ged = NULL) {
     
     observeEvent(ged(), {
       if(!is.null(records())) {
-        shiny::updateSelectInput(session = session, inputId = "records", choices = records())
+        shiny::updateSelectizeInput(session = session, inputId = "records", choices = records())
       } else {
-        shiny::updateSelectInput(session = session, inputId = "records", choices = character(), selected = character())
+        shiny::updateSelectizeInput(session = session, inputId = "records", choices = character(), selected = character())
       }
     })
     
@@ -43,11 +44,11 @@ source_server <- function(id, ged = NULL) {
 }
 
 source_app <- function(ged = NULL) {
-  ui <- fluidPage(
+  ui <- shiny::fluidPage(
     source_ui("sour")
   )
   server <- function(input, output, session) {
     source_server("sour", shiny::reactive(ged))
   }
-  shinyApp(ui, server)  
+  shiny::shinyApp(ui, server)  
 }

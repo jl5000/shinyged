@@ -4,24 +4,25 @@ note_ui <- function(id) {
   
   shiny::tagList(
     shiny::tags$br(),
-    notes_ui(ns("notes"))
+    shiny::textAreaInput(ns("note_text"), "Edit note...", height = "150px") %>%
+      shiny::tagAppendAttributes(style = 'width: 100%;')
   )
 }
 
 note_server <- function(id, notes = NULL) {
   moduleServer(id, function(input, output, session) {
     
-    notes_server("notes", notes)
+   
     
   })
 }
 
 note_app <- function(notes = NULL) {
-  ui <- fluidPage(
+  ui <- shiny::fluidPage(
     note_ui("note")
   )
   server <- function(input, output, session) {
     note_server("note", shiny::reactive(notes))
   }
-  shinyApp(ui, server)  
+  shiny::shinyApp(ui, server)  
 }

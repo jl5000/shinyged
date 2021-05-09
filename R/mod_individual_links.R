@@ -24,13 +24,13 @@ individual_links_server <- function(id, ged = NULL) {
 
 
 individual_links_app <- function(ged = NULL) {
-  ui <- fluidPage(
+  ui <- shiny::fluidPage(
     individual_links_ui("individual_links")
   )
   server <- function(input, output, session) {
     individual_links_server("individual_links", shiny::reactive(ged))
   }
-  shinyApp(ui, server)  
+  shiny::shinyApp(ui, server)  
 }
 
 

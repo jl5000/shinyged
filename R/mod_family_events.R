@@ -24,13 +24,13 @@ family_events_server <- function(id, ged = NULL) {
 
 
 family_events_app <- function(ged = NULL) {
-  ui <- fluidPage(
+  ui <- shiny::fluidPage(
     family_events_ui("family_events")
   )
   server <- function(input, output, session) {
     family_events_server("family_events", shiny::reactive(ged))
   }
-  shinyApp(ui, server)  
+  shiny::shinyApp(ui, server)  
 }
 
 

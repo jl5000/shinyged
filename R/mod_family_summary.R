@@ -24,13 +24,13 @@ family_summary_server <- function(id, ged = NULL) {
 
 
 family_summary_app <- function(ged = NULL) {
-  ui <- fluidPage(
+  ui <- shiny::fluidPage(
     family_summary_ui("family_summary")
   )
   server <- function(input, output, session) {
     family_summary_server("family_summary", shiny::reactive(ged))
   }
-  shinyApp(ui, server)  
+  shiny::shinyApp(ui, server)  
 }
 
 

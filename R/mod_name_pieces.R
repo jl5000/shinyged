@@ -1,36 +1,46 @@
 
 
-form_name_pieces <- function(trigger_id,
-                             namespace,
-                             prefix = "",
-                             given = "",
-                             nick = "",
-                             surn_prefix = "",
-                             surname = "",
-                             suffix = "") {
+name_pieces_ui <- function(id) {
   
   ns <- shiny::NS(id)
   
-  
-  shinyBS::bsModal(
-    shiny::NS(namespace, "name"),
-    "Enter name pieces...",
-    shiny::NS(namespace, trigger_id),
+  shiny::tagList(
+    shiny::tags$br(),
     
     shiny::fluidRow(
       shiny::column(6,
-             shiny::textInput(shiny::NS(namespace, "prefix"), "Name prefix", prefix),
-             shiny::textInput(shiny::NS(namespace, "given"), "Given name(s)", given),
-             shiny::textInput(shiny::NS(namespace, "nick"), "Nickname", nick)
+             shiny::textInput(ns("prefix"), "Name prefix"),
+             shiny::textInput(ns("given"), "Given name(s)"),
+             shiny::textInput(ns("nick"), "Nickname")
       ),
       shiny::column(6,
-             shiny::textInput(shiny::NS(namespace, "surn_prefix"), "Surname prefix", surn_prefix),
-             shiny::textInput(shiny::NS(namespace, "surname"), "Surname", surname),
-             shiny::textInput(shiny::NS(namespace, "suffix"), "Suffix (e.g. Jr.)", suffix)
+             shiny::textInput(ns("surn_prefix"), "Surname prefix"),
+             shiny::textInput(ns("surname"), "Surname"),
+             shiny::textInput(ns("suffix"), "Suffix (e.g. Jr.)")
       )
       
     )
  
   )
   
+}
+
+
+name_pieces_server <- function(id, name = NULL) {
+  moduleServer(id, function(input, output, session) {
+    
+
+    
+  })
+}
+
+
+name_app <- function(name = NULL) {
+  ui <- shiny::fluidPage(
+    name_pieces_ui("name")
+  )
+  server <- function(input, output, session) {
+    name_pieces_server("name", shiny::reactive(name))
+  }
+  shiny::shinyApp(ui, server)  
 }

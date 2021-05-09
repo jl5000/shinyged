@@ -24,13 +24,13 @@ individual_facts_server <- function(id, ged = NULL) {
 
 
 individual_facts_app <- function(ged = NULL) {
-  ui <- fluidPage(
+  ui <- shiny::fluidPage(
     individual_facts_ui("individual_facts")
   )
   server <- function(input, output, session) {
     individual_facts_server("individual_facts", shiny::reactive(ged))
   }
-  shinyApp(ui, server)  
+  shiny::shinyApp(ui, server)  
 }
 
 

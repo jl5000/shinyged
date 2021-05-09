@@ -21,13 +21,13 @@ media_links_server <- function(id, media_links = NULL) {
 
 
 media_links_app <- function(media_links = NULL) {
-  ui <- fluidPage(
+  ui <- shiny::fluidPage(
     media_links_ui("media")
   )
   server <- function(input, output, session) {
     media_links_server("media", shiny::reactive(media_links))
   }
-  shinyApp(ui, server)  
+  shiny::shinyApp(ui, server)  
 }
 
 

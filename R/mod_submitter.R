@@ -49,7 +49,7 @@ submitter_server <- function(id, ged = NULL) {
                              value = dplyr::filter(ged(), record == subm(), tag == "NAME")$value)
     })
     
-    address_server("subm_address", addr)
+    address_server("subm_address", addr) #Problem
     notes_server("subm_notes", notes)
     media_links_server("subm_media", media_links)
     
@@ -59,13 +59,13 @@ submitter_server <- function(id, ged = NULL) {
 
 
 submitter_app <- function(ged = NULL) {
-  ui <- fluidPage(
+  ui <- shiny::fluidPage(
     submitter_ui("submitter")
   )
   server <- function(input, output, session) {
     submitter_server("submitter", shiny::reactive(ged))
   }
-  shinyApp(ui, server)  
+  shiny::shinyApp(ui, server)  
 }
 
 

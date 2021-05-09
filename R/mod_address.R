@@ -73,11 +73,11 @@ address_server <- function(id, addr = NULL) {
 
 
 address_app <- function(addr = NULL) {
-  ui <- fluidPage(
+  ui <- shiny::fluidPage(
     address_ui("address")
   )
   server <- function(input, output, session) {
     address_server("address", shiny::reactive(addr))
   }
-  shinyApp(ui, server)  
+  shiny::shinyApp(ui, server)  
 }

@@ -62,13 +62,13 @@ file_details_server <- function(id, ged = NULL) {
 }
 
 file_details_app <- function(ged = NULL) {
-  ui <- fluidPage(
+  ui <- shiny::fluidPage(
     file_details_ui("file_details")
   )
   server <- function(input, output, session) {
     file_details_server("file_details", shiny::reactive(ged))
   }
-  shinyApp(ui, server)  
+  shiny::shinyApp(ui, server)  
 }
 
 
