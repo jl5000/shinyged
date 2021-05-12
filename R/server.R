@@ -1,13 +1,11 @@
 
 
-
 shiny::shinyServer(function(input, output, session) {
+
     ged <- shiny::reactive({
        req(input$read_file)
        tidyged.io::read_gedcom(input$read_file$datapath)
    })
-    
-    
     
     file_server("file", ged)
     submitter_server("subm", ged)
@@ -34,3 +32,4 @@ shiny::shinyServer(function(input, output, session) {
     
 
 })
+

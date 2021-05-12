@@ -46,6 +46,10 @@ individual_server <- function(id, ged = NULL) {
       }
     })
     
+    observeEvent(input$add, {
+      ged <- tidyged::add_indi(ged())
+    })
+    
     individual_summary_server("individual_summary", ged)
     individual_names_server("individual_names", ged)
     individual_facts_server("individual_facts", ged)

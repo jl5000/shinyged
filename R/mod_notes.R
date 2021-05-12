@@ -1,9 +1,5 @@
 
 
-
-
-
-
 notes_ui <- function(id) {
   ns <- shiny::NS(id)
   
@@ -17,8 +13,11 @@ notes_ui <- function(id) {
     shiny::fluidRow(
       shiny::column(12,
                     shiny::actionButton(ns("add_note"), "Add note"),
-                    shiny::actionButton(ns("remove_note"), "Remove note"),
-                    shiny::actionButton(ns("update_note"), "Update note"))
+                    shinyjs::disabled(
+                      shiny::actionButton(ns("remove_note"), "Remove note"),
+                      shiny::actionButton(ns("update_note"), "Update note")
+                    )
+      )
     ),
     shiny::tags$br(),
     shiny::textAreaInput(ns("note_text"), "Edit note...", height = "150px") %>%
@@ -27,64 +26,104 @@ notes_ui <- function(id) {
 
 }
 
-notes_server <- function(id, notes = NULL) {
+
+notes_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
+    
+    #523 | The vector of notes
+    notes <- shiny::reactive({
+      req(r$ged, r$section_rows)
+      dplyr::slice(r$ged, r$section_rows) %>%
+        dplyr::filter(level == .$level[1] + 1, tag == "NOTE") %>% 
+        dplyr::pull(value)
+    })
+    
+    # A running check on the text box to see if the note is valid
+    valid_note <- shiny::reactive({
+      !is.null(input$note_text) &&
+        !input$note_text == "" &&
+        !input$note_text %in% notes()
+      })
+    
+    selected_ged_row <- shiny::reactive({
+      req(r$ged, r$section_rows, input$notes_list_rows_selected)
+      dplyr::mutate(r$ged, row = dplyr::row_number()) %>% 
+        dplyr::slice(r$section_rows) %>%
+        dplyr::filter(level == .$level[1] + 1, tag == "NOTE") %>% 
+        dplyr::slice(input$notes_list_rows_selected) %>% 
+        dplyr::pull(row)
+    })
     
     # Update table with notes
     output$notes_list <- DT::renderDataTable({
-      req(notes)
       DT::datatable(data.frame(Notes = notes()), rownames = FALSE, selection = "single")
     })
     
-    # Disable add_note button if no text
-    observeEvent(input$note_text, {
-      shinyjs::toggleState("add_note", input$note_text != "" | is.null(input$note_text))
+    # Disable add_note button if no valid note
+    shiny::observeEvent(input$note_text, {
+      shinyjs::toggleState("add_note", valid_note())
+    })
+    
+    # Disable update_note button if no valid note and no row selected
+    shiny::observeEvent({
+      valid_note()
+      input$notes_list_rows_selected}, {
+      shinyjs::toggleState("update_note", valid_note() && !is.null(input$notes_list_rows_selected))
     })
     
    # Update text box with selected note and disable update/remove buttons if nothing selected
-   shiny::observeEvent({
-     input$notes_list_rows_selected 
-     notes}, {
-     shiny::updateTextAreaInput(inputId = "note_text", value = notes()[input$notes_list_rows_selected])
-     shinyjs::toggleState("update_note", !is.null(notes()) & !is.null(input$notes_list_rows_selected))
-     shinyjs::toggleState("remove_note", !is.null(notes()) & !is.null(input$notes_list_rows_selected))
-   })
-   
-   # Remove note and clear text box
-   shiny::observeEvent(input$remove_note, {
-     if(!is.null(input$notes_list_rows_selected)) {
-       notes(notes()[-input$notes_list_rows_selected])
+   # Note: there currently seems to be a bug as it's not firing on deselection events
+   shiny::observeEvent(input$notes_list_rows_selected, {
+     if(length(input$notes_list_rows_selected) > 0) {
+       shiny::updateTextAreaInput(inputId = "note_text", value = notes()[input$notes_list_rows_selected])
+     } else {
        shiny::updateTextAreaInput(inputId = "note_text", value = "")
      }
+     shinyjs::toggleState("remove_note", !is.null(input$notes_list_rows_selected))
    })
    
    # Add note and clear text box
    shiny::observeEvent(input$add_note, {
-     if(input$note_text != "") {
-       notes(unique(c(notes(), input$note_text)))
+     # Don't trigger changes from ged because we also need to update section_rows
+     shiny::isolate(
+       r$ged <- tibble::add_row(r$ged,
+                                tibble::tibble(record = r$ged$record[r$section_rows[1]],
+                                               level = r$ged$level[r$section_rows[1]] + 1,
+                                               tag = "NOTE",
+                                               value = input$note_text),
+                                # Need to insert new notes after final note so it
+                                # doesn't shift existing row numbers
+                                .after = max(r$section_rows))
+     )
+     r$section_rows <- c(r$section_rows, max(r$section_rows) + 1)
+     shiny::updateTextAreaInput(inputId = "note_text", value = "")
+   })
+   
+   # Remove note and clear text box
+   shiny::observeEvent(input$remove_note, {
+       shiny::isolate(
+         r$ged <- dplyr::slice(r$ged, -selected_ged_row())
+       )
+       r$section_rows <- r$section_rows[-length(r$section_rows)]
        shiny::updateTextAreaInput(inputId = "note_text", value = "")
-     }
    })
    
    # Update note
    shiny::observeEvent(input$update_note, {
-     if(input$note_text != "") {
-       nts <- notes()
-       nts[input$notes_list_rows_selected] <- input$note_text
-       notes(unique(nts))
-     }
+     r$ged$value[selected_ged_row()] <- input$note_text
    })
 
   })
 }
 
 
-notes_app <- function(notes = NULL) {
+notes_app <- function(ged = NULL, section_rows = NULL) {
+  r <- shiny::reactiveValues(ged = ged, section_rows = section_rows)
   ui <- shiny::fluidPage(
     notes_ui("notes")
   )
   server <- function(input, output, session) {
-    notes_server("notes", shiny::reactiveVal(notes))
+    notes_server("notes", r)
   }
   shiny::shinyApp(ui, server)  
 }
