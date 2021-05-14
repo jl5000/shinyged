@@ -6,7 +6,7 @@ notes_ui <- function(id) {
   shiny::tagList(
     shinyjs::useShinyjs(),
     shiny::tags$br(),
-    shiny::helpText("Here you can manage notes associated with the item. Use the buttons to add, remove, and edit notes via the text box and by selecting notes in the list."),
+    shiny::helpText("Here you can manage notes associated with an item. Use the buttons to add, remove, and edit notes via the text box and by selecting notes in the list."),
     shiny::tags$hr(),
     DT::DTOutput(ns("notes_list")),
     shiny::tags$br(),
@@ -67,13 +67,12 @@ notes_server <- function(id, r) {
     # Disable update_note button if no valid note and no row selected
     shiny::observeEvent({
       valid_note()
-      input$notes_list_rows_selected}, {
+      input$notes_list_rows_selected}, ignoreNULL = FALSE, {
       shinyjs::toggleState("update_note", valid_note() && !is.null(input$notes_list_rows_selected))
     })
     
    # Update text box with selected note and disable update/remove buttons if nothing selected
-   # Note: there currently seems to be a bug as it's not firing on deselection events
-   shiny::observeEvent(input$notes_list_rows_selected, {
+   shiny::observeEvent(input$notes_list_rows_selected, ignoreNULL = FALSE, {
      if(length(input$notes_list_rows_selected) > 0) {
        shiny::updateTextAreaInput(inputId = "note_text", value = notes()[input$notes_list_rows_selected])
      } else {
