@@ -36,13 +36,8 @@ shiny::shinyUI(shiny::fluidPage(
                                     shiny::tabPanel("Multimedia", multimedia_ui("media")),
                                     shiny::tabPanel("Sources", source_ui("sour")),
                                     shiny::tabPanel("Repositories", repository_ui("repo"))
-                                    
-                                    
-                                    
                                   )
                     )
-                    
-                    
                     
     )
   )

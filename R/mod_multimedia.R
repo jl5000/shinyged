@@ -17,8 +17,10 @@ multimedia_ui <- function(id) {
     ),
     
     shiny::tabsetPanel(
-      shiny::tabPanel("Summary")
-      
+      shiny::tabPanel("Summary", multimedia_summary_ui(ns("multimedia_summary"))),
+      shiny::tabPanel("Description", multimedia_description_ui(ns("multimedia_description"))),
+      shiny::tabPanel("Notes", notes_ui(ns("media_notes"))),
+      shiny::tabPanel("Citations", citations_ui(ns("multimedia_citations")))
     )
   )
 }

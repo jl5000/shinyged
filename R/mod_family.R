@@ -21,9 +21,9 @@ family_ui <- function(id) {
       shiny::tabPanel("Summary", family_summary_ui(ns("family_summary"))),
       shiny::tabPanel("Members", family_members_ui(ns("family_members"))),
       shiny::tabPanel("Events", family_events_ui(ns("family_events"))),
-      shiny::tabPanel("Notes"),
-      shiny::tabPanel("Citations"),
-      shiny::tabPanel("Media")
+      shiny::tabPanel("Notes", notes_ui(ns("family_notes"))),
+      shiny::tabPanel("Citations", citations_ui(ns("family_citations"))),
+      shiny::tabPanel("Media", media_links_ui(ns("family_media")))
 
       
     )

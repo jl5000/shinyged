@@ -17,8 +17,9 @@ repository_ui <- function(id) {
     ),
     
     shiny::tabsetPanel(
-      shiny::tabPanel("Summary")
-      
+      shiny::tabPanel("Summary", repository_summary_ui(ns("repo_summary"))),
+      shiny::tabPanel("Details", repository_details_ui(ns("repo_details"))),
+      shiny::tabPanel("Notes", notes_ui(ns("repo_notes")))
     )
   )
 }

@@ -17,8 +17,11 @@ source_ui <- function(id) {
     ),
     
     shiny::tabsetPanel(
-      shiny::tabPanel("Summary")
-      
+      shiny::tabPanel("Summary", source_summary_ui(ns("sour_summary"))),
+      shiny::tabPanel("Data", source_data_ui(ns("sour_data"))),
+      shiny::tabPanel("Details", source_details_ui(ns("sour_details"))),
+      shiny::tabPanel("Notes", notes_ui(ns("sour_notes"))),
+      shiny::tabPanel("Media", media_links_ui(ns("sour_media")))
     )
   )
 }

@@ -13,7 +13,7 @@ submitter_ui <- function(id) {
     shiny::tabsetPanel(
       shiny::tabPanel("Contact details", address_ui(ns("subm_address"))),
       shiny::tabPanel("Notes", notes_ui(ns("subm_notes"))),
-      shiny::tabPanel("Multimedia", media_links_ui(ns("subm_media")))
+      shiny::tabPanel("Media", media_links_ui(ns("subm_media")))
     )
     
   )

@@ -21,9 +21,9 @@ individual_ui <- function(id) {
       shiny::tabPanel("Names", individual_names_ui(ns("individual_names"))),
       shiny::tabPanel("Facts", individual_facts_ui(ns("individual_facts"))),
       shiny::tabPanel("Links", individual_links_ui(ns("individual_links"))),
-      shiny::tabPanel("Notes"),
-      shiny::tabPanel("Citations"),
-      shiny::tabPanel("Media")
+      shiny::tabPanel("Notes", notes_ui(ns("individual_notes"))),
+      shiny::tabPanel("Citations", citations_ui(ns("individual_citations"))),
+      shiny::tabPanel("Media", media_links_ui(ns("individual_media")))
       
     )
   )

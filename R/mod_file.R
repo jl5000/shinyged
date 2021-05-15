@@ -15,12 +15,12 @@ file_ui <- function(id) {
   )
 }
 
-file_server <- function(id, ged = NULL) {
+file_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     
-    file_summary_server("file_summary", ged)
-    file_details_server("file_details", ged)
-    file_data_server("file_data", ged)
+    file_summary_server("file_summary", r)
+    file_details_server("file_details", r)
+    file_data_server("file_data", r)
   })
 }
 
