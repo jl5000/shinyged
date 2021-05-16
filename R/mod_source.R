@@ -26,16 +26,16 @@ source_ui <- function(id) {
   )
 }
 
-source_server <- function(id, ged = NULL) {
+source_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     
     records <- shiny::reactive({
-      req(ged)
-      tidyged::xrefs_sour(ged()) %>% 
-        tidyged::describe_records(ged(), ., short_desc = TRUE)
+      req(r$ged)
+      tidyged::xrefs_sour(r$ged) %>% 
+        tidyged::describe_records(r$ged, ., short_desc = TRUE)
     })
     
-    observeEvent(ged(), {
+    observeEvent(r$ged, {
       if(!is.null(records())) {
         shiny::updateSelectizeInput(session = session, inputId = "records", choices = records())
       } else {
@@ -47,11 +47,12 @@ source_server <- function(id, ged = NULL) {
 }
 
 source_app <- function(ged = NULL) {
+  r <- shiny::reactiveValues(ged = ged)
   ui <- shiny::fluidPage(
     source_ui("sour")
   )
   server <- function(input, output, session) {
-    source_server("sour", shiny::reactive(ged))
+    source_server("sour", r)
   }
   shiny::shinyApp(ui, server)  
 }

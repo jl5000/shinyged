@@ -14,28 +14,29 @@ file_summary_ui <- function(id) {
   )
 }
 
-file_summary_server <- function(id, ged = NULL) {
+file_summary_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     
     output$str <- shiny::renderPrint({
-      req(ged)
-      str(ged())
+      req(r$ged)
+      str(r$ged)
     })
     
     output$summary <- shiny::renderPrint({
-      req(ged)
-      summary(ged())
+      req(r$ged)
+      summary(r$ged)
     })
     
   })
 }
 
 file_summary_app <- function(ged = NULL) {
+  r <- shiny::reactiveValues(ged = ged)
   ui <- shiny::fluidPage(
     file_summary_ui("file_summary")
   )
   server <- function(input, output, session) {
-    file_summary_server("file_summary", shiny::reactive(ged))
+    file_summary_server("file_summary", r)
   }
   shiny::shinyApp(ui, server)  
 }

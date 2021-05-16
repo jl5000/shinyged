@@ -14,7 +14,7 @@ individual_facts_ui <- function(id) {
   )
 }
 
-individual_facts_server <- function(id, ged = NULL) {
+individual_facts_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     
     
@@ -23,12 +23,13 @@ individual_facts_server <- function(id, ged = NULL) {
 }
 
 
-individual_facts_app <- function(ged = NULL) {
+individual_facts_app <- function(ged = NULL, section_rows = NULL) {
+  r <- shiny::reactiveValues(ged = ged, section_rows = section_rows)
   ui <- shiny::fluidPage(
     individual_facts_ui("individual_facts")
   )
   server <- function(input, output, session) {
-    individual_facts_server("individual_facts", shiny::reactive(ged))
+    individual_facts_server("individual_facts", r)
   }
   shiny::shinyApp(ui, server)  
 }

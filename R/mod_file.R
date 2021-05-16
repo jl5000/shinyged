@@ -25,11 +25,12 @@ file_server <- function(id, r) {
 }
 
 file_app <- function(ged = NULL) {
+  r <- shiny::reactiveValues(ged = ged)
   ui <- shiny::fluidPage(
     file_ui("file")
   )
   server <- function(input, output, session) {
-    file_server("file", shiny::reactive(ged))
+    file_server("file", r)
   }
   shiny::shinyApp(ui, server)  
 }

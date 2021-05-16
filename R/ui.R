@@ -9,25 +9,29 @@ shiny::shinyUI(shiny::fluidPage(
   shiny::titlePanel("shinyged"),
   
   shiny::fluidRow(
-    shiny::column(4,
-                  shiny::fileInput("read_file", "Import GEDCOM file",
+    
+    shiny::column(3,         
+                  shiny::actionButton("create_gedcom", icon = shiny::icon("plus-square"), "Create GEDCOM file")
+    ),
+    
+    shiny::column(5,
+                  shiny::fileInput("read_file", NULL, buttonLabel = "Import GEDCOM file",
                                    multiple = FALSE,
                                    accept = ".ged")
     ),
-    shiny::column(4, shiny::tags$br(),
-                  shiny::actionButton("create_gedcom", icon = shiny::icon("plus-square"), "Create GEDCOM file")
-    ),
-    shiny::column(4, shiny::tags$br(),
+    
+    shiny::column(3,
                   shinyjs::disabled(
                     shiny::downloadButton("export_gedcom", "Export to GEDCOM file")
                   )
     )
+    
   ),
-  
-  shinyjs::hidden(
-    shiny::fluidRow(id = "tabs",
-                    shiny::column(12,
-                                  shiny::tabsetPanel(
+
+shinyjs::hidden(
+  shiny::fluidRow(id = "tabs",
+                  shiny::column(12,
+                                shiny::tabsetPanel(
                                     shiny::tabPanel("GEDCOM File", file_ui("file")),
                                     shiny::tabPanel("Submitter", submitter_ui("subm")),
                                     shiny::tabPanel("Individuals", individual_ui("indi")),

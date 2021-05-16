@@ -19,24 +19,25 @@ file_details_ui <- function(id) {
   )
 }
 
-file_details_server <- function(id, ged = NULL) {
+file_details_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     
     
-    observeEvent(ged(), {
+    observeEvent(r$ged, {
       shiny::updateTextInput(session = session, "receiving_sys", 
-                             value = tidyged.internals::gedcom_value(ged(), "HD", "DEST", 1))
+                             value = tidyged.internals::gedcom_value(r$ged, "HD", "DEST", 1))
       shiny::updateSelectInput(session = session, "language", 
-                             selected = tidyged.internals::gedcom_value(ged(), "HD", "LANG", 1))
+                             selected = tidyged.internals::gedcom_value(r$ged, "HD", "LANG", 1))
       shiny::updateTextAreaInput(session = session, "ged_desc", 
-                               value = tidyged.internals::gedcom_value(ged(), "HD", "NOTE", 1))
+                               value = tidyged.internals::gedcom_value(r$ged, "HD", "NOTE", 1))
       shiny::updateTextAreaInput(session = session, "ged_copy", 
-                                 value = tidyged.internals::gedcom_value(ged(), "HD", "COPR", 1))
+                                 value = tidyged.internals::gedcom_value(r$ged, "HD", "COPR", 1))
     })
     
     observeEvent(input$receiving_sys, {
+      req(r$ged)
       shiny::isolate(
-        ged <- dplyr::mutate(ged(), value = ifelse(tag == "DEST", "New", value))
+        r$ged <- dplyr::mutate(r$ged, value = ifelse(tag == "DEST", "New", value))
       )
     })
     
@@ -62,11 +63,12 @@ file_details_server <- function(id, ged = NULL) {
 }
 
 file_details_app <- function(ged = NULL) {
+  r <- shiny::reactiveValues(ged = ged)
   ui <- shiny::fluidPage(
     file_details_ui("file_details")
   )
   server <- function(input, output, session) {
-    file_details_server("file_details", shiny::reactive(ged))
+    file_details_server("file_details", r)
   }
   shiny::shinyApp(ui, server)  
 }

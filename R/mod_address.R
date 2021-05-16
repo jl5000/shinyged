@@ -37,8 +37,15 @@ address_ui <- function(id) {
 }
 
 
-address_server <- function(id, addr = NULL) {
+address_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
+    
+    addr <- shiny::reactive({
+      req(r$ged, r$section_rows)
+      dplyr::slice(r$ged, r$section_rows) %>%
+        dplyr::filter(tag %in% c("ADDR",paste0("ADR",1:3),"CITY","STAE","POST",
+                                 "CTRY","EMAIL","PHON","FAX","WWW"))
+    })
     
     observeEvent(addr(), {
       shiny::updateTextAreaInput(session = session, "adr", 
@@ -73,11 +80,12 @@ address_server <- function(id, addr = NULL) {
 
 
 address_app <- function(addr = NULL) {
+  r <- shiny::reactiveValues(ged = ged, section_rows = section_rows)
   ui <- shiny::fluidPage(
     address_ui("address")
   )
   server <- function(input, output, session) {
-    address_server("address", shiny::reactive(addr))
+    address_server("address", r)
   }
   shiny::shinyApp(ui, server)  
 }

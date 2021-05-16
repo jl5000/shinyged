@@ -6,7 +6,7 @@ notes_ui <- function(id) {
   shiny::tagList(
     shinyjs::useShinyjs(),
     shiny::tags$br(),
-    shiny::helpText("Here you can manage notes associated with an item.", 
+    shiny::helpText("Here you can manage notes associated with an item. You can either add notes via the text box or point to existing note records.", 
                     "Use the buttons to add, remove, and edit notes via the text box and by selecting notes in the list."),
     shiny::tags$hr(),
     DT::DTOutput(ns("notes_list")),
@@ -77,7 +77,7 @@ notes_server <- function(id, r) {
       shinyjs::toggleState("add_note", valid_note())
     })
     
-    # Disable choose_note_ref button if no note records
+    # Disable choose_note_ref button if no note records to point to
     shiny::observeEvent(r$ged, {
       shinyjs::toggleState("choose_note_ref", tidyged::num_note(r$ged) > 0)
     })
@@ -132,7 +132,7 @@ notes_server <- function(id, r) {
      )
    })
    
-   # Disable choose_note_ref button if no note records
+   # Disable add_note_ref button if no note records or it's already been added
    shiny::observeEvent(input$note_ref_list, ignoreNULL = FALSE, {
      shinyjs::toggleState("add_note_ref", !is.null(input$note_ref_list) && 
                             !input$note_ref_list %in% notes_txt())

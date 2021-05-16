@@ -24,13 +24,13 @@ repository_ui <- function(id) {
   )
 }
 
-repository_server <- function(id, ged = NULL) {
+repository_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     
     records <- shiny::reactive({
-      req(ged)
-      tidyged::xrefs_repo(ged()) %>% 
-        tidyged::describe_records(ged(), ., short_desc = TRUE)
+      req(r$ged)
+      tidyged::xrefs_repo(r$ged) %>% 
+        tidyged::describe_records(r$ged, ., short_desc = TRUE)
     })
     
     observeEvent(ged(), {
@@ -45,11 +45,12 @@ repository_server <- function(id, ged = NULL) {
 }
 
 repository_app <- function(ged = NULL) {
+  r <- shiny::reactiveValues(ged = ged)
   ui <- shiny::fluidPage(
     repository_ui("repo")
   )
   server <- function(input, output, session) {
-    repository_server("repo", shiny::reactive(ged))
+    repository_server("repo", r)
   }
   shiny::shinyApp(ui, server)  
 }
