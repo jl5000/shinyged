@@ -29,14 +29,17 @@ notes_ui <- function(id) {
 }
 
 
-notes_server <- function(id, r) {
+notes_server <- function(id, r, section_rows) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
+    section <- shiny::reactiveValues(rows = section_rows)
+
     # The vector of notes
     notes_raw <- shiny::reactive({
-      req(r$ged, r$section_rows)
-      dplyr::slice(r$ged, r$section_rows) %>%
+      req(r$ged, section$rows)
+      
+      dplyr::slice(r$ged, section$rows) %>%
         dplyr::filter(level == .$level[1] + 1, tag == "NOTE") %>% 
         dplyr::pull(value)
     })
@@ -44,10 +47,12 @@ notes_server <- function(id, r) {
     # The vector of notes, but with references to global notes replaced with note text
     notes_txt <- shiny::reactive({
       req(notes_raw)
+      
       vapply(notes_raw(), function(nt) {if(stringr::str_detect(nt, tidyged.internals::reg_xref()))
                                         dplyr::filter(r$ged, record == nt, level == 0)$value else
                                         nt},
-             character(1))
+             character(1),
+             USE.NAMES = FALSE)
     })
     
     # A running check on the text box to see if the note is valid
@@ -58,13 +63,18 @@ notes_server <- function(id, r) {
       })
     
     # The row of the tidyged object corresponding to the selected note
-    selected_ged_row <- shiny::reactive({
-      req(r$ged, r$section_rows, input$notes_list_rows_selected)
-      dplyr::mutate(r$ged, row = dplyr::row_number()) %>% 
-        dplyr::slice(r$section_rows) %>%
-        dplyr::filter(level == .$level[1] + 1, tag == "NOTE") %>% 
-        dplyr::slice(input$notes_list_rows_selected) %>% 
-        dplyr::pull(row)
+    selected_ged_row <- shiny::eventReactive({
+      r$ged
+      section$rows
+      input$notes_list_rows_selected
+    },{
+      req(r$ged, section$rows, input$notes_list_rows_selected)
+
+        dplyr::mutate(r$ged, row = dplyr::row_number()) %>% 
+          dplyr::slice(section$rows) %>%
+          dplyr::filter(level == .$level[1] + 1, tag == "NOTE") %>% 
+          dplyr::slice(input$notes_list_rows_selected) %>% 
+          dplyr::pull(row)
     })
     
     # Update table with notes
@@ -86,7 +96,10 @@ notes_server <- function(id, r) {
     shiny::observeEvent({
       valid_note()
       input$notes_list_rows_selected}, ignoreNULL = FALSE, {
-      shinyjs::toggleState("update_note", valid_note() && !is.null(input$notes_list_rows_selected))
+      shinyjs::toggleState("update_note", valid_note() && 
+                                          !is.null(input$notes_list_rows_selected) && 
+                                          !stringr::str_detect(notes_raw()[input$notes_list_rows_selected], 
+                                                               tidyged.internals::reg_xref()))
     })
     
    # Update text box with selected note and disable update/remove buttons if nothing selected
@@ -101,18 +114,18 @@ notes_server <- function(id, r) {
    
    # Add note and clear text box
    shiny::observeEvent(input$add_note, {
-     # Don't trigger changes from ged because we also need to update section_rows
+
      shiny::isolate(
        r$ged <- tibble::add_row(r$ged,
-                                tibble::tibble(record = r$ged$record[r$section_rows[1]],
-                                               level = r$ged$level[r$section_rows[1]] + 1,
+                                tibble::tibble(record = r$ged$record[section$rows[1]],
+                                               level = r$ged$level[section$rows[1]] + 1,
                                                tag = "NOTE",
                                                value = input$note_text),
                                 # Need to insert new notes after final note so it
                                 # doesn't shift existing row numbers
-                                .after = max(r$section_rows))
+                                .after = max(section$rows))
      )
-     r$section_rows <- c(r$section_rows, max(r$section_rows) + 1)
+     section$rows <- c(section$rows, max(section$rows) + 1)
      shiny::updateTextAreaInput(inputId = "note_text", value = "")
    })
    
@@ -141,29 +154,28 @@ notes_server <- function(id, r) {
    # Add note reference
    shiny::observeEvent(input$add_note_ref, {
      note_xref <- dplyr::filter(r$ged, level == 0, tag == "NOTE", value == input$note_ref_list)$record
-     # Don't trigger changes from ged because we also need to update section_rows
+     
      shiny::isolate(
        r$ged <- tibble::add_row(r$ged,
-                                tibble::tibble(record = r$ged$record[r$section_rows[1]],
-                                               level = r$ged$level[r$section_rows[1]] + 1,
+                                tibble::tibble(record = r$ged$record[section$rows[1]],
+                                               level = r$ged$level[section$rows[1]] + 1,
                                                tag = "NOTE",
                                                value = note_xref),
                                 # Need to insert new notes after final note so it
                                 # doesn't shift existing row numbers
-                                .after = max(r$section_rows))
+                                .after = max(section$rows))
      )
-     r$section_rows <- c(r$section_rows, max(r$section_rows) + 1)
+     section$rows <- c(section$rows, max(section$rows) + 1)
      
      shiny::removeModal()
    })
    
    # Remove note and clear text box
    shiny::observeEvent(input$remove_note, {
-       shiny::isolate(
-         r$ged <- dplyr::slice(r$ged, -selected_ged_row())
-       )
-       r$section_rows <- r$section_rows[-length(r$section_rows)]
-       shiny::updateTextAreaInput(inputId = "note_text", value = "")
+     shiny::isolate(r$ged <- dplyr::slice(r$ged, -selected_ged_row()))
+     section$rows <- section$rows[-length(section$rows)]
+     
+     shiny::updateTextAreaInput(inputId = "note_text", value = "")
    })
    
    # Update note
@@ -176,12 +188,12 @@ notes_server <- function(id, r) {
 
 
 notes_app <- function(ged = NULL, section_rows = NULL) {
-  r <- shiny::reactiveValues(ged = ged, section_rows = section_rows)
+  r <- shiny::reactiveValues(ged = ged)
   ui <- shiny::fluidPage(
     notes_ui("notes")
   )
   server <- function(input, output, session) {
-    notes_server("notes", r)
+    notes_server("notes", r, section_rows)
   }
   shiny::shinyApp(ui, server)  
 }
