@@ -17,6 +17,7 @@ Imports:
     shiny (>= 1.6.0),
     shinyBS,
     shinyjs,
+    shinyFeedback,
     tidyged,
     tidyged.io,
     magrittr

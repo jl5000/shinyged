@@ -42,10 +42,8 @@ update_ged_value <- function(r, section, tag_order, lvl, tags, new_value = chara
   TRUE
 }
 
-split_multiline <- function(multiline, max_lines) {
-
-  multiline <- unlist(strsplit(multiline, "\n"))
-  multiline <- unique(multiline[multiline != ""])
-  if(length(multiline) > max_lines) multiline <- multiline[1:max_lines]
-  multiline
+process_input <- function(input) {
+  input <- unlist(strsplit(input, "\n"))
+  input <- unique(input[input != ""])
+  input
 }
