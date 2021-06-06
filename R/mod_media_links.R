@@ -10,7 +10,7 @@ media_links_ui <- function(id) {
   
 }
 
-media_links_server <- function(id, media_links = NULL) {
+media_links_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     
     
@@ -20,12 +20,13 @@ media_links_server <- function(id, media_links = NULL) {
 }
 
 
-media_links_app <- function(media_links = NULL) {
+media_links_app <- function(ged = NULL, section_rows = NULL) {
+  r <- shiny::reactiveValues(ged = ged, section_rows = section_rows)
   ui <- shiny::fluidPage(
     media_links_ui("media")
   )
   server <- function(input, output, session) {
-    media_links_server("media", shiny::reactive(media_links))
+    media_links_server("media", r)
   }
   shiny::shinyApp(ui, server)  
 }

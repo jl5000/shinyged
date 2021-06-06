@@ -25,8 +25,7 @@ The package is part of the `gedcompendium` ecosystem of packages. This ecosystem
 ```{r, echo=FALSE, out.width="65%", fig.align='center'}
 knitr::include_graphics("man/figures/allhex.png")
 ```
- <br>
-Please get in touch if you'd like to help create a shiny app. I have no experience and could do with some help.
+
 
 ## Installation
 

@@ -19,53 +19,55 @@ submitter_ui <- function(id) {
   )
 }
 
-submitter_server <- function(id, ged = NULL) {
+submitter_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     
-    subm <- reactive({
-      req(ged)
-      tidyged::xrefs_subm(ged())
+    shiny::observeEvent(r$ged, priority = 2, { # want this to fire first
+      req(r$ged)
+      subm_xref <- tidyged::xrefs_subm(r$ged)
+      r$subm_rows <- which(r$ged$record == subm_xref)
+      r$subm_addr_rows <- which(r$ged$record == subm_xref &
+                                  r$ged$tag %in% .pkgenv$tags_addr)
     })
     
-    addr <- reactive({
-      req(ged, subm)
-      dplyr::filter(ged(), record == subm(),
-                    tag %in% c(paste0("ADR",1:3),"CITY","STAE","POST","CTRY","EMAIL","WWW","FAX","PHON"))
+    subm <- shiny::reactive({
+      req(r$ged, r$subm_rows)
+      r$ged[r$subm_rows,]
     })
 
-    notes <- reactive({
-      req(ged, subm)
-      dplyr::filter(ged(), record == subm(), tag == "NOTE")$value
-    })
+    
+    shiny::observeEvent(subm(), print(subm()))
 
-    media_links <- reactive({
-      req(ged, subm)
-      dplyr::filter(ged(), record == subm(), tag == "OBJE")$value
+    shiny::observeEvent(subm(), once = TRUE, {
+      shiny::updateTextInput(session = session, "subm_name",
+                             value = dplyr::filter(subm(), tag == "NAME")$value)
     })
     
-    observeEvent(ged(), {
-      
-      shiny::updateTextInput(session = session, "subm_name", 
-                             value = dplyr::filter(ged(), record == subm(), tag == "NAME")$value)
+    shiny::observeEvent(input$subm_name, ignoreNULL = FALSE, ignoreInit = TRUE, {
+      subm_name <- process_input(input$subm_name)
+      err <- tidyged.internals::chk_submitter_name(subm_name, 1)
+      shinyFeedback::feedbackDanger("subm_name", !is.null(err), err)
+      req(is.null(err), cancelOutput = TRUE)
+      dummy <- update_ged_value(r, "subm_rows", 1, "NAME", subm_name)
     })
     
-    address_server("subm_address", addr) #Problem
-    notes_server("subm_notes", notes)
-    media_links_server("subm_media", media_links)
-    
+    address_server("subm_address", r, "subm_addr_rows")
+    notes_server("subm_notes", r, "subm_rows")
+    #media_links_server("subm_media", r, "subm_rows")
     
   })
 }
 
 
 submitter_app <- function(ged = NULL) {
+  r <- shiny::reactiveValues(ged = ged)
   ui <- shiny::fluidPage(
     submitter_ui("submitter")
   )
   server <- function(input, output, session) {
-    submitter_server("submitter", shiny::reactive(ged))
+    submitter_server("submitter", r)
   }
-  shiny::shinyApp(ui, server)  
+  shiny::shinyApp(ui, server)
 }
 
 

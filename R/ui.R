@@ -4,6 +4,7 @@
 
 shiny::shinyUI(shiny::fluidPage(
   shinyjs::useShinyjs(),
+  shinyFeedback::useShinyFeedback(),
   # Application title
   #tags$img(src = "logo.png"),
   shiny::titlePanel("shinyged"),

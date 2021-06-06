@@ -34,30 +34,34 @@ file_details_server <- function(id, r) {
                                  value = tidyged.internals::gedcom_value(r$ged, "HD", "COPR", 1))
     })
     
-    observeEvent(input$receiving_sys, {
-      req(r$ged)
-      shiny::isolate(
-        r$ged <- dplyr::mutate(r$ged, value = ifelse(tag == "DEST", "New", value))
-      )
+    shiny::observeEvent(input$receiving_sys, ignoreNULL = FALSE, ignoreInit = TRUE, {
+      receiving_sys <- process_input(input$receiving_sys)
+      err <- tidyged.internals::chk_receiving_system_name(receiving_sys, 1)
+      shinyFeedback::feedbackDanger("receiving_sys", !is.null(err), err)
+      req(is.null(err), cancelOutput = TRUE)
+      dummy <- update_ged_value(r, "head_rows", 1, "DEST", receiving_sys)
     })
-    
-    # observeEvent(input$language, {
-    #   shiny::isolate(
-    #     # ged <- tidyged.internals::update(ged())
-    #   )
-    # })
-    # 
-    # observeEvent(input$ged_desc, {
-    #   shiny::isolate(
-    #     # ged <- tidyged.internals::update(ged())
-    #   )
-    # })
-    # 
-    # observeEvent(input$ged_copy, {
-    #   shiny::isolate(
-    #     # ged <- tidyged.internals::update(ged())
-    #   )
-    # })
+    shiny::observeEvent(input$language, ignoreNULL = FALSE, ignoreInit = TRUE, {
+      language <- process_input(input$language)
+      err <- tidyged.internals::chk_language_of_text(language, 1)
+      shinyFeedback::feedbackDanger("language", !is.null(err), err)
+      req(is.null(err), cancelOutput = TRUE)
+      dummy <- update_ged_value(r, "head_rows", 1, "LANG", language)
+    })
+    shiny::observeEvent(input$ged_desc, ignoreNULL = FALSE, ignoreInit = TRUE, {
+      ged_desc <- process_input(input$ged_desc)
+      err <- tidyged.internals::chk_gedcom_content_description(ged_desc, 1)
+      shinyFeedback::feedbackDanger("ged_desc", !is.null(err), err)
+      req(is.null(err), cancelOutput = TRUE)
+      dummy <- update_ged_value(r, "head_rows", 1, "NOTE", ged_desc)
+    })
+    shiny::observeEvent(input$ged_copy, ignoreNULL = FALSE, ignoreInit = TRUE, {
+      ged_copy <- process_input(input$ged_copy)
+      err <- tidyged.internals::chk_copyright_gedcom_file(ged_copy, 1)
+      shinyFeedback::feedbackDanger("ged_copy", !is.null(err), err)
+      req(is.null(err), cancelOutput = TRUE)
+      dummy <- update_ged_value(r, "head_rows", 1, "COPR", ged_copy)
+    })
     
   })
 }

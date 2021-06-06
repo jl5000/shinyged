@@ -2,7 +2,11 @@
 
 shiny::shinyServer(function(input, output, session) {
 
-    r <- shiny::reactiveValues(ged = NULL)
+    r <- shiny::reactiveValues(ged = NULL,
+                               subm_rows = NULL,
+                               subm_addr_rows = NULL,
+                               head_rows = NULL,
+                               head_file_sour_rows = NULL)
     
     shiny::observeEvent(input$read_file, {
         r$ged <- tidyged.io::read_gedcom(input$read_file$datapath)
@@ -18,7 +22,7 @@ shiny::shinyServer(function(input, output, session) {
     })
     
     file_server("file", r)
-    # submitter_server("subm", r)
+    #submitter_server("subm", r)
     # individual_server("indi", r)
     # family_server("famg", r)
     # source_server("sour", r)
