@@ -9,11 +9,44 @@ shiny::shinyServer(function(input, output, session) {
                                head_file_sour_rows = NULL)
     
     shiny::observeEvent(input$read_file, {
-        r$ged <- tidyged.io::read_gedcom(input$read_file$datapath)
+        if(!is.null(r$ged)) {
+            shiny::showModal(
+                shiny::modalDialog(
+                    title = "Export existing file?",
+                    easyClose = FALSE,
+                    footer = shiny::tagList(
+                        shiny::modalButton("Cancel"),
+                        shiny::actionButton("discard", "Discard"),
+                        shiny::actionButton("export_before_new", "Export")
+                    )
+                )
+            )
+        } else {
+            r$ged <- tidyged.io::read_gedcom(input$read_file$datapath)
+        }
     })
     
     shiny::observeEvent(input$create_gedcom, {
+        if(!is.null(r$ged)) {
+            shiny::showModal(
+                shiny::modalDialog(
+                    title = "Export existing file?",
+                    easyClose = FALSE,
+                    footer = shiny::tagList(
+                        shiny::modalButton("Cancel"),
+                        shiny::actionButton("discard", "Discard"),
+                        shiny::actionButton("export_before_new", "Export")
+                    )
+                )
+            )
+        } else {
+            r$ged <- tidyged::gedcom()
+        }
+    })
+    
+    shiny::observeEvent(input$discard, {
         r$ged <- tidyged::gedcom()
+        shiny::removeModal()
     })
     
     shiny::observeEvent(r$ged, {
@@ -22,7 +55,7 @@ shiny::shinyServer(function(input, output, session) {
     })
     
     file_server("file", r)
-    #submitter_server("subm", r)
+    submitter_server("subm", r)
     # individual_server("indi", r)
     # family_server("famg", r)
     # source_server("sour", r)
@@ -36,6 +69,12 @@ shiny::shinyServer(function(input, output, session) {
             tidyged.io::write_gedcom(r$ged, file)
         }
     )
+    
+    shiny::observeEvent(input$export_before_new, {
+        shiny::removeModal()
+        output$export_gedcom #TODO: Get this working
+    })
+    
     
     
 

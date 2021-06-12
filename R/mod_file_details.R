@@ -23,7 +23,7 @@ file_details_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     
     
-    observeEvent(r$ged, {
+    shiny::observeEvent(r$ged, once = TRUE, {
       shiny::updateTextInput(session = session, "receiving_sys", 
                              value = tidyged.internals::gedcom_value(r$ged, "HD", "DEST", 1))
       shiny::updateSelectInput(session = session, "language", 
@@ -65,16 +65,4 @@ file_details_server <- function(id, r) {
     
   })
 }
-
-file_details_app <- function(ged = NULL) {
-  r <- shiny::reactiveValues(ged = ged)
-  ui <- shiny::fluidPage(
-    file_details_ui("file_details")
-  )
-  server <- function(input, output, session) {
-    file_details_server("file_details", r)
-  }
-  shiny::shinyApp(ui, server)  
-}
-
 

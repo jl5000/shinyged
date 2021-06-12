@@ -30,15 +30,4 @@ file_summary_server <- function(id, r) {
   })
 }
 
-file_summary_app <- function(ged = NULL) {
-  r <- shiny::reactiveValues(ged = ged)
-  ui <- shiny::fluidPage(
-    file_summary_ui("file_summary")
-  )
-  server <- function(input, output, session) {
-    file_summary_server("file_summary", r)
-  }
-  shiny::shinyApp(ui, server)  
-}
-
 

@@ -35,9 +35,6 @@ submitter_server <- function(id, r) {
       r$ged[r$subm_rows,]
     })
 
-    
-    shiny::observeEvent(subm(), print(subm()))
-
     shiny::observeEvent(subm(), once = TRUE, {
       shiny::updateTextInput(session = session, "subm_name",
                              value = dplyr::filter(subm(), tag == "NAME")$value)
@@ -53,21 +50,8 @@ submitter_server <- function(id, r) {
     
     address_server("subm_address", r, "subm_addr_rows")
     notes_server("subm_notes", r, "subm_rows")
-    #media_links_server("subm_media", r, "subm_rows")
+    media_links_server("subm_media", r, "subm_rows")
     
   })
 }
-
-
-submitter_app <- function(ged = NULL) {
-  r <- shiny::reactiveValues(ged = ged)
-  ui <- shiny::fluidPage(
-    submitter_ui("submitter")
-  )
-  server <- function(input, output, session) {
-    submitter_server("submitter", r)
-  }
-  shiny::shinyApp(ui, server)
-}
-
 

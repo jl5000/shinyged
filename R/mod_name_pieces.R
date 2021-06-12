@@ -34,13 +34,3 @@ name_pieces_server <- function(id, name = NULL) {
   })
 }
 
-
-name_app <- function(name = NULL) {
-  ui <- shiny::fluidPage(
-    name_pieces_ui("name")
-  )
-  server <- function(input, output, session) {
-    name_pieces_server("name", shiny::reactive(name))
-  }
-  shiny::shinyApp(ui, server)  
-}

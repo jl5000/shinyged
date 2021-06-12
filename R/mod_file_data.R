@@ -23,7 +23,7 @@ file_data_ui <- function(id) {
 file_data_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     
-    shiny::observeEvent(r$ged, {
+    shiny::observeEvent(r$ged, once = TRUE, {
       shiny::updateTextInput(session = session, "ged_source_name", 
                              value = tidyged.internals::gedcom_value(r$ged, "HD", "DATA", 2))
       shiny::updateTextInput(session = session, "ged_source_date", 
@@ -67,16 +67,4 @@ file_data_server <- function(id, r) {
     
   })
 }
-
-file_data_app <- function(ged = NULL) {
-  r <- shiny::reactiveValues(ged = ged)
-  ui <- shiny::fluidPage(
-    file_data_ui("file_data")
-  )
-  server <- function(input, output, session) {
-    file_data_server("file_data", r)
-  }
-  shiny::shinyApp(ui, server)  
-}
-
 

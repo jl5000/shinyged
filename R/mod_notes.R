@@ -52,7 +52,7 @@ notes_server <- function(id, r, section_rows) {
              character(1),
              USE.NAMES = FALSE)
     })
-    
+
     # A running check on the text box to see if the note is valid
     valid_note <- shiny::reactive({
       !is.null(input$note_text) &&
@@ -178,16 +178,5 @@ notes_server <- function(id, r, section_rows) {
   })
 }
 
-
-notes_app <- function(ged = NULL, rows = NULL) {
-  r <- shiny::reactiveValues(ged = ged, section_rows = rows)
-  ui <- shiny::fluidPage(
-    notes_ui("notes")
-  )
-  server <- function(input, output, session) {
-    notes_server("notes", r)
-  }
-  shiny::shinyApp(ui, server)  
-}
 
 
