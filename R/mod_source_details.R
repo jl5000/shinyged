@@ -5,7 +5,6 @@ source_details_ui <- function(id) {
   ns <- shiny::NS(id)
   
   shiny::tagList(
-    shinyjs::useShinyjs(),
     shiny::tags$br()
   )
   

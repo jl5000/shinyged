@@ -4,7 +4,6 @@ media_links_ui <- function(id) {
   ns <- shiny::NS(id)
   
   shiny::tagList(
-    shinyjs::useShinyjs(),
     shiny::tags$br(),
     shiny::helpText("Here you can manage links to multimedia associated with an item.", 
                     "Use the buttons to add and remove links by selecting items in the list."),

@@ -6,7 +6,7 @@ individual_ui <- function(id) {
     shiny::tags$br(),
     shiny::fluidRow(
       shiny::column(6,
-                    shiny::selectizeInput(ns("records"), label = NULL, choices = NULL, 
+                    shiny::selectizeInput(ns("record"), label = NULL, choices = NULL, 
                                        multiple = TRUE, width = "500px", options = list(maxItems = 1))
       ),
       shiny::column(6,
@@ -16,54 +16,88 @@ individual_ui <- function(id) {
       
     ),
     
-    shiny::tabsetPanel(
-      shiny::tabPanel("Summary", individual_summary_ui(ns("individual_summary"))),
-      shiny::tabPanel("Names", individual_names_ui(ns("individual_names"))),
-      shiny::tabPanel("Facts", individual_facts_ui(ns("individual_facts"))),
-      shiny::tabPanel("Links", individual_links_ui(ns("individual_links"))),
-      shiny::tabPanel("Notes", notes_ui(ns("individual_notes"))),
-      shiny::tabPanel("Citations", citations_ui(ns("individual_citations"))),
-      shiny::tabPanel("Media", media_links_ui(ns("individual_media")))
-      
+    shinyjs::hidden(
+      shiny::fluidRow(id = ns("indi_tabs"),
+                      shiny::column(12,
+                                    shiny::tabsetPanel(
+                                      shiny::tabPanel("Summary", individual_summary_ui(ns("indi_summary"))),
+                                      shiny::tabPanel("Names", individual_names_ui(ns("indi_names"))),
+                                      shiny::tabPanel("Facts", individual_facts_ui(ns("indi_facts"))),
+                                      shiny::tabPanel("Links", individual_links_ui(ns("indi_links"))),
+                                      shiny::tabPanel("Notes", notes_ui(ns("indi_notes"))),
+                                      shiny::tabPanel("Citations", citations_ui(ns("indi_citations"))),
+                                      shiny::tabPanel("Media", media_links_ui(ns("indi_media")))
+                                    )
+                      )
+      )
     )
   )
 }
 
-individual_server <- function(id, ged = NULL) {
+individual_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     
+    # Update list of individuals
     records <- shiny::reactive({
-      req(ged)
-      tidyged::xrefs_indi(ged()) %>% 
-        tidyged::describe_records(ged(), ., short_desc = TRUE)
+      req(r$ged)
+      tidyged::xrefs_indi(r$ged) %>% 
+        tidyged::describe_records(r$ged, ., short_desc = TRUE)
     })
     
-    observeEvent(ged(), {
+    # Update choices with list of individuals and select one
+    observeEvent(records(), {
       if(!is.null(records())) {
-        shiny::updateSelectizeInput(session = session, inputId = "records", choices = records())
+        
+        if(is.null(r$indi_to_select)) {
+          current_selection <- input$record
+        } else {
+          current_selection <- r$indi_to_select
+        }
+        
+        shiny::updateSelectizeInput(session = session, inputId = "record", choices = records(), selected = current_selection)
       } else {
-        shiny::updateSelectizeInput(session = session, inputId = "records", choices = character(), selected = character())
+        shiny::updateSelectizeInput(session = session, inputId = "record", choices = character(), selected = character())
       }
+      r$indi_to_select <- NULL
     })
     
+    # Update indi_rows
+    shiny::observeEvent(input$record, {
+      req(input$record)
+      indi_xref <- stringr::str_extract(input$record, "@[a-zA-Z0-9]{1,20}@")
+      r$indi_rows <- which(r$ged$record == indi_xref)
+    })
+    
+    # Show/hide tabs and toggle delete button
+    shiny::observeEvent(input$record, ignoreNULL = FALSE, {
+      shinyjs::toggle("indi_tabs", condition = !is.null(input$record))
+      shinyjs::toggleState("delete", !is.null(input$record))
+    })
+    
+    # Add individual and set a flag to ensure it is selected
     observeEvent(input$add, {
-      ged <- tidyged::add_indi(ged())
+      r$ged <- tidyged::add_indi(r$ged)
+      indi_xrefs <- tidyged::xrefs_indi(r$ged)
+      last_indi <- tail(indi_xrefs, 1)
+      r$indi_to_select <- tidyged::describe_records(r$ged, last_indi, short_desc = TRUE)
     })
     
-    individual_summary_server("individual_summary", ged)
-    individual_names_server("individual_names", ged)
-    individual_facts_server("individual_facts", ged)
-    individual_links_server("individual_links", ged)
+    # Remove individual and set a flag to ensure the previous individual is selected
+    observeEvent(input$delete, {
+      indi_xref <- stringr::str_extract(input$record, "@[a-zA-Z0-9]{1,20}@")
+      r$ged <- tidyged::remove_indi(r$ged, indi_xref)
+      indi_xrefs <- tidyged::xrefs_indi(r$ged)
+      last_indi <- tail(indi_xrefs, 1)
+      r$indi_to_select <- tidyged::describe_records(r$ged, last_indi, short_desc = TRUE)
+    })
     
+    # individual_summary_server("indi_summary", r, "indi_rows")
+    # individual_names_server("indi_names", r, "indi_name_rows")
+    # individual_facts_server("indi_facts", r, "indi_fact_rows")
+    # individual_links_server("indi_links", r, "indi_links_rows")
+    notes_server("indi_notes", r, "indi_rows")
+    
+    media_links_server("indi_media", r, "indi_rows")
   })
 }
 
-individualApp <- function(ged = NULL) {
-  ui <- shiny::fluidPage(
-    individual_ui("indi")
-  )
-  server <- function(input, output, session) {
-    individual_server("indi", shiny::reactive(ged))
-  }
-  shiny::shinyApp(ui, server)  
-}

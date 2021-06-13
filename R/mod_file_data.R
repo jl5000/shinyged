@@ -8,7 +8,6 @@ file_data_ui <- function(id) {
   ns <- shiny::NS(id)
   
   shiny::tagList(
-    shinyjs::useShinyjs(),
     shiny::tags$br(),
     shiny::splitLayout(
       shiny::textInput(ns("ged_source_name"), "Source name"),
@@ -47,7 +46,6 @@ file_data_server <- function(id, r) {
     shiny::observeEvent(input$ged_source_date, ignoreNULL = FALSE, ignoreInit = TRUE, {
       ged_source_date <- process_input(input$ged_source_date)
       err <- tidyged.internals::chk_date_exact(ged_source_date, 1)
-      print(err)
       shinyFeedback::feedbackDanger("ged_source_date", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
       dummy <- update_ged_value(r, "head_file_sour_rows", 3, "DATE", ged_source_date, .pkgenv$tags_file_sour)

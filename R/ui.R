@@ -8,7 +8,12 @@ shiny::shinyUI(shiny::fluidPage(
   # Application title
   #tags$img(src = "logo.png"),
   shiny::titlePanel("shinyged"),
-  
+  shiny::helpText(shiny::h4("This app provides an interactive interface to the packages of the gedcompendium.",
+                            "This allows you to record genealogical data in the Genealogical Data Communication (GEDCOM) standard.")),
+  shiny::helpText(shiny::h4("Use the controls below to create a new GEDCOM file or import an existing file.",
+                            "None of your changes will be saved unless you export to a GEDCOM file.")),
+  shiny::helpText(shiny::h4("The app is only compatible with GEDCOM v5.5.5 files.")),
+  shiny::tags$hr(),
   shiny::fluidRow(
     
     shiny::column(3,         

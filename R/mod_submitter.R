@@ -29,7 +29,7 @@ submitter_server <- function(id, r) {
       r$subm_addr_rows <- which(r$ged$record == subm_xref &
                                   r$ged$tag %in% .pkgenv$tags_addr)
     })
-    
+
     subm <- shiny::reactive({
       req(r$ged, r$subm_rows)
       r$ged[r$subm_rows,]

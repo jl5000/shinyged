@@ -4,7 +4,6 @@ notes_ui <- function(id) {
   ns <- shiny::NS(id)
   
   shiny::tagList(
-    shinyjs::useShinyjs(),
     shiny::tags$br(),
     shiny::helpText("Here you can manage notes associated with an item. You can either add notes via the text box or point to existing note records.", 
                     "Use the buttons to add, remove, and edit notes via the text box and by selecting notes in the list."),
