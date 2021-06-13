@@ -86,6 +86,7 @@ individual_server <- function(id, r) {
     observeEvent(input$delete, {
       indi_xref <- stringr::str_extract(input$record, "@[a-zA-Z0-9]{1,20}@")
       r$ged <- tidyged::remove_indi(r$ged, indi_xref)
+      shiny::showNotification("Individual deleted")
       indi_xrefs <- tidyged::xrefs_indi(r$ged)
       last_indi <- tail(indi_xrefs, 1)
       r$indi_to_select <- tidyged::describe_records(r$ged, last_indi, short_desc = TRUE)

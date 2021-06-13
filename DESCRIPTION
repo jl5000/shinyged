@@ -18,6 +18,8 @@ Imports:
     shinyBS,
     shinyjs,
     shinyFeedback,
+    DiagrammeR,
+    stringr,
     tidyged,
     tidyged.io,
     magrittr

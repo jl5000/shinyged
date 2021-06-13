@@ -89,13 +89,15 @@ family_server <- function(id, r) {
     # Remove family and set a flag to ensure the previous family is selected
     observeEvent(input$delete, {
       famg_xref <- stringr::str_extract(input$record, "@[a-zA-Z0-9]{1,20}@")
-      r$ged <- tidyged::remove_famg(r$ged, famg_xref)
+      r$ged <- tidyged::remove_famg(r$ged, famg_xref, remove_individuals = input$and_members)
+      shiny::showNotification("Family deleted")
+      if(input$and_members) shiny::showNotification("Family members deleted")
       famg_xrefs <- tidyged::xrefs_famg(r$ged)
       last_famg <- tail(famg_xrefs, 1)
       r$famg_to_select <- tidyged::describe_records(r$ged, last_famg, short_desc = TRUE)
     })
     
-    # family_summary_server("family_summary", r)
+    family_summary_server("family_summary", r)
     # family_members_server("family_members", r)
     # family_events_server("family_events", r)
   })
