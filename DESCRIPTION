@@ -22,10 +22,12 @@ Imports:
     stringr,
     tidyged,
     tidyged.io,
+    visged,
     magrittr
 Suggests: 
     testthat (>= 3.0.0),
     roxytest
 Remotes:
     jl5000/tidyged,
-    jl5000/tidyged.io
+    jl5000/tidyged.io,
+    jl5000/visged

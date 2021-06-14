@@ -25,9 +25,9 @@ family_ui <- function(id) {
                                       shiny::tabPanel("Summary", family_summary_ui(ns("family_summary"))),
                                       shiny::tabPanel("Members", family_members_ui(ns("family_members"))),
                                       shiny::tabPanel("Events", family_events_ui(ns("family_events"))),
-                                      shiny::tabPanel("Notes", notes_ui(ns("family_notes"))),
-                                      shiny::tabPanel("Citations", citations_ui(ns("family_citations"))),
-                                      shiny::tabPanel("Media", media_links_ui(ns("family_media")))
+                                      shiny::tabPanel("Notes", notes_ui(ns("famg_notes"))),
+                                      shiny::tabPanel("Citations", citations_ui(ns("famg_citations"))),
+                                      shiny::tabPanel("Media", media_links_ui(ns("famg_media")))
                                     )
                       )
       )
@@ -65,7 +65,10 @@ family_server <- function(id, r) {
     })
     
     # Update famg_rows
-    shiny::observeEvent(input$record, {
+    shiny::observeEvent(priority = 2, {
+      r$ged
+      input$record
+    }, {
       req(input$record)
       famg_xref <- stringr::str_extract(input$record, "@[a-zA-Z0-9]{1,20}@")
       r$famg_rows <- which(r$ged$record == famg_xref)
@@ -100,6 +103,9 @@ family_server <- function(id, r) {
     family_summary_server("family_summary", r)
     # family_members_server("family_members", r)
     # family_events_server("family_events", r)
+    notes_server("famg_notes", r, "famg_rows")
+    
+    media_links_server("famg_media", r, "famg_rows")
   })
 }
 

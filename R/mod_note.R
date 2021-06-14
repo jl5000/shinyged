@@ -29,12 +29,3 @@ note_server <- function(id, notes = NULL) {
   })
 }
 
-note_app <- function(notes = NULL) {
-  ui <- shiny::fluidPage(
-    note_ui("note")
-  )
-  server <- function(input, output, session) {
-    note_server("note", shiny::reactive(notes))
-  }
-  shiny::shinyApp(ui, server)  
-}

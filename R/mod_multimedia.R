@@ -45,12 +45,4 @@ multimedia_server <- function(id, ged = NULL) {
   })
 }
 
-multimedia_app <- function(ged = NULL) {
-  ui <- shiny::fluidPage(
-    multimedia_ui("media")
-  )
-  server <- function(input, output, session) {
-    multimedia_server("media", shiny::reactive(ged))
-  }
-  shiny::shinyApp(ui, server)  
-}
+

@@ -11,7 +11,8 @@ shiny::shinyServer(function(input, output, session) {
                                indi_name_rows = NULL,
                                indi_fact_rows = NULL,
                                indi_links_rows = NULL,
-                               famg_rows = NULL)
+                               famg_rows = NULL,
+                               famg_event_rows = NULL)
     
     shiny::observeEvent(input$read_file, {
         if(!is.null(r$ged)) {

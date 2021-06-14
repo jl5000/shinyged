@@ -46,13 +46,4 @@ source_server <- function(id, r) {
   })
 }
 
-source_app <- function(ged = NULL) {
-  r <- shiny::reactiveValues(ged = ged)
-  ui <- shiny::fluidPage(
-    source_ui("sour")
-  )
-  server <- function(input, output, session) {
-    source_server("sour", r)
-  }
-  shiny::shinyApp(ui, server)  
-}
+

@@ -44,13 +44,3 @@ repository_server <- function(id, r) {
   })
 }
 
-repository_app <- function(ged = NULL) {
-  r <- shiny::reactiveValues(ged = ged)
-  ui <- shiny::fluidPage(
-    repository_ui("repo")
-  )
-  server <- function(input, output, session) {
-    repository_server("repo", r)
-  }
-  shiny::shinyApp(ui, server)  
-}

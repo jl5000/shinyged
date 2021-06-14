@@ -62,7 +62,10 @@ individual_server <- function(id, r) {
     })
     
     # Update indi_rows
-    shiny::observeEvent(input$record, {
+    shiny::observeEvent(priority = 2, {
+      input$record
+      r$ged
+    }, {
       req(input$record)
       indi_xref <- stringr::str_extract(input$record, "@[a-zA-Z0-9]{1,20}@")
       r$indi_rows <- which(r$ged$record == indi_xref)
