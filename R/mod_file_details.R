@@ -11,9 +11,9 @@ file_details_ui <- function(id) {
     
     shiny::textInput(ns("receiving_sys"), "Receiving system"),
     shiny::textAreaInput(ns("ged_desc"), "Description", resize = "vertical") %>%
-      shiny::tagAppendAttributes(style = 'width: 100%;'),
+      shiny::tagAppendAttributes(style = 'width: 85%;'),
     shiny::textAreaInput(ns("ged_copy"), "Copyright statement", resize = "vertical") %>%
-      shiny::tagAppendAttributes(style = 'width: 100%;'),
+      shiny::tagAppendAttributes(style = 'width: 85%;'),
     shiny::selectInput(ns("language"), "Language", 
                        choices = tidyged.internals::val_languages(), selected = character())
   )

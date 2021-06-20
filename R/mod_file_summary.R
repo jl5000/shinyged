@@ -16,7 +16,6 @@ file_summary_ui <- function(id) {
 
 file_summary_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
-    
     output$str <- shiny::renderPrint({
       req(r$ged)
       str(r$ged)

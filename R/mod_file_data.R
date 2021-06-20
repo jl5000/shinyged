@@ -14,7 +14,7 @@ file_data_ui <- function(id) {
       shiny::textInput(ns("ged_source_date"), "Publication date (e.g. 6 APR 1983)")
     ),
     shiny::textAreaInput(ns("ged_source_copy"), "Copyright", resize = "vertical") %>%
-      shiny::tagAppendAttributes(style = 'width: 100%;')
+      shiny::tagAppendAttributes(style = 'width: 85%;')
     
   )
 }

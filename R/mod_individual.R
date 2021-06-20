@@ -95,12 +95,12 @@ individual_server <- function(id, r) {
       r$indi_to_select <- tidyged::describe_records(r$ged, last_indi, short_desc = TRUE)
     })
     
-    # individual_summary_server("indi_summary", r, "indi_rows")
-    # individual_names_server("indi_names", r, "indi_name_rows")
-    # individual_facts_server("indi_facts", r, "indi_fact_rows")
-    # individual_links_server("indi_links", r, "indi_links_rows")
+    # individual_summary_server("indi_summary", r)
+    # individual_names_server("indi_names", r)
+    # individual_facts_server("indi_facts", r)
+    # individual_links_server("indi_links", r)
     notes_server("indi_notes", r, "indi_rows")
-    
+    citations_server("indi_citations", r, "indi_rows")
     media_links_server("indi_media", r, "indi_rows")
   })
 }

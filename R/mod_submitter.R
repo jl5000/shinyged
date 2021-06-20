@@ -34,7 +34,7 @@ submitter_server <- function(id, r) {
       req(r$ged, r$subm_rows)
       r$ged[r$subm_rows,]
     })
-
+    
     shiny::observeEvent(subm(), once = TRUE, {
       shiny::updateTextInput(session = session, "subm_name",
                              value = dplyr::filter(subm(), tag == "NAME")$value)

@@ -104,7 +104,7 @@ family_server <- function(id, r) {
     # family_members_server("family_members", r)
     # family_events_server("family_events", r)
     notes_server("famg_notes", r, "famg_rows")
-    
+    citations_server("famg_citations", r, "famg_rows")
     media_links_server("famg_media", r, "famg_rows")
   })
 }

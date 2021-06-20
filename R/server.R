@@ -3,6 +3,7 @@
 shiny::shinyServer(function(input, output, session) {
 
     r <- shiny::reactiveValues(ged = NULL,
+                               citation_rows = NULL,
                                subm_rows = NULL,
                                subm_addr_rows = NULL,
                                head_rows = NULL,
@@ -19,6 +20,7 @@ shiny::shinyServer(function(input, output, session) {
             shiny::showModal(
                 shiny::modalDialog(
                     shiny::h4("If you continue, the current app data will be overwritten.",
+                              shiny::br(),
                               "Would you like to Cancel and export your data to file first, 
                               or Discard existing data and import the file?"),
                     title = "Continue?",
@@ -44,6 +46,7 @@ shiny::shinyServer(function(input, output, session) {
             shiny::showModal(
                 shiny::modalDialog(
                     shiny::h4("If you continue, the current app data will be overwritten.",
+                              shiny::br(),
                               "Would you like to Cancel and export your data to file first, 
                               or Discard existing data and create a new file?"),
                     title = "Continue?",

@@ -17,7 +17,7 @@ note_ui <- function(id) {
       
     ),
     shiny::textAreaInput(ns("note_text"), "Edit note...", height = "150px") %>%
-      shiny::tagAppendAttributes(style = 'width: 100%;')
+      shiny::tagAppendAttributes(style = 'width: 85%;')
   )
 }
 
