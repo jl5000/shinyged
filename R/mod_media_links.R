@@ -37,7 +37,7 @@ media_links_server <- function(id, r, section_rows) {
     })
     
     media_desc <- shiny::reactive({
-      req(media_xrefs)
+      req(r$ged, media_xrefs)
       tidyged::describe_records(r$ged, media_xrefs())
     })
 

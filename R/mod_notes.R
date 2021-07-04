@@ -43,7 +43,7 @@ notes_server <- function(id, r, section_rows) {
     
     # The vector of notes, but with references to global notes replaced with note text
     notes_txt <- shiny::reactive({
-      req(notes_raw)
+      req(r$ged, notes_raw)
       vapply(notes_raw(), function(nt) {if(stringr::str_detect(nt, tidyged.internals::reg_xref()))
                                         dplyr::filter(r$ged, record == nt, level == 0)$value else
                                         nt},
