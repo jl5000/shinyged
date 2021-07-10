@@ -40,6 +40,7 @@ individual_server <- function(id, r) {
     # Update list of individuals
     records <- shiny::reactive({
       req(r$ged)
+
       tidyged::xrefs_indi(r$ged) %>% 
         tidyged::describe_records(r$ged, ., short_desc = TRUE)
     })
@@ -85,14 +86,12 @@ individual_server <- function(id, r) {
       r$indi_to_select <- tidyged::describe_records(r$ged, last_indi, short_desc = TRUE)
     })
     
-    # Remove individual and set a flag to ensure the previous individual is selected
+    # Remove individual and set a flag to ensure no individual is selected
     observeEvent(input$delete, {
       indi_xref <- stringr::str_extract(input$record, tidyged.internals::reg_xref(FALSE))
       r$ged <- tidyged::remove_indi(r$ged, indi_xref)
       shiny::showNotification("Individual deleted")
-      indi_xrefs <- tidyged::xrefs_indi(r$ged)
-      last_indi <- tail(indi_xrefs, 1)
-      r$indi_to_select <- tidyged::describe_records(r$ged, last_indi, short_desc = TRUE)
+      r$indi_to_select <- NULL
     })
     
     # individual_summary_server("indi_summary", r)

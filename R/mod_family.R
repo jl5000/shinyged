@@ -95,9 +95,7 @@ family_server <- function(id, r) {
       r$ged <- tidyged::remove_famg(r$ged, famg_xref, remove_individuals = input$and_members)
       shiny::showNotification("Family deleted")
       if(input$and_members) shiny::showNotification("Family members deleted")
-      famg_xrefs <- tidyged::xrefs_famg(r$ged)
-      last_famg <- tail(famg_xrefs, 1)
-      r$famg_to_select <- tidyged::describe_records(r$ged, last_famg, short_desc = TRUE)
+      r$famg_to_select <- NULL
     })
     
     family_summary_server("family_summary", r)
