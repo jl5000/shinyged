@@ -91,18 +91,19 @@ citations_server <- function(id, r, section_rows) {
       r$cit_to_select <- NULL
     })
     
-    # Show/hide tabs and toggle delete button
-    shiny::observeEvent(input$citation, ignoreNULL = FALSE, {
+    # Show/hide tabs and toggle delete button if no citation
+    # Disable add_citation button if no source records to point to
+    shiny::observeEvent({
+      input$citation
+      r$ged
+    }, ignoreNULL = FALSE, {
       shinyjs::toggle("citation_tabs", condition = !is.null(input$citation))
       shinyjs::toggleState("remove_citation", !is.null(input$citation))
+      shinyjs::toggleState("add_citation", tidyged::num_sour(r$ged) > 0)
       req(input$citation)
       r$citation_rows <- citations_rows()[[which(citations() == input$citation)]]
     })
     
-    # Disable add_citation button if no source records to point to
-    shiny::observeEvent(r$ged, {
-      shinyjs::toggleState("add_citation", tidyged::num_sour(r$ged) > 0)
-    })
 
     # Show dialog to choose a source record
     shiny::observeEvent(input$add_citation, {
