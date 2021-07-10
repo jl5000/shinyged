@@ -67,7 +67,7 @@ individual_server <- function(id, r) {
       r$ged
     }, {
       req(input$record)
-      indi_xref <- stringr::str_extract(input$record, "@[a-zA-Z0-9]{1,20}@")
+      indi_xref <- stringr::str_extract(input$record, tidyged.internals::reg_xref(FALSE))
       r$indi_rows <- which(r$ged$record == indi_xref)
     })
     
@@ -87,7 +87,7 @@ individual_server <- function(id, r) {
     
     # Remove individual and set a flag to ensure the previous individual is selected
     observeEvent(input$delete, {
-      indi_xref <- stringr::str_extract(input$record, "@[a-zA-Z0-9]{1,20}@")
+      indi_xref <- stringr::str_extract(input$record, tidyged.internals::reg_xref(FALSE))
       r$ged <- tidyged::remove_indi(r$ged, indi_xref)
       shiny::showNotification("Individual deleted")
       indi_xrefs <- tidyged::xrefs_indi(r$ged)

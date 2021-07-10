@@ -45,7 +45,8 @@ shinyjs::hidden(
                                     shiny::tabPanel("Notes", note_ui("note")),
                                     shiny::tabPanel("Multimedia", multimedia_ui("media")),
                                     shiny::tabPanel("Sources", source_ui("sour")),
-                                    shiny::tabPanel("Repositories", repository_ui("repo"))
+                                    shiny::tabPanel("Repositories", repository_ui("repo")),
+                                    shiny::tabPanel("GEDCOM", ged_debug_ui("debug"))
                                   )
                     )
                     

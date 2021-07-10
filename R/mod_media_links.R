@@ -95,7 +95,7 @@ media_links_server <- function(id, r, section_rows) {
     
     # Add media reference
     shiny::observeEvent(input$add_media_ref, {
-      media_xref <- stringr::str_extract(input$media_choice, "@[a-zA-Z0-9]{1,20}@")
+      media_xref <- stringr::str_extract(input$media_choice, tidyged.internals::reg_xref(FALSE))
       
       r$ged <- tibble::add_row(r$ged,
                                tibble::tibble(record = r$ged$record[r[[section_rows]][1]],

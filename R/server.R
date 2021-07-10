@@ -1,5 +1,5 @@
 
-
+options(shiny.error = browser)
 shiny::shinyServer(function(input, output, session) {
 
     r <- shiny::reactiveValues(ged = NULL,
@@ -80,6 +80,7 @@ shiny::shinyServer(function(input, output, session) {
     # repository_server("repo", r)
     # note_server("note", r)
     # multimedia_server("media", r)
+    ged_debug_server("debug", r)
     
     output$export_gedcom <- shiny::downloadHandler(
         filename = "from_shinyged.ged",

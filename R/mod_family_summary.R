@@ -1,6 +1,5 @@
 
 
-
 family_summary_ui <- function(id) {
   ns <- shiny::NS(id)
   
@@ -24,4 +23,3 @@ family_summary_server <- function(id, r) {
     
   })
 }
-
