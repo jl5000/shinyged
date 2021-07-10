@@ -5,6 +5,8 @@ ged_debug_ui <- function(id) {
   
   shiny::tagList(
     shiny::tags$br(),
+    shiny::helpText("indi_rows"),
+    shiny::textOutput(ns("indi_rows")),
     shiny::helpText("famg_rows"),
     shiny::textOutput(ns("famg_rows")),
     shiny::helpText("citation_rows"),
@@ -22,6 +24,11 @@ ged_debug_server <- function(id, r) {
     output$citation_rows <- shiny::renderText({
       req(r$citation_rows)
       r$citation_rows
+    })
+    
+    output$indi_rows <- shiny::renderText({
+      req(r$indi_rows)
+      r$indi_rows
     })
     
     output$famg_rows <- shiny::renderText({
