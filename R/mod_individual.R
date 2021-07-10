@@ -7,7 +7,7 @@ individual_ui <- function(id) {
     shiny::fluidRow(
       shiny::column(6,
                     shiny::selectizeInput(ns("record"), label = NULL, choices = NULL, 
-                                       multiple = TRUE, width = "500px", options = list(maxItems = 1))
+                                          multiple = TRUE, width = "500px", options = list(maxItems = 1))
       ),
       shiny::column(6,
                     shiny::actionButton(ns("add"), "Add individual"),

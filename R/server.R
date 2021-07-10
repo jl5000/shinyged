@@ -13,7 +13,10 @@ shiny::shinyServer(function(input, output, session) {
                                indi_fact_rows = NULL,
                                indi_links_rows = NULL,
                                famg_rows = NULL,
-                               famg_event_rows = NULL)
+                               famg_event_rows = NULL,
+                               media_rows = NULL,
+                               sour_rows = NULL,
+                               repo_rows = NULL)
     
     shiny::observeEvent(input$read_file, {
         if(!is.null(r$ged)) {
@@ -82,16 +85,16 @@ shiny::shinyServer(function(input, output, session) {
         family_server("famg", r)
     })
     shiny::observeEvent({input$tabset == "sour_tab"},once=TRUE,ignoreInit = TRUE, {
-        # source_server("sour", r)
+        source_server("sour", r)
     })
     shiny::observeEvent({input$tabset == "repo_tab"},once=TRUE,ignoreInit = TRUE, {
-        # repository_server("repo", r)
+        repository_server("repo", r)
     })
     shiny::observeEvent({input$tabset == "note_tab"},once=TRUE,ignoreInit = TRUE, {
         # note_server("note", r)
     })
     shiny::observeEvent({input$tabset == "media_tab"},once=TRUE,ignoreInit = TRUE, {
-        # multimedia_server("media", r)
+        multimedia_server("media", r)
     })
     shiny::observeEvent({input$tabset == "debug_tab"},once=TRUE,ignoreInit = TRUE, {
         ged_debug_server("debug", r)

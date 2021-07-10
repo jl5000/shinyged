@@ -89,7 +89,7 @@ family_server <- function(id, r) {
       r$famg_to_select <- tidyged::describe_records(r$ged, last_famg, short_desc = TRUE)
     })
     
-    # Remove family and set a flag to ensure the previous family is selected
+    # Remove family and set a flag to ensure no family is selected
     observeEvent(input$delete, {
       famg_xref <- stringr::str_extract(input$record, tidyged.internals::reg_xref(FALSE))
       r$ged <- tidyged::remove_famg(r$ged, famg_xref, remove_individuals = input$and_members)
