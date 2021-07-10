@@ -74,13 +74,29 @@ shiny::shinyServer(function(input, output, session) {
     
     file_server("file", r)
     submitter_server("subm", r)
-    individual_server("indi", r)
-    family_server("famg", r)
-    # source_server("sour", r)
-    # repository_server("repo", r)
-    # note_server("note", r)
-    # multimedia_server("media", r)
-    ged_debug_server("debug", r)
+
+    shiny::observeEvent({input$tabset == "indi_tab"},once=TRUE,ignoreInit = TRUE, {
+        individual_server("indi", r)
+    })
+    shiny::observeEvent({input$tabset == "famg_tab"},once=TRUE,ignoreInit = TRUE, {
+        family_server("famg", r)
+    })
+    shiny::observeEvent({input$tabset == "sour_tab"},once=TRUE,ignoreInit = TRUE, {
+        # source_server("sour", r)
+    })
+    shiny::observeEvent({input$tabset == "repo_tab"},once=TRUE,ignoreInit = TRUE, {
+        # repository_server("repo", r)
+    })
+    shiny::observeEvent({input$tabset == "note_tab"},once=TRUE,ignoreInit = TRUE, {
+        # note_server("note", r)
+    })
+    shiny::observeEvent({input$tabset == "media_tab"},once=TRUE,ignoreInit = TRUE, {
+        # multimedia_server("media", r)
+    })
+    shiny::observeEvent({input$tabset == "debug_tab"},once=TRUE,ignoreInit = TRUE, {
+        ged_debug_server("debug", r)
+    })
+    
     
     output$export_gedcom <- shiny::downloadHandler(
         filename = "from_shinyged.ged",
