@@ -32,6 +32,7 @@ repository_ui <- function(id) {
 
 repository_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
+    ns <- session$ns
     
     # Update list of repositories
     records <- shiny::reactive({
@@ -74,12 +75,36 @@ repository_server <- function(id, r) {
       shinyjs::toggleState("delete", !is.null(input$record))
     })
     
-    # Add repository and set a flag to ensure it is selected
-    observeEvent(input$add, {
-      r$ged <- tidyged::add_repo(r$ged) #TODO: Can't add empty repo - need modal to choose name
+    # Popup to to give repository name
+    shiny::observeEvent(input$add, {
+      req(r$ged)
+      shiny::showModal(
+        shiny::modalDialog(
+          shiny::helpText("The repository must be given a name."),
+          shiny::textInput(ns("repo_name"), label = "Repository name"),
+          footer = shiny::tagList(
+            shiny::modalButton("Cancel"),
+            shinyjs::disabled(shiny::actionButton(ns("add_repo"), "Add repository"))
+          )
+        )
+      )
+    })
+    
+    # Disable add_repo button if no valid name
+    shiny::observeEvent(input$repo_name, ignoreNULL = FALSE, ignoreInit = TRUE, {
+      repo_name <- process_input(input$repo_name)
+      err <- tidyged.internals::chk_name_of_repository(repo_name, 1)
+      shinyFeedback::feedbackDanger("repo_name", !is.null(err), err)
+      shinyjs::toggleState("add_repo", is.null(err) & input$repo_name != "")
+    })
+    
+    # Add repository
+    observeEvent(input$add_repo, {
+      r$ged <- tidyged::add_repo(r$ged, input$repo_name)
       repo_xrefs <- tidyged::xrefs_repo(r$ged)
       last_repo <- tail(repo_xrefs, 1)
       r$repo_to_select <- tidyged::describe_records(r$ged, last_repo, short_desc = TRUE)
+      shiny::removeModal()
     })
     
     # Remove repository and set a flag to ensure no repository is selected

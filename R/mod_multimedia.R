@@ -33,6 +33,7 @@ multimedia_ui <- function(id) {
 
 multimedia_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
+    ns <- session$ns
     
     # Update list of media
     records <- shiny::reactive({
