@@ -48,6 +48,7 @@ citations_server <- function(id, r, section_rows) {
                                                        containing_tags = "SOUR",
                                                        xrefs = r$ged$record[r[[section_rows]]][1])
       
+      req(rows_vect)
       split(rows_vect, cumsum(r$ged$tag[rows_vect] == "SOUR"))
 
     })
@@ -63,14 +64,14 @@ citations_server <- function(id, r, section_rows) {
                                                                "")},
                       character(1),
                       USE.NAMES = FALSE)
-      
+
       citations_rows() %>% 
         sapply(`[[`, 1) %>% 
         dplyr::slice(r$ged, .) %>% 
         dplyr::pull(value) %>% 
-        tidyged::describe_records(r$ged, ., short_desc = TRUE) %>% 
+        sapply(tidyged::describe_records, gedcom = r$ged, short_desc = TRUE) %>% #describe_records removes duplicates!!
         ifelse(pages == "", ., paste0(., " [", pages, "]")) %>% 
-        paste0(seq_along(.), ". ", .)
+        paste0(seq_along(.), ". ", .) # 1. 2. 3. etc.
   
     })
     
@@ -101,7 +102,7 @@ citations_server <- function(id, r, section_rows) {
       shinyjs::toggleState("remove_citation", !is.null(input$citation))
       shinyjs::toggleState("add_citation", tidyged::num_sour(r$ged) > 0)
       req(input$citation)
-      r$citation_rows <- citations_rows()[[which(citations() == input$citation)]]
+      r$citation_rows <- citations_rows()[[which(citations() == input$citation)]]#TODO: THis is trying to select a deleted citation (selectinput not empty)
     })
     
 
@@ -139,7 +140,12 @@ citations_server <- function(id, r, section_rows) {
                                # doesn't shift existing row numbers
                                .after = max(r[[section_rows]]))
 
-      r$cit_to_select <- paste0(length(citations()), ". ",
+      cits <- r$ged %>% 
+        dplyr::slice(c(r[[section_rows]], max(r[[section_rows]]) + 1)) %>% 
+        dplyr::filter(level == r$ged$level[r[[section_rows]][1]] + 1, tag == "SOUR") %>% 
+        dplyr::pull(value)
+
+      r$cit_to_select <- paste0(length(cits), ". ",
                                 tidyged::describe_records(r$ged, sour_xref, short_desc = TRUE))
       shiny::removeModal()
     })
@@ -147,11 +153,11 @@ citations_server <- function(id, r, section_rows) {
     # Remove citation
     shiny::observeEvent(input$remove_citation, {
       r$ged <- dplyr::slice(r$ged, -r$citation_rows)
-      r$cit_to_select <-"1"
+      r$cit_to_select <- NULL
     })
 
 
-    # citation_details_server("citation_details", r, "citation_rows")
+    #citation_details_server("citation_details", r, "citation_rows")
     notes_server("citation_notes", r, "citation_rows")
     media_links_server("citation_media", r, "citation_rows")
     

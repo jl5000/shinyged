@@ -36,7 +36,7 @@ repository_server <- function(id, r) {
     # Update list of repositories
     records <- shiny::reactive({
       req(r$ged)
-      
+
       tidyged::xrefs_repo(r$ged) %>% 
         tidyged::describe_records(r$ged, ., short_desc = TRUE)
     })
