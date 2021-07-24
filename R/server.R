@@ -1,5 +1,5 @@
 
-options(shiny.error = browser)
+
 shiny::shinyServer(function(input, output, session) {
 
     r <- shiny::reactiveValues(ged = NULL,

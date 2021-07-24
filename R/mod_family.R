@@ -21,7 +21,7 @@ family_ui <- function(id) {
     shinyjs::hidden(
       shiny::fluidRow(id = ns("famg_tabs"),
                       shiny::column(12,
-                                    shiny::tabsetPanel(
+                                    shiny::tabsetPanel(id = ns("tabset"),
                                       shiny::tabPanel("Summary", family_summary_ui(ns("family_summary"))),
                                       shiny::tabPanel("Members", family_members_ui(ns("family_members"))),
                                       shiny::tabPanel("Events", family_events_ui(ns("family_events"))),
@@ -99,11 +99,28 @@ family_server <- function(id, r) {
     })
     
     family_summary_server("family_summary", r)
-    # family_members_server("family_members", r)
-    # family_events_server("family_events", r)
-    notes_server("famg_notes", r, "famg_rows")
-    citations_server("famg_citations", r, "famg_rows")
-    media_links_server("famg_media", r, "famg_rows")
+    
+    shiny::observeEvent({input$tabset == "Members"},once=TRUE,ignoreInit = TRUE, {
+      family_members_server("family_members", r)
+    })
+    shiny::observeEvent({input$tabset == "Events"},once=TRUE,ignoreInit = TRUE, {
+      family_events_server("family_events", r)
+    })
+    shiny::observeEvent({input$tabset == "Notes"},once=TRUE,ignoreInit = TRUE, {
+      notes_server("famg_notes", r, "famg_rows")
+    })
+    shiny::observeEvent({input$tabset == "Citations"},once=TRUE,ignoreInit = TRUE, {
+      citations_server("famg_citations", r, "famg_rows")
+    })
+    shiny::observeEvent({input$tabset == "Media"},once=TRUE,ignoreInit = TRUE, {
+      media_links_server("famg_media", r, "famg_rows")
+    })
+    
+    
+   
+    
+    
+    
   })
 }
 

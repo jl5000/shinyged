@@ -19,7 +19,7 @@ individual_ui <- function(id) {
     shinyjs::hidden(
       shiny::fluidRow(id = ns("indi_tabs"),
                       shiny::column(12,
-                                    shiny::tabsetPanel(
+                                    shiny::tabsetPanel(id = ns("tabset"),
                                       shiny::tabPanel("Summary", individual_summary_ui(ns("indi_summary"))),
                                       shiny::tabPanel("Names", individual_names_ui(ns("indi_names"))),
                                       shiny::tabPanel("Facts", individual_facts_ui(ns("indi_facts"))),
@@ -36,7 +36,7 @@ individual_ui <- function(id) {
 
 individual_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
-    
+
     # Update list of individuals
     records <- shiny::reactive({
       req(r$ged)
@@ -94,13 +94,29 @@ individual_server <- function(id, r) {
       r$indi_to_select <- NULL
     })
     
-    # individual_summary_server("indi_summary", r)
-    # individual_names_server("indi_names", r)
-    # individual_facts_server("indi_facts", r)
-    # individual_links_server("indi_links", r)
-    notes_server("indi_notes", r, "indi_rows")
-    citations_server("indi_citations", r, "indi_rows")
-    media_links_server("indi_media", r, "indi_rows")
+    individual_summary_server("indi_summary", r)
+    
+    shiny::observeEvent({input$tabset == "Names"},once=TRUE,ignoreInit = TRUE, {
+      individual_names_server("indi_names", r)
+    })
+    shiny::observeEvent({input$tabset == "Facts"},once=TRUE,ignoreInit = TRUE, {
+      individual_facts_server("indi_facts", r)
+    })
+    shiny::observeEvent({input$tabset == "Links"},once=TRUE,ignoreInit = TRUE, {
+      individual_links_server("indi_links", r)
+    })
+    shiny::observeEvent({input$tabset == "Notes"},once=TRUE,ignoreInit = TRUE, {
+      notes_server("indi_notes", r, "indi_rows")
+    })
+    shiny::observeEvent({input$tabset == "Citations"},once=TRUE,ignoreInit = TRUE, {
+      citations_server("indi_citations", r, "indi_rows")
+    })
+    shiny::observeEvent({input$tabset == "Media"},once=TRUE,ignoreInit = TRUE, {
+      media_links_server("indi_media", r, "indi_rows")
+    })
+    
+    
+    
   })
 }
 

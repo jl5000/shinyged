@@ -19,7 +19,7 @@ multimedia_ui <- function(id) {
     shinyjs::hidden(
       shiny::fluidRow(id = ns("media_tabs"),
                       shiny::column(12,
-                                    shiny::tabsetPanel(
+                                    shiny::tabsetPanel(id = ns("tabset"),
                                       shiny::tabPanel("Summary", multimedia_summary_ui(ns("media_summary"))),
                                       shiny::tabPanel("Description", multimedia_description_ui(ns("media_description"))),
                                       shiny::tabPanel("Notes", notes_ui(ns("media_notes"))),
@@ -93,9 +93,16 @@ multimedia_server <- function(id, r) {
     })
     
     multimedia_summary_server("media_summary", r)
-    multimedia_description_server("media_description", r)
-    notes_server("media_notes", r, "media_rows")
-    citations_server("media_citations", r, "media_rows")
+    
+    shiny::observeEvent({input$tabset == "Description"},once=TRUE,ignoreInit = TRUE, {
+      multimedia_description_server("media_description", r)
+    })
+    shiny::observeEvent({input$tabset == "Notes"},once=TRUE,ignoreInit = TRUE, {
+      notes_server("media_notes", r, "media_rows")
+    })
+    shiny::observeEvent({input$tabset == "Citations"},once=TRUE,ignoreInit = TRUE, {
+      citations_server("media_citations", r, "media_rows")
+    })
     
   })
 }

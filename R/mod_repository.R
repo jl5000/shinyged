@@ -19,7 +19,7 @@ repository_ui <- function(id) {
     shinyjs::hidden(
       shiny::fluidRow(id = ns("repo_tabs"),
                       shiny::column(12,
-                                    shiny::tabsetPanel(
+                                    shiny::tabsetPanel(id = ns("tabset"),
                                       shiny::tabPanel("Summary", repository_summary_ui(ns("repo_summary"))),
                                       shiny::tabPanel("Details", repository_details_ui(ns("repo_details"))),
                                       shiny::tabPanel("Notes", notes_ui(ns("repo_notes")))
@@ -116,8 +116,15 @@ repository_server <- function(id, r) {
     })
     
     repository_summary_server("repo_summary", r)
-    repository_details_server("repo_details", r)
-    notes_server("repo_notes", r, "repo_rows")
+    
+    shiny::observeEvent({input$tabset == "Details"},once=TRUE,ignoreInit = TRUE, {
+      repository_details_server("repo_details", r)
+    })
+    shiny::observeEvent({input$tabset == "Notes"},once=TRUE,ignoreInit = TRUE, {
+      notes_server("repo_notes", r, "repo_rows")
+    })
+    
+    
     
   })
 }
