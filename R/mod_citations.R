@@ -3,13 +3,13 @@
 
 citations_ui <- function(id) {
   ns <- shiny::NS(id)
-  
+
   shiny::tagList(
     shiny::tags$br(),
-    shiny::helpText("Here you can manage citations associated with an item.", 
+    shiny::helpText("Here you can manage citations associated with an item.",
                     "Citations are links to sources that provide evidence for the item."),
     shiny::tags$hr(),
-    shiny::selectizeInput(ns("citation"), label = NULL, choices = NULL, 
+    shiny::selectizeInput(ns("citation"), label = NULL, choices = NULL,
                           multiple = TRUE, width = "750px", options = list(maxItems = 1)),
     shiny::fluidRow(
       shiny::column(12,
@@ -21,7 +21,7 @@ citations_ui <- function(id) {
     shinyjs::hidden(
       shiny::fluidRow(id = ns("citation_tabs"),
                       shiny::column(12,
-                                    shiny::tabsetPanel(
+                                    shiny::tabsetPanel(id = ns("tabset"),
                                       shiny::tabPanel("Details", citation_details_ui(ns("citation_details"))),
                                       shiny::tabPanel("Notes", notes_ui(ns("citation_notes"))),
                                       shiny::tabPanel("Media", media_links_ui(ns("citation_media")))
@@ -30,82 +30,92 @@ citations_ui <- function(id) {
       )
     )
   )
-  
-  
+
+
 }
 
 
 citations_server <- function(id, r, section_rows) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
-    
+
     # The list of rows in the tidyged object for each citation
     citations_rows <- shiny::reactive({
       req(r$ged, r[[section_rows]])
-      
-      rows_vect <- tidyged.internals::identify_section(r$ged, 
+
+      rows_vect <- tidyged.internals::identify_section(r$ged,
                                                        containing_level = r$ged$level[r[[section_rows]]][1] + 1,
                                                        containing_tags = "SOUR",
                                                        xrefs = r$ged$record[r[[section_rows]]][1])
-      
-      req(rows_vect)
+
       split(rows_vect, cumsum(r$ged$tag[rows_vect] == "SOUR"))
 
     })
-    
+
     # The vector of citation descriptions
     citations <- shiny::reactive({
       req(r$ged, citations_rows)
       
-      pages <- vapply(citations_rows(), function(rows) {ifelse("PAGE" %in% r$ged$tag[rows], 
-                                                               dplyr::slice(r$ged, rows) %>% 
-                                                                 dplyr::filter(tag == "PAGE") %>% 
-                                                                 dplyr::pull(value), 
+      if(length(citations_rows()) == 0) return(NULL)
+      
+      pages <- vapply(citations_rows(), function(rows) {ifelse("PAGE" %in% r$ged$tag[rows],
+                                                               dplyr::slice(r$ged, rows) %>%
+                                                                 dplyr::filter(tag == "PAGE") %>%
+                                                                 dplyr::pull(value),
                                                                "")},
                       character(1),
                       USE.NAMES = FALSE)
-
-      citations_rows() %>% 
-        sapply(`[[`, 1) %>% 
-        dplyr::slice(r$ged, .) %>% 
-        dplyr::pull(value) %>% 
+      
+      
+      citations_rows() %>%
+        sapply(`[[`, 1) %>%
+        dplyr::slice(r$ged, .) %>%
+        dplyr::pull(value) %>%
         sapply(tidyged::describe_records, gedcom = r$ged, short_desc = TRUE) %>% #describe_records removes duplicates!!
-        ifelse(pages == "", ., paste0(., " [", pages, "]")) %>% 
+        ifelse(pages == "", ., paste0(., " [", pages, "]")) %>%
         paste0(seq_along(.), ". ", .) # 1. 2. 3. etc.
-  
+
+    })
+
+    citation_to_select <- shiny::reactive({
+      if(is.null(r$cit_to_select)) {
+        input$citation
+      } else {
+        r$cit_to_select
+      }
     })
     
     # Update choices with list of individuals and select one
-    observeEvent(citations(), {
+    observeEvent(citations(), ignoreNULL = FALSE, {
       if(!is.null(citations())) {
-
-        if(is.null(r$cit_to_select)) {
-          current_selection <- input$citation
-        } else {
-          current_selection <- r$cit_to_select
-        }
-        
-        shiny::updateSelectizeInput(session = session, inputId = "citation", choices = citations(), selected = current_selection)
+        shiny::updateSelectizeInput(session = session, inputId = "citation", choices = citations(), 
+                                    selected = citation_to_select())
       } else {
-        shiny::updateSelectizeInput(session = session, inputId = "citation", choices = character(), selected = character())
+        shiny::updateSelectizeInput(session = session, inputId = "citation", choices = character(), 
+                                    selected = character())
       }
       r$cit_to_select <- NULL
     })
-    
+
+    # Update citation_rows with rows of selected citation
+    shiny::observeEvent(input$citation, {
+      req(input$citation, citations_rows, citations)
+      
+      r$citation_rows <- citations_rows()[[which(citations() == input$citation)]]
+    })
+
+
     # Show/hide tabs and toggle delete button if no citation
-    # Disable add_citation button if no source records to point to
-    shiny::observeEvent({
-      input$citation
-      r$ged
-    }, ignoreNULL = FALSE, {
+    shiny::observeEvent(input$citation, ignoreNULL = FALSE, {
       shinyjs::toggle("citation_tabs", condition = !is.null(input$citation))
       shinyjs::toggleState("remove_citation", !is.null(input$citation))
-      shinyjs::toggleState("add_citation", tidyged::num_sour(r$ged) > 0)
-      req(input$citation)
-      r$citation_rows <- citations_rows()[[which(citations() == input$citation)]]#TODO: THis is trying to select a deleted citation (selectinput not empty)
     })
     
-
+    # Disable add_citation button if no source records to point to
+    shiny::observeEvent(r$ged, {
+      shinyjs::toggleState("add_citation", tidyged::num_sour(r$ged) > 0)
+    })
+    
     # Show dialog to choose a source record
     shiny::observeEvent(input$add_citation, {
       req(r$ged)
@@ -140,9 +150,9 @@ citations_server <- function(id, r, section_rows) {
                                # doesn't shift existing row numbers
                                .after = max(r[[section_rows]]))
 
-      cits <- r$ged %>% 
-        dplyr::slice(c(r[[section_rows]], max(r[[section_rows]]) + 1)) %>% 
-        dplyr::filter(level == r$ged$level[r[[section_rows]][1]] + 1, tag == "SOUR") %>% 
+      cits <- r$ged %>%
+        dplyr::slice(c(r[[section_rows]], max(r[[section_rows]]) + 1)) %>%
+        dplyr::filter(level == r$ged$level[r[[section_rows]][1]] + 1, tag == "SOUR") %>%
         dplyr::pull(value)
 
       r$cit_to_select <- paste0(length(cits), ". ",
@@ -158,9 +168,14 @@ citations_server <- function(id, r, section_rows) {
 
 
     #citation_details_server("citation_details", r, "citation_rows")
-    notes_server("citation_notes", r, "citation_rows")
-    media_links_server("citation_media", r, "citation_rows")
-    
+
+    shiny::observeEvent({input$tabset == "Notes"},once=TRUE,ignoreInit = TRUE, {
+      notes_server("citation_notes", r, "citation_rows")
+    })
+    shiny::observeEvent({input$tabset == "Media"},once=TRUE,ignoreInit = TRUE, {
+      media_links_server("citation_media", r, "citation_rows")
+    })
+
   })
 }
 
