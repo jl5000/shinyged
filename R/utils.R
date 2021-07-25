@@ -10,12 +10,13 @@
 #' @param new_value A character vector of new values with the appropriate tag and level. 
 #' @param tag_order A character vector of tags indicating the desired order of tags in the section.
 #'
-#' @return Nothing. The critical return value is the updated r$ged object,
+#' @return Nothing. The critical side effect is the updated r$ged object,
 #' which is updated by reference.
 update_ged_value <- function(r, rows_name, lvl, tags, new_value = character(), tag_order = NULL) {
 
   if(!is.null(tag_order)) for(tg in tags) if(!tg %in% tag_order) stop("Tag is not recognised")
   if(length(new_value) == 1 && new_value == "") new_value = character()
+  new_value <- as.character(new_value)
   
   section_rows <- r[[rows_name]]
   sec <- r$ged[section_rows,]
@@ -31,6 +32,9 @@ update_ged_value <- function(r, rows_name, lvl, tags, new_value = character(), t
   new_sec <- new_sec %>% 
     tibble::add_row(tibble::tibble(record = sec$record[1], level = lvl, tag = tags, value = new_value))
   
+  # If source citation, potentially add a DATA row
+  if(new_sec$tag[1] == "SOUR" & new_sec$level[1] > 0) new_sec <- manage_source_citation_data_row(new_sec, r)
+  
   # Order by tags
   if(!is.null(tag_order)) {
     new_sec <- dplyr::mutate(new_sec, tag = factor(tag, levels = tag_order, ordered = TRUE)) %>% 
@@ -44,8 +48,36 @@ update_ged_value <- function(r, rows_name, lvl, tags, new_value = character(), t
   invisible(TRUE)
 }
 
+manage_source_citation_data_row <- function(citation_tbl, r){
+  
+  data_exists <- length(which(citation_tbl$tag == "DATA")) > 0
+  date_or_text_exists <- nrow(dplyr::filter(citation_tbl, tag %in% c("DATE","TEXT"))) > 0
+  
+  if(date_or_text_exists) {
+    if(!data_exists){ 
+      # Add it to end, because it will be reordered eventually
+      citation_tbl <- citation_tbl %>% 
+        tibble::add_row(tibble::tibble(record = citation_tbl$record[1], 
+                                       level = citation_tbl$level[1] + 1, 
+                                       tag = "DATA", value = ""))
+      # We need to modify this explicitly as the number of rows is different
+      #r$citation_rows <- c(r$citation_rows, max(r$citation_rows) + 1)
+    }
+  } else if(data_exists) {
+    citation_tbl <- dplyr::filter(citation_tbl, tag != "DATA")
+    #r$citation_rows <- r$citation_rows[-length(r$citation_rows)]
+  }
+  
+  citation_tbl
+}
+
 process_input <- function(input) {
+  if(is.null(input)) return(character())
+  input <- as.character(input) 
   input <- unlist(strsplit(input, "\n"))
   input <- unique(input[input != ""])
+  
   input
 }
+
+

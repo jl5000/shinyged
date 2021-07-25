@@ -71,8 +71,9 @@ citations_server <- function(id, r, section_rows) {
         sapply(`[[`, 1) %>%
         dplyr::slice(r$ged, .) %>%
         dplyr::pull(value) %>%
-        sapply(tidyged::describe_records, gedcom = r$ged, short_desc = TRUE) %>% #describe_records removes duplicates!!
-        ifelse(pages == "", ., paste0(., " [", pages, "]")) %>%
+        sapply(tidyged::describe_records, gedcom = r$ged, 
+               short_desc = TRUE, USE.NAMES = FALSE) %>% #describe_records removes duplicates!!
+        # ifelse(pages == "", ., paste0(., " [", pages, "]")) %>%
         paste0(seq_along(.), ". ", .) # 1. 2. 3. etc.
 
     })
@@ -149,14 +150,8 @@ citations_server <- function(id, r, section_rows) {
                                # Need to insert new citations after final citation so it
                                # doesn't shift existing row numbers
                                .after = max(r[[section_rows]]))
-
-      cits <- r$ged %>%
-        dplyr::slice(c(r[[section_rows]], max(r[[section_rows]]) + 1)) %>%
-        dplyr::filter(level == r$ged$level[r[[section_rows]][1]] + 1, tag == "SOUR") %>%
-        dplyr::pull(value)
-
-      r$cit_to_select <- paste0(length(cits), ". ",
-                                tidyged::describe_records(r$ged, sour_xref, short_desc = TRUE))
+      
+      r$cit_to_select <- citations()[length(citations())]
       shiny::removeModal()
     })
 
@@ -167,7 +162,7 @@ citations_server <- function(id, r, section_rows) {
     })
 
 
-    #citation_details_server("citation_details", r, "citation_rows")
+    citation_details_server("citation_details", r)
 
     shiny::observeEvent({input$tabset == "Notes"},once=TRUE,ignoreInit = TRUE, {
       notes_server("citation_notes", r, "citation_rows")

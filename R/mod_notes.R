@@ -59,11 +59,7 @@ notes_server <- function(id, r, section_rows) {
       })
     
     # The row of the tidyged object corresponding to the selected note
-    selected_ged_row <- shiny::eventReactive({
-      r$ged
-      r[[section_rows]]
-      input$notes_list_rows_selected
-    },{
+    selected_ged_row <- shiny::reactive({
       req(r$ged, r[[section_rows]], input$notes_list_rows_selected)
 
         dplyr::mutate(r$ged, row = dplyr::row_number()) %>% 
