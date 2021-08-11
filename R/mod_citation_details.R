@@ -11,19 +11,19 @@ citation_details_ui <- function(id) {
                     shiny::textInput(ns("page"), "Where within source?")
                     ),
       shiny::column(6,
-                    shiny::textInput(ns("entry_date"), "Entry date (e.g. 6 APR 1983)")
-                    )
-    ),
-    shiny::fluidRow(
-      shiny::column(6,
                     shiny::selectizeInput(ns("event_type"), label = "Event type", 
                                           choices = unique_facts(),
                                           multiple = TRUE, options = list(maxItems = 1))
-                    ),
+      )
+    ),
+    shiny::fluidRow(
       shiny::column(6, 
-                    shiny::selectizeInput(ns("role"), "Role in event", #TODO: Allow custom values
-                                     choices = tidyged.internals::val_roles(),
-                                     multiple = TRUE, options = list(maxItems = 1))
+                    shiny::selectizeInput(ns("role"), "Role in event",
+                                          choices = c(tidyged.internals::val_roles(), Other = "Other"),
+                                          multiple = TRUE, options = list(maxItems = 1))
+      ),
+      shiny::column(6,
+                    shiny::textInput(ns("custom_role"), "Custom role")
                     )
     ),
     shiny::fluidRow(
@@ -36,6 +36,11 @@ citation_details_ui <- function(id) {
       shiny::column(6,
                     shiny::textInput(ns("certainty"), "Certainty assessment")
       ),
+      shiny::column(6,
+                    shiny::textInput(ns("entry_date"), "Entry date (e.g. 6 APR 1983)")
+      )
+    ),
+    shiny::fluidRow(
       shiny::column(6,
                     shiny::helpText("What is the credibility of this source?",
                                     shiny::br(),
@@ -82,14 +87,23 @@ citation_details_server <- function(id, r) {
                              value = tidyged.internals::gedcom_value(r$ged[r$citation_rows,], 
                                                                      r$ged$record[r$citation_rows[1]], "DATE", 
                                                                      r$ged$level[r$citation_rows[1]] + 2))
-      shiny::updateTextInput(session = session, "event_type",
-                             value = tidyged.internals::gedcom_value(r$ged[r$citation_rows,], 
-                                                                     r$ged$record[r$citation_rows[1]], "EVEN", 
-                                                                     r$ged$level[r$citation_rows[1]] + 1))
-      shiny::updateTextInput(session = session, "role",
-                             value = tidyged.internals::gedcom_value(r$ged[r$citation_rows,], 
-                                                                     r$ged$record[r$citation_rows[1]], "ROLE", 
-                                                                     r$ged$level[r$citation_rows[1]] + 2))
+      shiny::updateSelectizeInput(session = session, "event_type",
+                                  selected = tidyged.internals::gedcom_value(r$ged[r$citation_rows,], 
+                                                                             r$ged$record[r$citation_rows[1]], "EVEN", 
+                                                                             r$ged$level[r$citation_rows[1]] + 1))
+      
+      role <- tidyged.internals::gedcom_value(r$ged[r$citation_rows,], 
+                                              r$ged$record[r$citation_rows[1]], "ROLE", 
+                                              r$ged$level[r$citation_rows[1]] + 2)
+
+      if(role == "" | role %in% tidyged.internals::val_roles()) {
+        shiny::updateSelectizeInput(session = session, "role",  selected = role)
+        shiny::updateTextInput(session = session, "custom_role",  value = "")
+      } else { #custom role
+        shiny::updateSelectizeInput(session = session, "role",  selected = "Other")
+        shiny::updateTextInput(session = session, "custom_role",  value = stringr::str_sub(role, 2, -2))
+      }
+      
       shiny::updateTextAreaInput(session = session, "source_text",
                                  value = tidyged.internals::gedcom_value(r$ged[r$citation_rows,], 
                                                                          r$ged$record[r$citation_rows[1]], "TEXT", 
@@ -102,6 +116,7 @@ citation_details_server <- function(id, r) {
     
     shiny::observeEvent(input$event_type, ignoreNULL = FALSE, {
       shinyjs::toggleState("role", !is.null(input$event_type))
+      shinyjs::toggleState("custom_role", !is.null(input$role) && input$role == "Custom")
     })
     
     shiny::observeEvent(input$page, ignoreNULL = FALSE, ignoreInit = TRUE, {
@@ -133,13 +148,31 @@ citation_details_server <- function(id, r) {
                        "EVEN", event_type, .pkgenv$tags_sour_cit)
     })
     
-    shiny::observeEvent(input$role, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    shiny::observeEvent(input$role, ignoreNULL = FALSE, ignoreInit = TRUE, { # finish this
       role <- process_input(input$role)
+      shinyjs::toggleState("custom_role", !is.null(input$role) && input$role == "Custom")
+      if(input$role == "Other") {
+        role <- paste0("(", input$custom_role, ")")
+      }
       err <- tidyged.internals::chk_role_in_event(role, 1)
-      shinyFeedback::feedbackDanger("role", !is.null(err), err)
+      if(input$role == "Other") {
+        shinyFeedback::feedbackWarning("custom_role", !is.null(err), "Enter a custom role")
+      } else {
+        shinyFeedback::feedbackDanger("role", !is.null(err), err)
+      }
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, "citation_rows", r$ged$level[r$citation_rows[1]] + 2, 
                        "ROLE", role, .pkgenv$tags_sour_cit)
+    })
+    
+    shiny::observeEvent(input$custom_role, ignoreNULL = FALSE, ignoreInit = TRUE, { # finish this
+      custom_role <- process_input(input$custom_role)
+      custom_role <- paste0("(", custom_role, ")")
+      err <- tidyged.internals::chk_role_in_event(custom_role, 1)
+      shinyFeedback::feedbackWarning("custom_role", !is.null(err), "Enter a custom role")
+      req(is.null(err), cancelOutput = TRUE)
+      update_ged_value(r, "citation_rows", r$ged$level[r$citation_rows[1]] + 2, 
+                       "ROLE", custom_role, .pkgenv$tags_sour_cit)
     })
     
     shiny::observeEvent(input$source_text, ignoreNULL = FALSE, ignoreInit = TRUE, {
