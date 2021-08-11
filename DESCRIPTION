@@ -19,6 +19,7 @@ Imports:
     shinyjs,
     shinyFeedback,
     DiagrammeR,
+    DT,
     stringr,
     tidyged,
     tidyged.io,
