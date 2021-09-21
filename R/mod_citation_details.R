@@ -77,7 +77,7 @@ citation_details_server <- function(id, r) {
       r$ged$value[r$citation_rows[1]]
     })
     
-    shiny::observeEvent(sour_xref(), once = TRUE, {
+    shiny::observeEvent(sour_xref(), {
       
       shiny::updateTextInput(session = session, "page", 
                              value = tidyged.internals::gedcom_value(r$ged[r$citation_rows,], 

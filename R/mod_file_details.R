@@ -23,7 +23,7 @@ file_details_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     
     
-    shiny::observeEvent(r$ged, once = TRUE, {
+    shiny::observeEvent(r$ged, {
       shiny::updateTextInput(session = session, "receiving_sys", 
                              value = tidyged.internals::gedcom_value(r$ged, "HD", "DEST", 1))
       shiny::updateSelectInput(session = session, "language", 

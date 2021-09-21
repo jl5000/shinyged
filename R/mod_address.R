@@ -45,7 +45,7 @@ address_server <- function(id, r, addr_rows) {
       r$ged[r[[addr_rows]],]
     })
     
-    shiny::observeEvent(addr(), once = TRUE, {
+    shiny::observeEvent(addr(), {
       shiny::updateTextAreaInput(session = session, "adr",
                                  value = dplyr::filter(addr(), tag %in% paste0("ADR",1:3))$value %>%
                                    paste(collapse = "\n"))
