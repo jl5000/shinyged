@@ -114,9 +114,9 @@ citation_details_server <- function(id, r) {
                                                                         r$ged$level[r$citation_rows[1]] + 1))
     })
     
-    shiny::observeEvent(input$event_type, ignoreNULL = FALSE, {
+    shiny::observe({
       shinyjs::toggleState("role", !is.null(input$event_type))
-      shinyjs::toggleState("custom_role", !is.null(input$role) && input$role == "Custom")
+      shinyjs::toggleState("custom_role", !is.null(input$role) && input$role == "Other")
     })
     
     shiny::observeEvent(input$page, ignoreNULL = FALSE, ignoreInit = TRUE, {
@@ -148,14 +148,13 @@ citation_details_server <- function(id, r) {
                        "EVEN", event_type, .pkgenv$tags_sour_cit)
     })
     
-    shiny::observeEvent(input$role, ignoreNULL = FALSE, ignoreInit = TRUE, { # finish this
+    shiny::observeEvent(input$role, ignoreNULL = FALSE, ignoreInit = TRUE, {
       role <- process_input(input$role)
-      shinyjs::toggleState("custom_role", !is.null(input$role) && input$role == "Custom")
-      if(input$role == "Other") {
+      if(!is.null(input$role) && input$role == "Other") {
         role <- paste0("(", input$custom_role, ")")
       }
       err <- tidyged.internals::chk_role_in_event(role, 1)
-      if(input$role == "Other") {
+      if(!is.null(input$role) && input$role == "Other") {
         shinyFeedback::feedbackWarning("custom_role", !is.null(err), "Enter a custom role")
       } else {
         shinyFeedback::feedbackDanger("role", !is.null(err), err)
@@ -165,7 +164,7 @@ citation_details_server <- function(id, r) {
                        "ROLE", role, .pkgenv$tags_sour_cit)
     })
     
-    shiny::observeEvent(input$custom_role, ignoreNULL = FALSE, ignoreInit = TRUE, { # finish this
+    shiny::observeEvent(input$custom_role, ignoreNULL = FALSE, ignoreInit = TRUE, {
       custom_role <- process_input(input$custom_role)
       custom_role <- paste0("(", custom_role, ")")
       err <- tidyged.internals::chk_role_in_event(custom_role, 1)
