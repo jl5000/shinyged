@@ -3,6 +3,7 @@
 shiny::shinyServer(function(input, output, session) {
 
     r <- shiny::reactiveValues(ged = NULL,
+                               file_count = 0,
                                citation_rows = NULL,
                                subm_rows = NULL,
                                subm_addr_rows = NULL,
@@ -36,12 +37,14 @@ shiny::shinyServer(function(input, output, session) {
             )
         } else {
             r$ged <- tidyged.io::read_gedcom(input$read_file$datapath)
+            r$file_count <- r$file_count + 1
         }
     })
     
     shiny::observeEvent(input$discard_and_read, {
         shiny::removeModal()
         r$ged <- tidyged.io::read_gedcom(input$read_file$datapath)
+        r$file_count <- r$file_count + 1
     })
     
     shiny::observeEvent(input$create_gedcom, {
@@ -62,12 +65,14 @@ shiny::shinyServer(function(input, output, session) {
             )
         } else {
             r$ged <- tidyged::gedcom()
+            r$file_count <- r$file_count + 1
         }
     })
     
     shiny::observeEvent(input$discard_and_create, {
         shiny::removeModal()
         r$ged <- tidyged::gedcom()
+        r$file_count <- r$file_count + 1
     })
     
     shiny::observeEvent(r$ged, {

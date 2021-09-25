@@ -22,7 +22,8 @@ file_data_ui <- function(id) {
 file_data_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     
-    shiny::observeEvent(r$ged, {
+    shiny::observeEvent(r$file_count, {
+      req(r$ged)
       shiny::updateTextInput(session = session, "ged_source_name", 
                              value = tidyged.internals::gedcom_value(r$ged, "HD", "DATA", 2))
       shiny::updateTextInput(session = session, "ged_source_date", 
