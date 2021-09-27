@@ -16,21 +16,31 @@ individual_ui <- function(id) {
       
     ),
     
-    shinyjs::hidden(
-      shiny::fluidRow(id = ns("indi_tabs"),
-                      shiny::column(12,
-                                    shiny::tabsetPanel(id = ns("tabset"),
-                                      shiny::tabPanel("Summary", individual_summary_ui(ns("indi_summary"))),
-                                      shiny::tabPanel("Names", individual_names_ui(ns("indi_names"))),
-                                      shiny::tabPanel("Facts", individual_facts_ui(ns("indi_facts"))),
-                                      shiny::tabPanel("Links", individual_links_ui(ns("indi_links"))),
-                                      shiny::tabPanel("Notes", notes_ui(ns("indi_notes"))),
-                                      shiny::tabPanel("Citations", citations_ui(ns("indi_citations"))),
-                                      shiny::tabPanel("Media", media_links_ui(ns("indi_media")))
-                                    )
-                      )
-      )
-    )
+    shiny::fluidRow(id = ns("indi_data"),
+                    shiny::column(3,
+                                  shiny::selectizeInput(ns("sex"), label = "Sex", choices = tidyged.internals::val_sexes(), 
+                                                        multiple = TRUE, width = "100%", options = list(maxItems = 1)),
+                    ),
+                    shiny::column(9,
+                                  ref_numbers_ui(ns("indi_ref_numbers")),
+                    )
+    ) %>% shinyjs::hidden(),
+    
+    shiny::br(),
+    
+    shiny::tabsetPanel(id = ns("tabset"),
+                       shiny::tabPanel("Summary", individual_summary_ui(ns("indi_summary"))),
+                       shiny::tabPanel("Names", individual_names_ui(ns("indi_names"))),
+                       shiny::tabPanel("Facts", individual_facts_ui(ns("indi_facts"))),
+                       shiny::tabPanel("Links", individual_links_ui(ns("indi_links"))),
+                       shiny::tabPanel("Notes", notes_ui(ns("indi_notes"))),
+                       shiny::tabPanel("Citations", citations_ui(ns("indi_citations"))),
+                       shiny::tabPanel("Media", media_links_ui(ns("indi_media")))
+    ) %>% 
+      shiny::column(width = 12) %>% 
+      shiny::fluidRow(id = ns("indi_tabs")) %>% 
+      shinyjs::hidden()
+    
   )
 }
 
@@ -75,7 +85,12 @@ individual_server <- function(id, r) {
     # Show/hide tabs and toggle delete button
     shiny::observeEvent(input$record, ignoreNULL = FALSE, {
       shinyjs::toggle("indi_tabs", condition = !is.null(input$record))
+      shinyjs::toggle("indi_data", condition = !is.null(input$record))
       shinyjs::toggleState("delete", !is.null(input$record))
+      if(!is.null(input$record)){
+        sex <- tidyged.internals::gedcom_value(r$ged, r$ged$record[r$indi_rows[1]], "SEX", 1)
+        shiny::updateSelectizeInput(session = session, inputId = "sex", selected = sex)
+      }
     })
     
     # Add individual and set a flag to ensure it is selected
@@ -94,6 +109,16 @@ individual_server <- function(id, r) {
       r$indi_to_select <- NULL
     })
     
+    observeEvent(input$sex, ignoreNULL = FALSE, ignoreInit = TRUE, {
+      sex <- process_input(input$sex)
+      err <- tidyged.internals::chk_sex_value(sex, 1)
+      shinyFeedback::feedbackDanger("sex", !is.null(err), err)
+      req(is.null(err), cancelOutput = TRUE)
+      update_ged_value(r, "indi_rows", 1, "SEX", sex)
+    })
+    
+
+    ref_numbers_server("indi_ref_numbers", r, "indi_rows")
     individual_summary_server("indi_summary", r)
     
     shiny::observeEvent({input$tabset == "Names"},once=TRUE,ignoreInit = TRUE, {

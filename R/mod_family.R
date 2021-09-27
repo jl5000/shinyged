@@ -18,20 +18,25 @@ family_ui <- function(id) {
       
     ),
     
-    shinyjs::hidden(
-      shiny::fluidRow(id = ns("famg_tabs"),
-                      shiny::column(12,
-                                    shiny::tabsetPanel(id = ns("tabset"),
-                                      shiny::tabPanel("Summary", family_summary_ui(ns("family_summary"))),
-                                      shiny::tabPanel("Members", family_members_ui(ns("family_members"))),
-                                      shiny::tabPanel("Events", family_events_ui(ns("family_events"))),
-                                      shiny::tabPanel("Notes", notes_ui(ns("famg_notes"))),
-                                      shiny::tabPanel("Citations", citations_ui(ns("famg_citations"))),
-                                      shiny::tabPanel("Media", media_links_ui(ns("famg_media")))
-                                    )
-                      )
-      )
-    )
+    ref_numbers_ui(ns("famg_ref_numbers")) %>% 
+      shiny::column(width = 12) %>% 
+      shiny::fluidRow(id = ns("famg_data")) %>% 
+      shinyjs::hidden(),
+    
+    shiny::br(),
+    
+    shiny::tabsetPanel(id = ns("tabset"),
+                       shiny::tabPanel("Summary", family_summary_ui(ns("family_summary"))),
+                       shiny::tabPanel("Members", family_members_ui(ns("family_members"))),
+                       shiny::tabPanel("Events", family_events_ui(ns("family_events"))),
+                       shiny::tabPanel("Notes", notes_ui(ns("famg_notes"))),
+                       shiny::tabPanel("Citations", citations_ui(ns("famg_citations"))),
+                       shiny::tabPanel("Media", media_links_ui(ns("famg_media")))
+    ) %>% 
+      shiny::column(width = 12) %>% 
+      shiny::fluidRow(id = ns("famg_tabs")) %>% 
+      shinyjs::hidden()
+      
   )
 }
 
@@ -77,6 +82,7 @@ family_server <- function(id, r) {
     # Show/hide tabs and toggle delete button
     shiny::observeEvent(input$record, ignoreNULL = FALSE, {
       shinyjs::toggle("famg_tabs", condition = !is.null(input$record))
+      shinyjs::toggle("famg_data", condition = !is.null(input$record))
       shinyjs::toggleState("delete", !is.null(input$record))
       shinyjs::toggleState("and_members", !is.null(input$record))
     })
@@ -98,6 +104,7 @@ family_server <- function(id, r) {
       r$famg_to_select <- NULL
     })
     
+    ref_numbers_server("famg_ref_numbers", r, "famg_rows")
     family_summary_server("family_summary", r)
     
     shiny::observeEvent({input$tabset == "Members"},once=TRUE,ignoreInit = TRUE, {

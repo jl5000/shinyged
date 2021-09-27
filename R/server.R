@@ -2,11 +2,12 @@
 
 shiny::shinyServer(function(input, output, session) {
 
+    # The tidyged object and rows of structures that could occur multiple times
     r <- shiny::reactiveValues(ged = NULL,
-                               file_count = 0,
+                               file_count = 0, # this increases every time r$ged changes and triggers re-population of inputs
+                               addr_rows = NULL,
                                citation_rows = NULL,
                                subm_rows = NULL,
-                               subm_addr_rows = NULL,
                                head_rows = NULL,
                                head_file_sour_rows = NULL,
                                indi_rows = NULL,

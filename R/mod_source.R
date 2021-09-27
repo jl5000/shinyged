@@ -16,6 +16,13 @@ source_ui <- function(id) {
       
     ),
     
+    ref_numbers_ui(ns("sour_ref_numbers")) %>% 
+      shiny::column(width = 12) %>% 
+      shiny::fluidRow(id = ns("sour_data")) %>% 
+      shinyjs::hidden(),
+    
+    shiny::br(),
+    
     shinyjs::hidden(
       shiny::fluidRow(id = ns("sour_tabs"),
                       shiny::column(12,
@@ -73,6 +80,7 @@ source_server <- function(id, r) {
     # Show/hide tabs and toggle delete button
     shiny::observeEvent(input$record, ignoreNULL = FALSE, {
       shinyjs::toggle("sour_tabs", condition = !is.null(input$record))
+      shinyjs::toggle("sour_data", condition = !is.null(input$record))
       shinyjs::toggleState("delete", !is.null(input$record))
     })
     
@@ -92,6 +100,7 @@ source_server <- function(id, r) {
       r$sour_to_select <- NULL
     })
     
+    ref_numbers_server("sour_ref_numbers", r, "sour_rows")
     source_summary_server("sour_summary", r)
     
     shiny::observeEvent({input$tabset == "Data"},once=TRUE,ignoreInit = TRUE, {

@@ -26,8 +26,6 @@ submitter_server <- function(id, r) {
       req(r$ged)
       subm_xref <- tidyged::xrefs_subm(r$ged)
       r$subm_rows <- which(r$ged$record == subm_xref)
-      r$subm_addr_rows <- which(r$ged$record == subm_xref &
-                                  r$ged$tag %in% .pkgenv$tags_addr)
     })
 
     subm <- shiny::reactive({
@@ -35,20 +33,21 @@ submitter_server <- function(id, r) {
       r$ged[r$subm_rows,]
     })
     
-    shiny::observeEvent(subm(), {
+    shiny::observeEvent(r$file_count, {
+      req(subm)
       shiny::updateTextInput(session = session, "subm_name",
                              value = dplyr::filter(subm(), tag == "NAME")$value)
     })
     
     shiny::observeEvent(input$subm_name, ignoreNULL = FALSE, ignoreInit = TRUE, {
-      subm_name <- process_input(input$subm_name)
+      subm_name <- process_input(input$subm_name, input_required = TRUE)
       err <- tidyged.internals::chk_submitter_name(subm_name, 1)
       shinyFeedback::feedbackDanger("subm_name", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, "subm_rows", 1, "NAME", subm_name)
     })
     
-    address_server("subm_address", r, "subm_addr_rows")
+    address_server("subm_address", r, "subm_rows") #TODO
     notes_server("subm_notes", r, "subm_rows")
     media_links_server("subm_media", r, "subm_rows")
     

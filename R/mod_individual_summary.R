@@ -14,7 +14,7 @@ individual_summary_ui <- function(id) {
   )
 }
 
-individual_summary_server <- function(id, ged = NULL) {
+individual_summary_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     
     

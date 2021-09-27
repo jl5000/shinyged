@@ -14,7 +14,7 @@ individual_links_ui <- function(id) {
   )
 }
 
-individual_links_server <- function(id, ged = NULL) {
+individual_links_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     
     

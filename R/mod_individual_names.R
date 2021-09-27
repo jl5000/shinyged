@@ -15,7 +15,7 @@ individual_names_ui <- function(id) {
   )
 }
 
-individual_names_server <- function(id, ged = NULL) {
+individual_names_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     
     

@@ -16,17 +16,17 @@ repository_ui <- function(id) {
       
     ),
     
-    shinyjs::hidden(
-      shiny::fluidRow(id = ns("repo_tabs"),
-                      shiny::column(12,
-                                    shiny::tabsetPanel(id = ns("tabset"),
-                                      shiny::tabPanel("Summary", repository_summary_ui(ns("repo_summary"))),
-                                      shiny::tabPanel("Details", repository_details_ui(ns("repo_details"))),
-                                      shiny::tabPanel("Notes", notes_ui(ns("repo_notes")))
-                                    )
-                      )
-      )
-    )
+    
+    shiny::tabsetPanel(id = ns("tabset"),
+                       shiny::tabPanel("Summary", repository_summary_ui(ns("repo_summary"))),
+                       shiny::tabPanel("Details", repository_details_ui(ns("repo_details"))),
+                       shiny::tabPanel("Notes", notes_ui(ns("repo_notes")))
+    ) %>% 
+      shiny::column(width = 12) %>% 
+      shiny::fluidRow(id = ns("repo_tabs")) %>% 
+      shinyjs::hidden()
+    
+    
   )
 }
 
@@ -92,7 +92,8 @@ repository_server <- function(id, r) {
     
     # Disable add_repo button if no valid name
     shiny::observeEvent(input$repo_name, ignoreNULL = FALSE, ignoreInit = TRUE, {
-      repo_name <- process_input(input$repo_name)
+      #don't need input_required=TRUE because add_repo button is disabled
+      repo_name <- process_input(input$repo_name) 
       err <- tidyged.internals::chk_name_of_repository(repo_name, 1)
       shinyFeedback::feedbackDanger("repo_name", !is.null(err), err)
       shinyjs::toggleState("add_repo", is.null(err) & input$repo_name != "")
