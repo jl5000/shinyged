@@ -17,7 +17,7 @@ update_ged_value <- function(r, rows_name, lvl, tags, new_value = character(), t
   if(!is.null(tag_order)) for(tg in tags) if(!tg %in% tag_order) stop("Tag is not recognised")
   if(length(new_value) == 1 && new_value == "") new_value = character()
   new_value <- as.character(new_value)
-  
+
   section_rows <- r[[rows_name]]
   sec <- r$ged[section_rows,]
   ged <- r$ged[-section_rows,]
@@ -71,13 +71,13 @@ manage_source_citation_data_row <- function(citation_tbl, r){
   citation_tbl
 }
 
-process_input <- function(input) {
+process_input <- function(input, input_required = FALSE) {
   if(is.null(input)) return(character())
   input <- as.character(input) 
-  input <- unlist(strsplit(input, "\n"))
-  input <- unique(input[input != ""])
+  input <- unlist(stringr::str_split(input, "\n")) #base::strsplit doesn't handle ""
+  if(!input_required) input <- input[input != ""]
   
-  input
+  unique(input)
 }
 
 
