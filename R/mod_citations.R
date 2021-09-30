@@ -18,17 +18,17 @@ citations_ui <- function(id) {
       )
     ),
     shiny::tags$br(),
-    shinyjs::hidden(
-      shiny::fluidRow(id = ns("citation_tabs"),
-                      shiny::column(12,
-                                    shiny::tabsetPanel(id = ns("tabset"),
-                                      shiny::tabPanel("Details", citation_details_ui(ns("citation_details"))),
-                                      shiny::tabPanel("Notes", notes_ui(ns("citation_notes"))),
-                                      shiny::tabPanel("Media", media_links_ui(ns("citation_media")))
-                                    )
-                      )
-      )
-    )
+    
+    shiny::fluidRow(id = ns("citation_tabs"),
+                    shiny::column(12,
+                                  shiny::tabsetPanel(id = ns("tabset"),
+                                                     shiny::tabPanel("Details", citation_details_ui(ns("citation_details"))),
+                                                     shiny::tabPanel("Notes", notes_ui(ns("citation_notes"))),
+                                                     shiny::tabPanel("Media", media_links_ui(ns("citation_media")))
+                                  )
+                    )
+    ) %>% shinyjs::hidden()
+    
   )
 
 

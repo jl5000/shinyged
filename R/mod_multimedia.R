@@ -23,7 +23,8 @@ multimedia_ui <- function(id) {
                                       shiny::tabPanel("Summary", multimedia_summary_ui(ns("media_summary"))),
                                       shiny::tabPanel("Description", multimedia_description_ui(ns("media_description"))),
                                       shiny::tabPanel("Notes", notes_ui(ns("media_notes"))),
-                                      shiny::tabPanel("Citations", citations_ui(ns("media_citations")))
+                                      shiny::tabPanel("Citations", citations_ui(ns("media_citations"))),
+                                      shiny::tabPanel("Raw data", record_ui(ns("media_raw")))
                                     )
                       )
       )
@@ -93,6 +94,7 @@ multimedia_server <- function(id, r) {
     })
     
     multimedia_summary_server("media_summary", r)
+    record_server("media_raw", r, "media_rows")
     
     shiny::observeEvent({input$tabset == "Description"},once=TRUE,ignoreInit = TRUE, {
       multimedia_description_server("media_description", r)

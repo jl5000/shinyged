@@ -6,11 +6,11 @@ address_ui <- function(id) {
     shiny::tags$br(),
     
     shiny::fluidRow(
-      shiny::column(8,
+      shiny::column(5,
                     shiny::htmlOutput(ns("address"), 
                                       style = "border-style:solid;border-width:thin;border-color:lightgrey;padding:12px")
                     ),
-      shiny::column(4,
+      shiny::column(2,
                     shiny::actionButton(ns("edit_address"), "Edit address")
                     )
     )

@@ -13,7 +13,8 @@ submitter_ui <- function(id) {
     shiny::tabsetPanel(
       shiny::tabPanel("Contact details", address_ui(ns("subm_address"))),
       shiny::tabPanel("Notes", notes_ui(ns("subm_notes"))),
-      shiny::tabPanel("Media", media_links_ui(ns("subm_media")))
+      shiny::tabPanel("Media", media_links_ui(ns("subm_media"))),
+      shiny::tabPanel("Raw data", record_ui(ns("subm_raw")))
     )
     
   )
@@ -50,6 +51,7 @@ submitter_server <- function(id, r) {
     address_server("subm_address", r, "subm_rows") #TODO
     notes_server("subm_notes", r, "subm_rows")
     media_links_server("subm_media", r, "subm_rows")
+    record_server("subm_raw", r, "subm_rows")
     
   })
 }

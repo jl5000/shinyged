@@ -18,25 +18,29 @@ family_ui <- function(id) {
       
     ),
     
-    ref_numbers_ui(ns("famg_ref_numbers")) %>% 
-      shiny::column(width = 12) %>% 
-      shiny::fluidRow(id = ns("famg_data")) %>% 
-      shinyjs::hidden(),
+    shiny::fluidRow(id = ns("famg_data"),
+                    shiny::column(width = 12,
+                                  ref_numbers_ui(ns("famg_ref_numbers"))
+                    )
+    ) %>% shinyjs::hidden(),
     
     shiny::br(),
     
-    shiny::tabsetPanel(id = ns("tabset"),
-                       shiny::tabPanel("Summary", family_summary_ui(ns("family_summary"))),
-                       shiny::tabPanel("Members", family_members_ui(ns("family_members"))),
-                       shiny::tabPanel("Events", family_events_ui(ns("family_events"))),
-                       shiny::tabPanel("Notes", notes_ui(ns("famg_notes"))),
-                       shiny::tabPanel("Citations", citations_ui(ns("famg_citations"))),
-                       shiny::tabPanel("Media", media_links_ui(ns("famg_media")))
-    ) %>% 
-      shiny::column(width = 12) %>% 
-      shiny::fluidRow(id = ns("famg_tabs")) %>% 
-      shinyjs::hidden()
-      
+    shiny::fluidRow(id = ns("famg_tabs"),
+                    shiny::column(width = 12,
+                                  shiny::tabsetPanel(id = ns("tabset"),
+                                                     shiny::tabPanel("Summary", family_summary_ui(ns("family_summary"))),
+                                                     shiny::tabPanel("Members", family_members_ui(ns("family_members"))),
+                                                     shiny::tabPanel("Events", family_events_ui(ns("family_events"))),
+                                                     shiny::tabPanel("Timeline", timeline_ui(ns("famg_timeline"))),
+                                                     shiny::tabPanel("Notes", notes_ui(ns("famg_notes"))),
+                                                     shiny::tabPanel("Citations", citations_ui(ns("famg_citations"))),
+                                                     shiny::tabPanel("Media", media_links_ui(ns("famg_media"))),
+                                                     shiny::tabPanel("Raw data", record_ui(ns("famg_raw"))))
+                    )
+    ) %>% shinyjs::hidden(),
+    
+    
   )
 }
 
@@ -106,7 +110,11 @@ family_server <- function(id, r) {
     
     ref_numbers_server("famg_ref_numbers", r, "famg_rows")
     family_summary_server("family_summary", r)
+    record_server("famg_raw", r, "famg_rows")
     
+    shiny::observeEvent({input$tabset == "Timeline"},once=TRUE,ignoreInit = TRUE, {
+      timeline_server("famg_timeline", r, "famg_rows")
+    })
     shiny::observeEvent({input$tabset == "Members"},once=TRUE,ignoreInit = TRUE, {
       family_members_server("family_members", r)
     })

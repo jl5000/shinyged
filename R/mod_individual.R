@@ -28,18 +28,20 @@ individual_ui <- function(id) {
     
     shiny::br(),
     
-    shiny::tabsetPanel(id = ns("tabset"),
-                       shiny::tabPanel("Summary", individual_summary_ui(ns("indi_summary"))),
-                       shiny::tabPanel("Names", individual_names_ui(ns("indi_names"))),
-                       shiny::tabPanel("Facts", individual_facts_ui(ns("indi_facts"))),
-                       shiny::tabPanel("Links", individual_links_ui(ns("indi_links"))),
-                       shiny::tabPanel("Notes", notes_ui(ns("indi_notes"))),
-                       shiny::tabPanel("Citations", citations_ui(ns("indi_citations"))),
-                       shiny::tabPanel("Media", media_links_ui(ns("indi_media")))
-    ) %>% 
-      shiny::column(width = 12) %>% 
-      shiny::fluidRow(id = ns("indi_tabs")) %>% 
-      shinyjs::hidden()
+    shiny::fluidRow(id = ns("indi_tabs"),
+                    shiny::column(width = 12,
+                                  shiny::tabsetPanel(id = ns("tabset"),
+                                                     shiny::tabPanel("Summary", individual_summary_ui(ns("indi_summary"))),
+                                                     shiny::tabPanel("Names", individual_names_ui(ns("indi_names"))),
+                                                     shiny::tabPanel("Facts", individual_facts_ui(ns("indi_facts"))),
+                                                     shiny::tabPanel("Timeline", timeline_ui(ns("indi_timeline"))),
+                                                     shiny::tabPanel("Links", individual_links_ui(ns("indi_links"))),
+                                                     shiny::tabPanel("Notes", notes_ui(ns("indi_notes"))),
+                                                     shiny::tabPanel("Citations", citations_ui(ns("indi_citations"))),
+                                                     shiny::tabPanel("Media", media_links_ui(ns("indi_media"))),
+                                                     shiny::tabPanel("Raw data", record_ui(ns("indi_raw"))))
+                    )
+    ) %>% shinyjs::hidden()
     
   )
 }
@@ -120,7 +122,11 @@ individual_server <- function(id, r) {
 
     ref_numbers_server("indi_ref_numbers", r, "indi_rows")
     individual_summary_server("indi_summary", r)
+    record_server("indi_raw", r, "indi_rows")
     
+    shiny::observeEvent({input$tabset == "Timeline"},once=TRUE,ignoreInit = TRUE, {
+      timeline_server("indi_timeline", r, "indi_rows")
+    })
     shiny::observeEvent({input$tabset == "Names"},once=TRUE,ignoreInit = TRUE, {
       individual_names_server("indi_names", r)
     })

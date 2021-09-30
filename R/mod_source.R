@@ -16,26 +16,27 @@ source_ui <- function(id) {
       
     ),
     
-    ref_numbers_ui(ns("sour_ref_numbers")) %>% 
-      shiny::column(width = 12) %>% 
-      shiny::fluidRow(id = ns("sour_data")) %>% 
-      shinyjs::hidden(),
+    shiny::fluidRow(id = ns("sour_data"),
+                    shiny::column(width = 12,
+                                  ref_numbers_ui(ns("sour_ref_numbers")) 
+                    )
+    ) %>% shinyjs::hidden(),
     
     shiny::br(),
     
-    shinyjs::hidden(
-      shiny::fluidRow(id = ns("sour_tabs"),
-                      shiny::column(12,
-                                    shiny::tabsetPanel(id = ns("tabset"),
-                                      shiny::tabPanel("Summary", source_summary_ui(ns("sour_summary"))),
-                                      shiny::tabPanel("Data", source_data_ui(ns("sour_data"))),
-                                      shiny::tabPanel("Details", source_details_ui(ns("sour_details"))),
-                                      shiny::tabPanel("Notes", notes_ui(ns("sour_notes"))),
-                                      shiny::tabPanel("Media", media_links_ui(ns("sour_media")))
-                                    )
-                      )
-      )
-    )
+    shiny::fluidRow(id = ns("sour_tabs"),
+                    shiny::column(12,
+                                  shiny::tabsetPanel(id = ns("tabset"),
+                                                     shiny::tabPanel("Summary", source_summary_ui(ns("sour_summary"))),
+                                                     shiny::tabPanel("Data", source_data_ui(ns("sour_data"))),
+                                                     shiny::tabPanel("Details", source_details_ui(ns("sour_details"))),
+                                                     shiny::tabPanel("Notes", notes_ui(ns("sour_notes"))),
+                                                     shiny::tabPanel("Media", media_links_ui(ns("sour_media"))),
+                                                     shiny::tabPanel("Raw data", record_ui(ns("sour_raw")))
+                                  )
+                    )
+    )  %>% shinyjs::hidden()
+    
   )
 }
 
@@ -102,6 +103,7 @@ source_server <- function(id, r) {
     
     ref_numbers_server("sour_ref_numbers", r, "sour_rows")
     source_summary_server("sour_summary", r)
+    record_server("sour_raw", r, "sour_rows")
     
     shiny::observeEvent({input$tabset == "Data"},once=TRUE,ignoreInit = TRUE, {
       source_data_server("sour_data", r)

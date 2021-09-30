@@ -17,15 +17,15 @@ repository_ui <- function(id) {
     ),
     
     
-    shiny::tabsetPanel(id = ns("tabset"),
-                       shiny::tabPanel("Summary", repository_summary_ui(ns("repo_summary"))),
-                       shiny::tabPanel("Details", repository_details_ui(ns("repo_details"))),
-                       shiny::tabPanel("Notes", notes_ui(ns("repo_notes")))
-    ) %>% 
-      shiny::column(width = 12) %>% 
-      shiny::fluidRow(id = ns("repo_tabs")) %>% 
-      shinyjs::hidden()
-    
+    shiny::fluidRow(id = ns("repo_tabs"),
+                    shiny::column(width = 12,
+                                  shiny::tabsetPanel(id = ns("tabset"),
+                                                     shiny::tabPanel("Summary", repository_summary_ui(ns("repo_summary"))),
+                                                     shiny::tabPanel("Details", repository_details_ui(ns("repo_details"))),
+                                                     shiny::tabPanel("Notes", notes_ui(ns("repo_notes"))),
+                                                     shiny::tabPanel("Raw data", record_ui(ns("repo_raw"))))
+                    ) 
+    ) %>% shinyjs::hidden()
     
   )
 }
@@ -117,6 +117,7 @@ repository_server <- function(id, r) {
     })
     
     repository_summary_server("repo_summary", r)
+    record_server("repo_raw", r, "repo_rows")
     
     shiny::observeEvent({input$tabset == "Details"},once=TRUE,ignoreInit = TRUE, {
       repository_details_server("repo_details", r)
