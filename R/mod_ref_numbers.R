@@ -52,7 +52,10 @@ ref_numbers_server <- function(id, r, section_rows) {
       rows <- tidyged.internals::identify_section(r$ged, 1, "REFN", 
                                                   xrefs = r$ged$record[r[[section_rows]][1]],
                                                   first_only = FALSE)
-      ref_num_df <- r$ged %>% 
+      
+      if(length(rows) > 0) {
+
+      ref_num_df <- r$ged %>%
         dplyr::slice(rows) %>% 
         dplyr::select(tag, value) %>% 
         dplyr::mutate(id1 = cumsum(tag == "REFN")) %>% 
@@ -60,8 +63,15 @@ ref_numbers_server <- function(id, r, section_rows) {
         reshape(direction = "wide", idvar = "id1", v.names = "value", timevar = "tag") %>% 
         dplyr::select(-id1)
 
+      if(ncol(ref_num_df) == 1) ref_num_df <- dplyr::mutate(ref_num_df, b = "")
       names(ref_num_df) <- letters[1:2]
       ref_num_df[is.na(ref_num_df)] <- ""
+      
+      } else {
+        
+        ref_num_df <- data.frame()
+        
+      }
 
       ref_num_df
     })
@@ -132,6 +142,9 @@ ref_numbers_server <- function(id, r, section_rows) {
                           .after = max(r[[section_rows]]) + 1)
         
       }
+      
+      shiny::updateTextInput(inputId = "ref_num", value = "")
+      shiny::updateTextInput(inputId = "ref_type", value = "")
     })
     
     # Update ref number in tidyged object
