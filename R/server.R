@@ -106,6 +106,8 @@ shiny::shinyServer(function(input, output, session) {
         ged_debug_server("debug", r)
     })
     
+    tools_server("tools", r)
+    
     
     output$export_gedcom <- shiny::downloadHandler(
         filename = "from_shinyged.ged",

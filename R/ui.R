@@ -44,6 +44,7 @@ shiny::shinyUI(shiny::fluidPage(
                                                    shiny::tabPanel("Multimedia", value = "media_tab", multimedia_ui("media")),
                                                    shiny::tabPanel("Sources", value = "sour_tab", source_ui("sour")),
                                                    shiny::tabPanel("Repositories", value = "repo_tab", repository_ui("repo")),
+                                                   shiny::tabPanel("Tools", value = "tools_tab", tools_ui("tools")),
                                                    shiny::tabPanel("GEDCOM", value = "debug_tab", ged_debug_ui("debug")))
                   ) 
   ) %>% shinyjs::hidden()
