@@ -25,6 +25,7 @@ address_server <- function(id, r, section_rows) {
     
     addr <- shiny::reactive({
       req(r$ged, r[[section_rows]])
+
       r$addr_rows <- intersect(r[[section_rows]],
                              which(r$ged$tag %in% .pkgenv$tags_addr))
       r$ged[r$addr_rows,]
@@ -114,63 +115,63 @@ address_server <- function(id, r, section_rows) {
       err <- tidyged.internals::chk_address_lines(adr, 3)
       shinyFeedback::feedbackDanger("adr", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
-      update_ged_value(r, "addr_rows", addr()$level[1] + 1, paste0("ADR", 1:3), adr, .pkgenv$tags_addr)
+      update_ged_value(r, "addr_rows", r$ged$level[r[[section_rows]][1]] + 2, paste0("ADR", 1:3), adr, .pkgenv$tags_addr)
     })
     shiny::observeEvent(input$city, ignoreNULL = FALSE, ignoreInit = TRUE, {
       city <- process_input(input$city)
       err <- tidyged.internals::chk_address_city(city, 1)
       shinyFeedback::feedbackDanger("city", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
-      update_ged_value(r, "addr_rows", addr()$level[1] + 1, "CITY", city, .pkgenv$tags_addr)
+      update_ged_value(r, "addr_rows", r$ged$level[r[[section_rows]][1]] + 2, "CITY", city, .pkgenv$tags_addr)
     })
     shiny::observeEvent(input$state, ignoreNULL = FALSE, ignoreInit = TRUE, {
       state <- process_input(input$state)
       err <- tidyged.internals::chk_address_state(state, 1)
       shinyFeedback::feedbackDanger("state", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
-      update_ged_value(r, "addr_rows", addr()$level[1] + 1, "STAE", state, .pkgenv$tags_addr)
+      update_ged_value(r, "addr_rows", r$ged$level[r[[section_rows]][1]] + 2, "STAE", state, .pkgenv$tags_addr)
     })
     shiny::observeEvent(input$postcode, ignoreNULL = FALSE, ignoreInit = TRUE, {
       postcode <- process_input(input$postcode)
       err <- tidyged.internals::chk_address_postal_code(postcode, 1)
       shinyFeedback::feedbackDanger("postcode", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
-      update_ged_value(r, "addr_rows", addr()$level[1] + 1, "POST", postcode, .pkgenv$tags_addr)
+      update_ged_value(r, "addr_rows", r$ged$level[r[[section_rows]][1]] + 2, "POST", postcode, .pkgenv$tags_addr)
     })
     shiny::observeEvent(input$country, ignoreNULL = FALSE, ignoreInit = TRUE, {
       country <- process_input(input$country)
       err <- tidyged.internals::chk_address_country(country, 1)
       shinyFeedback::feedbackDanger("country", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
-      update_ged_value(r, "addr_rows", addr()$level[1] + 1, "CTRY", country, .pkgenv$tags_addr)
+      update_ged_value(r, "addr_rows", r$ged$level[r[[section_rows]][1]] + 2, "CTRY", country, .pkgenv$tags_addr)
     })
     shiny::observeEvent(input$emails, ignoreNULL = FALSE, ignoreInit = TRUE, {
       emails <- process_input(input$emails)
       err <- tidyged.internals::chk_address_email(emails, 3)
       shinyFeedback::feedbackDanger("emails", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
-      update_ged_value(r, "addr_rows", addr()$level[1], "EMAIL", emails, .pkgenv$tags_addr)
+      update_ged_value(r, "addr_rows", r$ged$level[r[[section_rows]][1]] + 1, "EMAIL", emails, .pkgenv$tags_addr)
     })
     shiny::observeEvent(input$phones, ignoreNULL = FALSE, ignoreInit = TRUE, {
       phones <- process_input(input$phones)
       err <- tidyged.internals::chk_phone_number(phones, 3)
       shinyFeedback::feedbackDanger("phones", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
-      update_ged_value(r, "addr_rows", addr()$level[1], "PHON", phones, .pkgenv$tags_addr)
+      update_ged_value(r, "addr_rows", r$ged$level[r[[section_rows]][1]] + 1, "PHON", phones, .pkgenv$tags_addr)
     })
     shiny::observeEvent(input$faxes, ignoreNULL = FALSE, ignoreInit = TRUE, {
       faxes <- process_input(input$faxes)
       err <- tidyged.internals::chk_address_fax(faxes, 3)
       shinyFeedback::feedbackDanger("faxes", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
-      update_ged_value(r, "addr_rows", addr()$level[1], "FAX", faxes, .pkgenv$tags_addr)
+      update_ged_value(r, "addr_rows", r$ged$level[r[[section_rows]][1]] + 1, "FAX", faxes, .pkgenv$tags_addr)
     })
     shiny::observeEvent(input$websites, ignoreNULL = FALSE, ignoreInit = TRUE, {
       websites <- process_input(input$websites)
       err <- tidyged.internals::chk_address_web_page(websites, 3)
       shinyFeedback::feedbackDanger("websites", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
-      update_ged_value(r, "addr_rows", addr()$level[1], "WWW", websites, .pkgenv$tags_addr)
+      update_ged_value(r, "addr_rows", r$ged$level[r[[section_rows]][1]] + 1, "WWW", websites, .pkgenv$tags_addr)
     })
     
   })
