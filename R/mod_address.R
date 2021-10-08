@@ -25,6 +25,7 @@ address_server <- function(id, r, section_rows) {
     
     addr <- shiny::reactive({
       req(r$ged, r[[section_rows]])
+
       r$addr_rows <- intersect(r[[section_rows]],
                              which(r$ged$tag %in% .pkgenv$tags_addr))
       r$ged[r$addr_rows,]
@@ -135,7 +136,7 @@ address_server <- function(id, r, section_rows) {
       err <- tidyged.internals::chk_address_postal_code(postcode, 1)
       shinyFeedback::feedbackDanger("postcode", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
-      update_ged_value(r, "addr_rows",r$ged$level[r[[section_rows]][1]] + 2, "POST", postcode, .pkgenv$tags_addr)
+      update_ged_value(r, "addr_rows", r$ged$level[r[[section_rows]][1]] + 2, "POST", postcode, .pkgenv$tags_addr)
     })
     shiny::observeEvent(input$country, ignoreNULL = FALSE, ignoreInit = TRUE, {
       country <- process_input(input$country)
@@ -170,7 +171,7 @@ address_server <- function(id, r, section_rows) {
       err <- tidyged.internals::chk_address_web_page(websites, 3)
       shinyFeedback::feedbackDanger("websites", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
-      update_ged_value(r, "addr_rows",r$ged$level[r[[section_rows]][1]] + 1, "WWW", websites, .pkgenv$tags_addr)
+      update_ged_value(r, "addr_rows", r$ged$level[r[[section_rows]][1]] + 1, "WWW", websites, .pkgenv$tags_addr)
     })
     
   })
