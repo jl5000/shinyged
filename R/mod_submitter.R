@@ -48,7 +48,7 @@ submitter_server <- function(id, r) {
       update_ged_value(r, "subm_rows", 1, "NAME", subm_name)
     })
     
-    address_server("subm_address", r, "subm_rows") #TODO
+    address_server("subm_address", r, "subm_rows")
     notes_server("subm_notes", r, "subm_rows")
     media_links_server("subm_media", r, "subm_rows")
     record_server("subm_raw", r, "subm_rows")
