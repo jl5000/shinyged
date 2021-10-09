@@ -42,21 +42,21 @@ file_data_server <- function(id, r) {
       shinyFeedback::feedbackDanger("ged_source_date", err1, "Source name is required for this input")
       shinyFeedback::feedbackDanger("ged_source_copy", err2, "Source name is required for this input")
       req(is.null(err), !err1, !err2, cancelOutput = TRUE)
-      update_ged_value(r, "head_file_sour_rows", 2, "DATA", ged_source_name, .pkgenv$tags_file_sour)
+      update_ged_value(r, "head_file_sour_rows", "HD", 2, "DATA", ged_source_name, .pkgenv$tags_file_sour)
     })
     shiny::observeEvent(input$ged_source_date, ignoreNULL = FALSE, ignoreInit = TRUE, {
       ged_source_date <- process_input(input$ged_source_date)
       err <- tidyged.internals::chk_date_exact(ged_source_date, 1)
       shinyFeedback::feedbackDanger("ged_source_date", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
-      update_ged_value(r, "head_file_sour_rows", 3, "DATE", ged_source_date, .pkgenv$tags_file_sour)
+      update_ged_value(r, "head_file_sour_rows", "HD", 3, "DATE", ged_source_date, .pkgenv$tags_file_sour)
     })
     shiny::observeEvent(input$ged_source_copy, ignoreNULL = FALSE, ignoreInit = TRUE, {
       ged_source_copy <- process_input(input$ged_source_copy)
       err <- tidyged.internals::chk_copyright_source_data(ged_source_copy, 1)
       shinyFeedback::feedbackDanger("ged_source_copy", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
-      update_ged_value(r, "head_file_sour_rows", 3, "COPR", ged_source_copy, .pkgenv$tags_file_sour)
+      update_ged_value(r, "head_file_sour_rows", "HD", 3, "COPR", ged_source_copy, .pkgenv$tags_file_sour)
     })
     
     shiny::observeEvent(input$ged_source_name, {

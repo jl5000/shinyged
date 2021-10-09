@@ -124,8 +124,10 @@ citation_details_server <- function(id, r) {
       err <- tidyged.internals::chk_where_within_source(page, 1)
       shinyFeedback::feedbackDanger("page", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
-      update_ged_value(r, "citation_rows", r$ged$level[r$citation_rows[1]] + 1, 
-                                "PAGE", page, .pkgenv$tags_sour_cit)
+      update_ged_value(r, "citation_rows", 
+                       r$ged$record[r$citation_rows[1]],
+                       r$ged$level[r$citation_rows[1]] + 1, 
+                       "PAGE", page, .pkgenv$tags_sour_cit)
     })
     
     shiny::observeEvent(input$entry_date, ignoreNULL = FALSE, ignoreInit = TRUE, {
@@ -133,8 +135,10 @@ citation_details_server <- function(id, r) {
       err <- tidyged.internals::chk_date_value(entry_date, 1)
       shinyFeedback::feedbackDanger("entry_date", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
-      update_ged_value(r, "citation_rows", r$ged$level[r$citation_rows[1]] + 2, 
-                                "DATE", entry_date, .pkgenv$tags_sour_cit)
+      update_ged_value(r, "citation_rows", 
+                       r$ged$record[r$citation_rows[1]],
+                       r$ged$level[r$citation_rows[1]] + 2, 
+                       "DATE", entry_date, .pkgenv$tags_sour_cit)
     })
     
     shiny::observeEvent(input$event_type, ignoreNULL = FALSE, ignoreInit = TRUE, {
@@ -144,7 +148,9 @@ citation_details_server <- function(id, r) {
       shinyFeedback::feedbackDanger("event_type", !is.null(err), err)
       shinyFeedback::feedbackDanger("role", err1, "Event type is required for this input")
       req(is.null(err), !err1, cancelOutput = TRUE)
-      update_ged_value(r, "citation_rows", r$ged$level[r$citation_rows[1]] + 1, 
+      update_ged_value(r, "citation_rows", 
+                       r$ged$record[r$citation_rows[1]],
+                       r$ged$level[r$citation_rows[1]] + 1, 
                        "EVEN", event_type, .pkgenv$tags_sour_cit)
     })
     
@@ -160,7 +166,9 @@ citation_details_server <- function(id, r) {
         shinyFeedback::feedbackDanger("role", !is.null(err), err)
       }
       req(is.null(err), cancelOutput = TRUE)
-      update_ged_value(r, "citation_rows", r$ged$level[r$citation_rows[1]] + 2, 
+      update_ged_value(r, "citation_rows", 
+                       r$ged$record[r$citation_rows[1]],
+                       r$ged$level[r$citation_rows[1]] + 2, 
                        "ROLE", role, .pkgenv$tags_sour_cit)
     })
     
@@ -170,7 +178,9 @@ citation_details_server <- function(id, r) {
       err <- tidyged.internals::chk_role_in_event(custom_role, 1)
       shinyFeedback::feedbackWarning("custom_role", !is.null(err), "Enter a custom role")
       req(is.null(err), cancelOutput = TRUE)
-      update_ged_value(r, "citation_rows", r$ged$level[r$citation_rows[1]] + 2, 
+      update_ged_value(r, "citation_rows", 
+                       r$ged$record[r$citation_rows[1]],
+                       r$ged$level[r$citation_rows[1]] + 2, 
                        "ROLE", custom_role, .pkgenv$tags_sour_cit)
     })
     
@@ -179,7 +189,9 @@ citation_details_server <- function(id, r) {
       err <- tidyged.internals::chk_text_from_source(source_text, 1)
       shinyFeedback::feedbackDanger("source_text", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
-      update_ged_value(r, "citation_rows", r$ged$level[r$citation_rows[1]] + 2, 
+      update_ged_value(r, "citation_rows", 
+                       r$ged$record[r$citation_rows[1]],
+                       r$ged$level[r$citation_rows[1]] + 2, 
                        "TEXT", source_text, .pkgenv$tags_sour_cit)
     })
     
@@ -188,8 +200,10 @@ citation_details_server <- function(id, r) {
       err <- tidyged.internals::chk_certainty_assessment(certainty, 1)
       shinyFeedback::feedbackDanger("certainty", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
-      update_ged_value(r, "citation_rows", r$ged$level[r$citation_rows[1]] + 1, 
-                                "QUAY", certainty, .pkgenv$tags_sour_cit)
+      update_ged_value(r, "citation_rows", 
+                       r$ged$record[r$citation_rows[1]],
+                       r$ged$level[r$citation_rows[1]] + 1, 
+                       "QUAY", certainty, .pkgenv$tags_sour_cit)
     })
     
     

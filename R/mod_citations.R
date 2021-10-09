@@ -161,7 +161,6 @@ citations_server <- function(id, r, section_rows) {
       r$cit_to_select <- NULL
     })
 
-
     citation_details_server("citation_details", r)
 
     shiny::observeEvent({input$tabset == "Notes"},once=TRUE,ignoreInit = TRUE, {

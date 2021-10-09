@@ -116,7 +116,7 @@ individual_server <- function(id, r) {
       err <- tidyged.internals::chk_sex_value(sex, 1)
       shinyFeedback::feedbackDanger("sex", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
-      update_ged_value(r, "indi_rows", 1, "SEX", sex)
+      update_ged_value(r, "indi_rows", r$ged$record[r$indi_rows[1]], 1, "SEX", sex)
     })
     
 

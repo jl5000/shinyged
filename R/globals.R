@@ -8,7 +8,6 @@
 .pkgenv$tags_file_sour <- c("SOUR","VERS","NAME","CORP",.pkgenv$tags_addr, "DATA","DATE","COPR")
 .pkgenv$tags_sour_cit <- c("SOUR","PAGE","EVEN","ROLE","DATA","DATE","TEXT","OBJE","NOTE","QUAY")
 
-
 unique_facts <- function() {
   # Make values of the lookups unique for selectInput
   add_space <- function(x) {paste0(x, " ")}

@@ -45,7 +45,7 @@ submitter_server <- function(id, r) {
       err <- tidyged.internals::chk_submitter_name(subm_name, 1)
       shinyFeedback::feedbackDanger("subm_name", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
-      update_ged_value(r, "subm_rows", 1, "NAME", subm_name)
+      update_ged_value(r, "subm_rows", subm()$record[1], 1, "NAME", subm_name)
     })
     
     address_server("subm_address", r, "subm_rows")
