@@ -21,7 +21,8 @@ multimedia_ui <- function(id) {
                                   ref_numbers_ui(ns("media_ref_numbers"))
                     ),
                     shiny::column(width = 6,
-                                  notes_ui(ns("media_notes"))
+                                  notes_ui(ns("media_notes")),
+                                  citations_ui(ns("media_citations"))
                     )
     ) %>% shinyjs::hidden(),
     
@@ -33,7 +34,6 @@ multimedia_ui <- function(id) {
                                     shiny::tabsetPanel(id = ns("tabset"),
                                       shiny::tabPanel("Summary", multimedia_summary_ui(ns("media_summary"))),
                                       shiny::tabPanel("Description", multimedia_description_ui(ns("media_description"))),
-                                      shiny::tabPanel("Citations", citations_ui(ns("media_citations"))),
                                       shiny::tabPanel("Raw data", record_ui(ns("media_raw")))
                                     )
                       )
@@ -113,9 +113,7 @@ multimedia_server <- function(id, r) {
 
     notes_server("media_notes", r, "media_rows")
 
-    shiny::observeEvent({input$tabset == "Citations"},once=TRUE,ignoreInit = TRUE, {
-      citations_server("media_citations", r, "media_rows")
-    })
+    citations_server("media_citations", r, "media_rows")
     
   })
 }

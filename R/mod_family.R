@@ -24,7 +24,8 @@ family_ui <- function(id) {
                     ),
                     shiny::column(width = 6,
                                   notes_ui(ns("famg_notes")),
-                                  media_links_ui(ns("famg_media"))
+                                  media_links_ui(ns("famg_media")),
+                                  citations_ui(ns("famg_citations"))
                     )
     ) %>% shinyjs::hidden(),
     
@@ -37,7 +38,6 @@ family_ui <- function(id) {
                                                      shiny::tabPanel("Members", family_members_ui(ns("family_members"))),
                                                      shiny::tabPanel("Events", family_events_ui(ns("family_events"))),
                                                      shiny::tabPanel("Timeline", timeline_ui(ns("famg_timeline"))),
-                                                     shiny::tabPanel("Citations", citations_ui(ns("famg_citations"))),
                                                      shiny::tabPanel("Raw data", record_ui(ns("famg_raw"))))
                     )
     ) %>% shinyjs::hidden(),
@@ -126,9 +126,7 @@ family_server <- function(id, r) {
 
     notes_server("famg_notes", r, "famg_rows")
  
-    shiny::observeEvent({input$tabset == "Citations"},once=TRUE,ignoreInit = TRUE, {
-      citations_server("famg_citations", r, "famg_rows")
-    })
+    citations_server("famg_citations", r, "famg_rows")
 
     media_links_server("famg_media", r, "famg_rows")
 

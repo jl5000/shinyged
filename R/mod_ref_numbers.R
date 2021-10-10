@@ -21,7 +21,9 @@ ref_numbers_server <- function(id, r, section_rows) {
     shiny::observeEvent(input$ref_numbers, {
       
       shiny::modalDialog(title = "Edit reference numbers",
+                         
                          shiny::helpText("Each record can have any number of user-defined reference numbers associated with it."),
+                         shiny::hr(),
                          DT::DTOutput(ns("table")),
                          
                          shiny::textInput(ns("ref_num"), label = "Reference number"),

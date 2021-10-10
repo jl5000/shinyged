@@ -10,17 +10,15 @@ submitter_ui <- function(id) {
     shiny::tags$br(),
     shiny::helpText("The submitter is the individual who has created and owns the file."),
     shiny::fluidRow(
-      shiny::column(12,
+      shiny::column(4,
                     shiny::textInput(ns("subm_name"), "Name"),
+                    ),
+      shiny::column(8,
                     notes_ui(ns("subm_notes")),
                     media_links_ui(ns("subm_media"))
-                    )
+      )
     ),
-    
-    shiny::tabsetPanel(
-      shiny::tabPanel("Contact details", address_ui(ns("subm_address"))),
-      shiny::tabPanel("Raw data", record_ui(ns("subm_raw")))
-    )
+    address_ui(ns("subm_address")),
     
   )
 }
@@ -56,7 +54,6 @@ submitter_server <- function(id, r) {
     address_server("subm_address", r, "subm_rows")
     notes_server("subm_notes", r, "subm_rows")
     media_links_server("subm_media", r, "subm_rows")
-    record_server("subm_raw", r, "subm_rows")
     
   })
 }
