@@ -3,29 +3,41 @@
 media_links_ui <- function(id) {
   ns <- shiny::NS(id)
   
-  shiny::tagList(
-    shiny::tags$br(),
-    shiny::helpText("Here you can manage links to multimedia associated with an item.", 
-                    "Use the buttons to add and remove links by selecting items in the list."),
-    shiny::tags$hr(),
-    DT::DTOutput(ns("media_list")),
-    shiny::tags$br(),
-    shiny::fluidRow(
-      shiny::column(12,
-                    shiny::actionButton(ns("add_link"), "Add multimedia link"),
-                    shinyjs::disabled(
-                      shiny::actionButton(ns("remove_link"), "Remove multimedia link")
-                    )
-      )
-    )
-    
-  )
-  
+  shiny::actionButton(ns("media_links"), label = NULL)
 }
 
 media_links_server <- function(id, r, section_rows) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
+    
+    # Click the button to show popup
+    shiny::observeEvent(input$media_links, {
+      
+      shiny::modalDialog(
+        title = "Edit multimedia links",
+        
+        shiny::helpText("Here you can manage links to multimedia associated with an item.", 
+                        "Use the buttons to add and remove links by selecting items in the list."),
+        shiny::tags$hr(),
+        DT::DTOutput(ns("media_list")),
+        shiny::tags$br(),
+        shiny::fluidRow(
+          shiny::column(12,
+                        shiny::actionButton(ns("add_link"), "Add multimedia link"),
+                        shinyjs::disabled(
+                          shiny::actionButton(ns("remove_link"), "Remove multimedia link")
+                        )
+          )
+        ),
+        shiny::fluidRow(
+          shiny::selectizeInput(ns("media_choice"), label = "Add reference to existing multimedia record...",
+                                choices = tidyged::describe_records(r$ged, tidyged::xrefs_media(r$ged)),
+                                multiple = TRUE, options = list(maxItems = 1), width = "500px"),
+        )
+      ) %>% shiny::showModal()
+      
+    })
+    
     
     # The vector of media xrefs
     media_xrefs <- shiny::reactive({
@@ -61,9 +73,9 @@ media_links_server <- function(id, r, section_rows) {
       DT::datatable(data.frame(Multimedia = media_desc()), rownames = FALSE, selection = "single")
     })
     
-    # Disable add_link button if no media records to point to
+    # Disable media_choice if no media records to point to
     shiny::observeEvent(r$ged, {
-      shinyjs::toggleState("add_link", tidyged::num_media(r$ged) > 0)
+      shinyjs::toggleState("media_choice", tidyged::num_media(r$ged) > 0)
     })
     
     # Disable remove_link button if nothing selected
@@ -71,30 +83,15 @@ media_links_server <- function(id, r, section_rows) {
       shinyjs::toggleState("remove_link", !is.null(input$media_list_rows_selected))
     })
     
-    # Show dialog to choose a media record
-    shiny::observeEvent(input$add_link, {
-      req(r$ged)
-      shiny::showModal(
-        shiny::modalDialog(
-          shiny::selectizeInput(ns("media_choice"), label = "Add reference to existing multimedia record...",
-                                choices = tidyged::describe_records(r$ged, tidyged::xrefs_media(r$ged)),
-                                multiple = TRUE, options = list(maxItems = 1), width = "500px"),
-          footer = shiny::tagList(
-            shiny::modalButton("Cancel"),
-            shiny::actionButton(ns("add_media_ref"), "Add reference")
-          )
-        )
-      )
-    })
 
-    # Disable add_media_ref button if no media records or it's already been added
-    shiny::observeEvent(input$media_choice, ignoreNULL = FALSE, {
-      shinyjs::toggleState("add_media_ref", !is.null(input$media_choice) && 
+    # Disable add_link button if no media records or it's already been added
+    shiny::observe({
+      shinyjs::toggleState("add_link", !is.null(input$media_choice) && 
                              !input$media_choice %in% media_desc())
     })
     
     # Add media reference
-    shiny::observeEvent(input$add_media_ref, {
+    shiny::observeEvent(input$add_link, {
       media_xref <- stringr::str_extract(input$media_choice, tidyged.internals::reg_xref(FALSE))
       
       r$ged <- tibble::add_row(r$ged,
@@ -106,7 +103,6 @@ media_links_server <- function(id, r, section_rows) {
                                # doesn't shift existing row numbers
                                .after = max(r[[section_rows]]))
       
-      shiny::removeModal()
     })
     
     # Remove media link

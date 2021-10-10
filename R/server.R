@@ -22,20 +22,20 @@ shiny::shinyServer(function(input, output, session) {
     
     shiny::observeEvent(input$read_file, {
         if(!is.null(r$ged)) {
-            shiny::showModal(
-                shiny::modalDialog(
-                    shiny::h4("If you continue, the current app data will be overwritten.",
-                              shiny::br(),
-                              "Would you like to Cancel and export your data to file first, 
+            
+            shiny::modalDialog(
+                shiny::h4("If you continue, the current app data will be overwritten.",
+                          shiny::br(),
+                          "Would you like to Cancel and export your data to file first, 
                               or Discard existing data and import the file?"),
-                    title = "Continue?",
-                    easyClose = FALSE,
-                    footer = shiny::tagList(
-                        shiny::modalButton("Cancel"),
-                        shiny::actionButton("discard_and_read", "Discard")
-                    )
+                title = "Continue?",
+                easyClose = FALSE,
+                footer = shiny::tagList(
+                    shiny::modalButton("Cancel"),
+                    shiny::actionButton("discard_and_read", "Discard")
                 )
-            )
+            ) %>% shiny::showModal()
+            
         } else {
             r$ged <- tidyged.io::read_gedcom(input$read_file$datapath)
             r$file_count <- r$file_count + 1
@@ -50,20 +50,20 @@ shiny::shinyServer(function(input, output, session) {
     
     shiny::observeEvent(input$create_gedcom, {
         if(!is.null(r$ged)) {
-            shiny::showModal(
-                shiny::modalDialog(
-                    shiny::h4("If you continue, the current app data will be overwritten.",
-                              shiny::br(),
-                              "Would you like to Cancel and export your data to file first, 
+            
+            shiny::modalDialog(
+                shiny::h4("If you continue, the current app data will be overwritten.",
+                          shiny::br(),
+                          "Would you like to Cancel and export your data to file first, 
                               or Discard existing data and create a new file?"),
-                    title = "Continue?",
-                    easyClose = FALSE,
-                    footer = shiny::tagList(
-                        shiny::modalButton("Cancel"),
-                        shiny::actionButton("discard_and_create", "Discard")
-                    )
+                title = "Continue?",
+                easyClose = FALSE,
+                footer = shiny::tagList(
+                    shiny::modalButton("Cancel"),
+                    shiny::actionButton("discard_and_create", "Discard")
                 )
-            )
+            ) %>% shiny::showModal()
+            
         } else {
             r$ged <- tidyged::gedcom()
             r$file_count <- r$file_count + 1

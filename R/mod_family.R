@@ -17,10 +17,14 @@ family_ui <- function(id) {
       )
       
     ),
-    
+
     shiny::fluidRow(id = ns("famg_data"),
-                    shiny::column(width = 12,
+                    shiny::column(width = 6,
                                   ref_numbers_ui(ns("famg_ref_numbers"))
+                    ),
+                    shiny::column(width = 6,
+                                  notes_ui(ns("famg_notes")),
+                                  media_links_ui(ns("famg_media"))
                     )
     ) %>% shinyjs::hidden(),
     
@@ -33,9 +37,7 @@ family_ui <- function(id) {
                                                      shiny::tabPanel("Members", family_members_ui(ns("family_members"))),
                                                      shiny::tabPanel("Events", family_events_ui(ns("family_events"))),
                                                      shiny::tabPanel("Timeline", timeline_ui(ns("famg_timeline"))),
-                                                     shiny::tabPanel("Notes", notes_ui(ns("famg_notes"))),
                                                      shiny::tabPanel("Citations", citations_ui(ns("famg_citations"))),
-                                                     shiny::tabPanel("Media", media_links_ui(ns("famg_media"))),
                                                      shiny::tabPanel("Raw data", record_ui(ns("famg_raw"))))
                     )
     ) %>% shinyjs::hidden(),
@@ -121,15 +123,15 @@ family_server <- function(id, r) {
     shiny::observeEvent({input$tabset == "Events"},once=TRUE,ignoreInit = TRUE, {
       family_events_server("family_events", r)
     })
-    shiny::observeEvent({input$tabset == "Notes"},once=TRUE,ignoreInit = TRUE, {
-      notes_server("famg_notes", r, "famg_rows")
-    })
+
+    notes_server("famg_notes", r, "famg_rows")
+ 
     shiny::observeEvent({input$tabset == "Citations"},once=TRUE,ignoreInit = TRUE, {
       citations_server("famg_citations", r, "famg_rows")
     })
-    shiny::observeEvent({input$tabset == "Media"},once=TRUE,ignoreInit = TRUE, {
-      media_links_server("famg_media", r, "famg_rows")
-    })
+
+    media_links_server("famg_media", r, "famg_rows")
+
     
     
    

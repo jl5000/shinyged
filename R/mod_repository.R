@@ -13,8 +13,18 @@ repository_ui <- function(id) {
                     shiny::actionButton(ns("add"), "Add repository"),
                     shiny::actionButton(ns("delete"), "Delete repository")
       )
-      
     ),
+    
+    shiny::fluidRow(id = ns("repo_data"),
+                    shiny::column(width = 6,
+                                  ref_numbers_ui(ns("repo_ref_numbers"))
+                    ),
+                    shiny::column(width = 6,
+                                  notes_ui(ns("repo_notes"))
+                    )
+    ) %>% shinyjs::hidden(),
+    
+    shiny::br(),
     
     
     shiny::fluidRow(id = ns("repo_tabs"),
@@ -22,7 +32,6 @@ repository_ui <- function(id) {
                                   shiny::tabsetPanel(id = ns("tabset"),
                                                      shiny::tabPanel("Summary", repository_summary_ui(ns("repo_summary"))),
                                                      shiny::tabPanel("Details", repository_details_ui(ns("repo_details"))),
-                                                     shiny::tabPanel("Notes", notes_ui(ns("repo_notes"))),
                                                      shiny::tabPanel("Raw data", record_ui(ns("repo_raw"))))
                     ) 
     ) %>% shinyjs::hidden()
@@ -78,16 +87,16 @@ repository_server <- function(id, r) {
     # Popup to to give repository name
     shiny::observeEvent(input$add, {
       req(r$ged)
-      shiny::showModal(
-        shiny::modalDialog(
-          shiny::helpText("The repository must be given a name."),
-          shiny::textInput(ns("repo_name"), label = "Repository name"),
-          footer = shiny::tagList(
-            shiny::modalButton("Cancel"),
-            shinyjs::disabled(shiny::actionButton(ns("add_repo"), "Add repository"))
-          )
+      
+      shiny::modalDialog(
+        shiny::helpText("The repository must be given a name."),
+        shiny::textInput(ns("repo_name"), label = "Repository name"),
+        footer = shiny::tagList(
+          shiny::modalButton("Cancel"),
+          shinyjs::disabled(shiny::actionButton(ns("add_repo"), "Add repository"))
         )
-      )
+      ) %>% shiny::showModal()
+      
     })
     
     # Disable add_repo button if no valid name
@@ -116,15 +125,16 @@ repository_server <- function(id, r) {
       r$repo_to_select <- NULL
     })
     
+    ref_numbers_server("repo_ref_numbers", r, "repo_rows")
     repository_summary_server("repo_summary", r)
     record_server("repo_raw", r, "repo_rows")
     
     shiny::observeEvent({input$tabset == "Details"},once=TRUE,ignoreInit = TRUE, {
       repository_details_server("repo_details", r)
     })
-    shiny::observeEvent({input$tabset == "Notes"},once=TRUE,ignoreInit = TRUE, {
-      notes_server("repo_notes", r, "repo_rows")
-    })
+
+    notes_server("repo_notes", r, "repo_rows")
+
     
     
     

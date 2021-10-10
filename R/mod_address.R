@@ -57,59 +57,54 @@ address_server <- function(id, r, section_rows) {
 
     shiny::observeEvent(input$edit_address, {
       req(r$ged)
-      shiny::showModal(
-        shiny::modalDialog(title = "Edit address",
-
-                           shiny::fluidRow(
-                             shiny::column(6,
-                                           shiny::textAreaInput(ns("adr"), "Initial address lines (max 3 lines, no separator)",
-                                                                dplyr::filter(addr(), tag %in% paste0("ADR",1:3))$value %>%
-                                                                  paste(collapse = "\n"), rows = 3),
-                                           shiny::textInput(ns("city"), "City",
-                                                            dplyr::filter(addr(), tag == "CITY")$value),
-                             ),
-                             shiny::column(6,
-                                           shiny::textInput(ns("state"), "State",
-                                                            dplyr::filter(addr(), tag == "STAE")$value),
-                                           shiny::textInput(ns("postcode"), "Postal code",
-                                                            dplyr::filter(addr(), tag == "POST")$value),
-                                           shiny::textInput(ns("country"), "Country",
-                                                            dplyr::filter(addr(), tag == "CTRY")$value)
-                             )
-
+      
+      shiny::modalDialog(title = "Edit address",
+                         
+                         shiny::fluidRow(
+                           shiny::column(6,
+                                         shiny::textAreaInput(ns("adr"), "Initial address lines (max 3 lines, no separator)",
+                                                              dplyr::filter(addr(), tag %in% paste0("ADR",1:3))$value %>%
+                                                                paste(collapse = "\n"), rows = 3),
+                                         shiny::textInput(ns("city"), "City",
+                                                          dplyr::filter(addr(), tag == "CITY")$value),
                            ),
-
-                           shiny::helpText("Up to 3 separate phone numbers, FAX numbers, email addresses, and websites can be defined. ",
-                                           "These must be defined on separate lines."),
-
-                           shiny::fluidRow(
-                             shiny::column(6,
-                                           shiny::textAreaInput(ns("phones"), "Phone numbers", 
-                                                                dplyr::filter(addr(), tag == "PHON")$value %>%
-                                                                  paste(collapse = "\n"), rows = 3),
-                                           shiny::textAreaInput(ns("emails"), "Email addresses", 
-                                                                dplyr::filter(addr(), tag == "EMAIL")$value %>%
-                                                                  paste(collapse = "\n"), rows = 3)
-                             ),
-                             shiny::column(6,
-                                           shiny::textAreaInput(ns("faxes"), "Fax numbers", 
-                                                                dplyr::filter(addr(), tag == "FAX")$value %>%
-                                                                  paste(collapse = "\n"), rows = 3),
-                                           shiny::textAreaInput(ns("websites"), "Websites", 
-                                                                dplyr::filter(addr(), tag == "WWW")$value %>%
-                                                                  paste(collapse = "\n"), rows = 3)
-                             )
-                           ),
-
-                           footer = shiny::tagList(
-                             shiny::actionButton(ns("apply"), "Apply")
+                           shiny::column(6,
+                                         shiny::textInput(ns("state"), "State",
+                                                          dplyr::filter(addr(), tag == "STAE")$value),
+                                         shiny::textInput(ns("postcode"), "Postal code",
+                                                          dplyr::filter(addr(), tag == "POST")$value),
+                                         shiny::textInput(ns("country"), "Country",
+                                                          dplyr::filter(addr(), tag == "CTRY")$value)
                            )
-        )
-      )
+                           
+                         ),
+                         
+                         shiny::helpText("Up to 3 separate phone numbers, FAX numbers, email addresses, and websites can be defined. ",
+                                         "These must be defined on separate lines."),
+                         
+                         shiny::fluidRow(
+                           shiny::column(6,
+                                         shiny::textAreaInput(ns("phones"), "Phone numbers", 
+                                                              dplyr::filter(addr(), tag == "PHON")$value %>%
+                                                                paste(collapse = "\n"), rows = 3),
+                                         shiny::textAreaInput(ns("emails"), "Email addresses", 
+                                                              dplyr::filter(addr(), tag == "EMAIL")$value %>%
+                                                                paste(collapse = "\n"), rows = 3)
+                           ),
+                           shiny::column(6,
+                                         shiny::textAreaInput(ns("faxes"), "Fax numbers", 
+                                                              dplyr::filter(addr(), tag == "FAX")$value %>%
+                                                                paste(collapse = "\n"), rows = 3),
+                                         shiny::textAreaInput(ns("websites"), "Websites", 
+                                                              dplyr::filter(addr(), tag == "WWW")$value %>%
+                                                                paste(collapse = "\n"), rows = 3)
+                           )
+                         ),
+                         
+      ) %>% shiny::showModal()
+    
     })
     
-    shiny::observeEvent(input$apply, shiny::removeModal())
-
     shiny::observeEvent(input$adr, ignoreNULL = FALSE, ignoreInit = TRUE, {
       adr <- process_input(input$adr)
       err <- tidyged.internals::chk_address_lines(adr, 3)

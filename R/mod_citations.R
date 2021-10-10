@@ -17,14 +17,14 @@ citations_ui <- function(id) {
                     shiny::actionButton(ns("remove_citation"), "Delete citation")
       )
     ),
+    notes_ui(ns("citation_notes")),
+    media_links_ui(ns("citation_media")),
     shiny::tags$br(),
     
     shiny::fluidRow(id = ns("citation_tabs"),
                     shiny::column(12,
                                   shiny::tabsetPanel(id = ns("tabset"),
-                                                     shiny::tabPanel("Details", citation_details_ui(ns("citation_details"))),
-                                                     shiny::tabPanel("Notes", notes_ui(ns("citation_notes"))),
-                                                     shiny::tabPanel("Media", media_links_ui(ns("citation_media")))
+                                                     shiny::tabPanel("Details", citation_details_ui(ns("citation_details")))
                                   )
                     )
     ) %>% shinyjs::hidden()
@@ -120,17 +120,17 @@ citations_server <- function(id, r, section_rows) {
     # Show dialog to choose a source record
     shiny::observeEvent(input$add_citation, {
       req(r$ged)
-      shiny::showModal(
-        shiny::modalDialog(
-          shiny::selectizeInput(ns("source_select"), label = "Choose a source...",
-                                choices = tidyged::describe_records(r$ged, tidyged::xrefs_sour(r$ged), short_desc = TRUE),
-                                multiple = TRUE, options = list(maxItems = 1), width = "500px"),
-          footer = shiny::tagList(
-            shiny::modalButton("Cancel"),
-            shiny::actionButton(ns("add_sour_citation"), "Add source citation")
-          )
+      
+      shiny::modalDialog(
+        shiny::selectizeInput(ns("source_select"), label = "Choose a source...",
+                              choices = tidyged::describe_records(r$ged, tidyged::xrefs_sour(r$ged), short_desc = TRUE),
+                              multiple = TRUE, options = list(maxItems = 1), width = "500px"),
+        footer = shiny::tagList(
+          shiny::modalButton("Cancel"),
+          shiny::actionButton(ns("add_sour_citation"), "Add source citation")
         )
-      )
+      ) %>% shiny::showModal()
+      
     })
 
     # Disable add_sour_citation button if no source records
@@ -163,12 +163,11 @@ citations_server <- function(id, r, section_rows) {
 
     citation_details_server("citation_details", r)
 
-    shiny::observeEvent({input$tabset == "Notes"},once=TRUE,ignoreInit = TRUE, {
-      notes_server("citation_notes", r, "citation_rows")
-    })
-    shiny::observeEvent({input$tabset == "Media"},once=TRUE,ignoreInit = TRUE, {
-      media_links_server("citation_media", r, "citation_rows")
-    })
+    notes_server("citation_notes", r, "citation_rows")
+
+
+    media_links_server("citation_media", r, "citation_rows")
+
 
   })
 }

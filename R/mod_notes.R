@@ -3,28 +3,7 @@
 notes_ui <- function(id) {
   ns <- shiny::NS(id)
   
-  shiny::tagList(
-    shiny::tags$br(),
-    shiny::helpText("Here you can manage notes associated with an item. You can either add notes via the text box or point to existing note records.", 
-                    "Use the buttons to add, remove, and edit notes via the text box and by selecting notes in the list."),
-    shiny::tags$hr(),
-    DT::DTOutput(ns("notes_list")),
-    shiny::tags$br(),
-    shiny::fluidRow(
-      shiny::column(12,
-                    shiny::actionButton(ns("add_note"), "Add note"),
-                    shiny::actionButton(ns("choose_note_ref"), "Add reference to global note"),
-                    shinyjs::disabled(
-                      shiny::actionButton(ns("remove_note"), "Remove note"),
-                      shiny::actionButton(ns("update_note"), "Update note")
-                    )
-      )
-    ),
-    shiny::tags$br(),
-    shiny::textAreaInput(ns("note_text"), "Edit note...", height = "150px") %>%
-      shiny::tagAppendAttributes(style = 'width: 85%;')
-    )
-
+  shiny::actionButton(ns("notes"), label = NULL)
 }
 
 
@@ -32,13 +11,54 @@ notes_server <- function(id, r, section_rows) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
+    # Click the button to show popup
+    shiny::observeEvent(input$notes, {
+      
+      shiny::modalDialog(
+        title = "Edit notes",
+        
+        shiny::helpText("Here you can manage notes associated with an item. You can either add notes via the text box or point to existing note records.", 
+                        "Use the buttons to add, remove, and edit notes via the text box and by selecting notes in the list."),
+        shiny::tags$hr(),
+        DT::DTOutput(ns("notes_list")),
+        shiny::tags$br(),
+        shiny::fluidRow(
+          shiny::column(12,
+                        shiny::actionButton(ns("add_note"), "Add note"),
+                        shiny::actionButton(ns("remove_note"), "Remove note") %>% shinyjs::disabled(),
+                        shiny::actionButton(ns("update_note"), "Update note") %>% shinyjs::disabled()
+          )
+        ),
+        shiny::tags$br(),
+        shiny::textAreaInput(ns("note_text"), "Edit note...", height = "150px") %>%
+          shiny::tagAppendAttributes(style = 'width: 85%;'),
+        
+        shiny::selectizeInput(ns("note_ref_list"), label = "Add reference to existing note record...",
+                              choices = dplyr::filter(r$ged, level == 0, tag == "NOTE")$value,
+                              multiple = TRUE, options = list(maxItems = 1), width = "500px"),
+        shiny::actionButton(ns("add_note_ref"), "Add reference"),
+        
+      ) %>% shiny::showModal()
+      
+      shinyjs::toggleState("note_ref_list", tidyged::num_note(r$ged) > 0)
+      
+    })
+      
     # The vector of notes
     notes_raw <- shiny::reactive({
       req(r$ged, r[[section_rows]])
-
+      
       dplyr::slice(r$ged, r[[section_rows]]) %>%
         dplyr::filter(level == .$level[1] + 1, tag == "NOTE") %>% 
         dplyr::pull(value)
+    })
+    
+    shiny::observeEvent(notes_raw(), {
+      req(notes_raw)
+      
+      lbl <- paste0(length(notes_raw()), " notes")
+      if(length(notes_raw()) == 1) lbl <- substr(lbl, 1, nchar(lbl) - 1)
+      shiny::updateActionButton(inputId = "notes", label = lbl)
     })
     
     # The vector of notes, but with references to global notes replaced with note text
@@ -79,9 +99,9 @@ notes_server <- function(id, r, section_rows) {
       shinyjs::toggleState("add_note", valid_note())
     })
     
-    # Disable choose_note_ref button if no note records to point to
+    # Disable note_ref_list if no note records to point to
     shiny::observeEvent(r$ged, {
-      shinyjs::toggleState("choose_note_ref", tidyged::num_note(r$ged) > 0)
+      shinyjs::toggleState("note_ref_list", tidyged::num_note(r$ged) > 0)
     })
     
     # Disable update_note button if no valid note and no row selected
@@ -119,24 +139,8 @@ notes_server <- function(id, r, section_rows) {
      shiny::updateTextAreaInput(inputId = "note_text", value = "")
    })
    
-   # Show dialog to choose a note record
-   shiny::observeEvent(input$choose_note_ref, {
-     req(r$ged)
-     shiny::showModal(
-       shiny::modalDialog(
-         shiny::selectizeInput(ns("note_ref_list"), label = "Add reference to existing note record...",
-                               choices = dplyr::filter(r$ged, level == 0, tag == "NOTE")$value,
-                               multiple = TRUE, options = list(maxItems = 1), width = "500px"),
-         footer = shiny::tagList(
-           shiny::modalButton("Cancel"),
-           shiny::actionButton(ns("add_note_ref"), "Add reference")
-         )
-       )
-     )
-   })
-   
    # Disable add_note_ref button if no note records or it's already been added
-   shiny::observeEvent(input$note_ref_list, ignoreNULL = FALSE, {
+   shiny::observe({
      shinyjs::toggleState("add_note_ref", !is.null(input$note_ref_list) && 
                             !input$note_ref_list %in% notes_txt())
    })
@@ -154,7 +158,6 @@ notes_server <- function(id, r, section_rows) {
                               # doesn't shift existing row numbers
                               .after = max(r[[section_rows]]))
      
-     shiny::removeModal()
    })
    
    # Remove note and clear text box

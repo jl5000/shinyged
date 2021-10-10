@@ -9,11 +9,16 @@ submitter_ui <- function(id) {
   shiny::tagList(
     shiny::tags$br(),
     shiny::helpText("The submitter is the individual who has created and owns the file."),
-    shiny::textInput(ns("subm_name"), "Name"),
+    shiny::fluidRow(
+      shiny::column(12,
+                    shiny::textInput(ns("subm_name"), "Name"),
+                    notes_ui(ns("subm_notes")),
+                    media_links_ui(ns("subm_media"))
+                    )
+    ),
+    
     shiny::tabsetPanel(
       shiny::tabPanel("Contact details", address_ui(ns("subm_address"))),
-      shiny::tabPanel("Notes", notes_ui(ns("subm_notes"))),
-      shiny::tabPanel("Media", media_links_ui(ns("subm_media"))),
       shiny::tabPanel("Raw data", record_ui(ns("subm_raw")))
     )
     

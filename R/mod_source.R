@@ -17,8 +17,12 @@ source_ui <- function(id) {
     ),
     
     shiny::fluidRow(id = ns("sour_data"),
-                    shiny::column(width = 12,
-                                  ref_numbers_ui(ns("sour_ref_numbers")) 
+                    shiny::column(width = 6,
+                                  ref_numbers_ui(ns("sour_ref_numbers"))
+                    ),
+                    shiny::column(width = 6,
+                                  notes_ui(ns("sour_notes")),
+                                  media_links_ui(ns("sour_media"))
                     )
     ) %>% shinyjs::hidden(),
     
@@ -30,8 +34,6 @@ source_ui <- function(id) {
                                                      shiny::tabPanel("Summary", source_summary_ui(ns("sour_summary"))),
                                                      shiny::tabPanel("Data", source_data_ui(ns("sour_data"))),
                                                      shiny::tabPanel("Details", source_details_ui(ns("sour_details"))),
-                                                     shiny::tabPanel("Notes", notes_ui(ns("sour_notes"))),
-                                                     shiny::tabPanel("Media", media_links_ui(ns("sour_media"))),
                                                      shiny::tabPanel("Raw data", record_ui(ns("sour_raw")))
                                   )
                     )
@@ -111,12 +113,12 @@ source_server <- function(id, r) {
     shiny::observeEvent({input$tabset == "Details"},once=TRUE,ignoreInit = TRUE, {
       source_details_server("sour_details", r)
     })
-    shiny::observeEvent({input$tabset == "Notes"},once=TRUE,ignoreInit = TRUE, {
-      notes_server("sour_notes", r, "sour_rows")
-    })
-    shiny::observeEvent({input$tabset == "Media"},once=TRUE,ignoreInit = TRUE, {
-      media_links_server("sour_media", r, "sour_rows")
-    })
+
+    notes_server("sour_notes", r, "sour_rows")
+
+
+    media_links_server("sour_media", r, "sour_rows")
+
     
   })
 }
