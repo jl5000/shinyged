@@ -4,8 +4,9 @@
 citations_ui <- function(id) {
   ns <- shiny::NS(id)
   
-  shiny::actionButton(ns("citations"), label = NULL)
-
+  shiny::tagList(
+    shiny::actionButton(ns("citations"), label = NULL)
+  )
 }
 
 
@@ -20,7 +21,7 @@ citations_server <- function(id, r, section_rows) {
     
     # Show modal
     shiny::observeEvent(input$citations, {
-      show_citations_modal(ns)
+      show_citations_modal(ns, r)
     })
     
     
@@ -71,7 +72,7 @@ citations_server <- function(id, r, section_rows) {
         paste0(seq_along(.), ". ", .) # 1. 2. 3. etc.
 
     })
-
+    #TODO: Try to get same citation selected when modal is returned to
     citation_to_select <- shiny::reactive({
       if(is.null(r$cit_to_select)) {
         input$citation
@@ -82,6 +83,7 @@ citations_server <- function(id, r, section_rows) {
     
     # Update choices with list of individuals and select one
     observe({
+      r$cits <- citations()
       if(!is.null(citations())) {
         shiny::updateSelectizeInput(session = session, inputId = "citation", choices = citations(), 
                                     selected = citation_to_select())
@@ -89,7 +91,7 @@ citations_server <- function(id, r, section_rows) {
         shiny::updateSelectizeInput(session = session, inputId = "citation", choices = character(), 
                                     selected = character())
       }
-      r$cit_to_select <- NULL
+      r$cit_to_select <- input$citation
     })
 
     # Update citation_rows with rows of selected citation
@@ -102,7 +104,7 @@ citations_server <- function(id, r, section_rows) {
 
     # Show/hide tabs and toggle delete button if no citation
     shiny::observeEvent(input$citation, ignoreNULL = FALSE, {
-      shinyjs::toggle("citation_tabs", condition = !is.null(input$citation))
+      shinyjs::toggle("citation_section", condition = !is.null(input$citation))
       shinyjs::toggleState("remove_citation", !is.null(input$citation))
     })
     
@@ -149,6 +151,10 @@ citations_server <- function(id, r, section_rows) {
       r$ged <- dplyr::slice(r$ged, -r$citation_rows)
       r$cit_to_select <- NULL
     })
+    
+    shiny::observeEvent(r$cit_to_select, ignoreNULL = FALSE, {
+      print(r$cit_to_select)
+    })
 
     citation_details_server("citation_details", r)
     notes_server("citation_notes", r, "citation_rows", show_citations_modal)
@@ -158,7 +164,7 @@ citations_server <- function(id, r, section_rows) {
   })
 }
 
-show_citations_modal <- function(ns){
+show_citations_modal <- function(ns, r){
   
   shiny::modalDialog(
     title = "Edit source citations",
@@ -166,7 +172,7 @@ show_citations_modal <- function(ns){
     shiny::helpText("Here you can manage citations associated with an item.",
                     "Citations are links to sources that provide evidence for the item."),
     shiny::tags$hr(),
-    shiny::selectizeInput(ns("citation"), label = NULL, choices = NULL,
+    shiny::selectizeInput(ns("citation"), label = NULL, choices = r$cits, selected = r$cit_to_select,
                           multiple = TRUE, width = "750px", options = list(maxItems = 1)),
     shiny::fluidRow(
       shiny::column(12,
@@ -174,15 +180,17 @@ show_citations_modal <- function(ns){
                     shiny::actionButton(ns("remove_citation"), "Delete citation")
       )
     ),
-    notes_ui(ns("citation_notes")),
-    media_links_ui(ns("citation_media")),
-    shiny::tags$br(),
     
-    shiny::fluidRow(id = ns("citation_tabs"),
+    shiny::tags$hr(),
+    
+    shiny::fluidRow(id = ns("citation_section"),
                     shiny::column(12,
-                                  shiny::tabsetPanel(id = ns("tabset"),
-                                                     shiny::tabPanel("Details", citation_details_ui(ns("citation_details")))
-                                  )
+                                  notes_ui(ns("citation_notes")),
+                                  media_links_ui(ns("citation_media")),
+                                  
+                    ),
+                    shiny::column(12,
+                                  citation_details_ui(ns("citation_details"))
                     )
     ) %>% shinyjs::hidden()
     

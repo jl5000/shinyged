@@ -7,7 +7,7 @@ file_ui <- function(id) {
   shiny::tagList(
     shiny::tags$br(),
     
-    shiny::tabsetPanel(
+    shiny::tabsetPanel(id = "tabset",
       shiny::tabPanel("Summary", file_summary_ui(ns("file_summary"))),
       shiny::tabPanel("File details", file_details_ui(ns("file_details"))),
       shiny::tabPanel("Source data details", file_data_ui(ns("file_data"))),
@@ -27,9 +27,17 @@ file_server <- function(id, r) {
     })
     
     file_summary_server("file_summary", r)
-    file_details_server("file_details", r)
-    file_data_server("file_data", r)
-    record_server("file_raw", r, "head_rows")
+    
+    shiny::observeEvent({input$tabset == "File details"},once=TRUE,ignoreInit = TRUE, {
+      file_details_server("file_details", r)
+    })
+    shiny::observeEvent({input$tabset == "Source data details"},once=TRUE,ignoreInit = TRUE, {
+      file_data_server("file_data", r)
+    })
+    shiny::observeEvent({input$tabset == "Raw data"},once=TRUE,ignoreInit = TRUE, {
+      record_server("file_raw", r, "head_rows")
+    })
+    
   })
 }
 

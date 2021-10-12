@@ -13,7 +13,7 @@ submitter_ui <- function(id) {
       shiny::column(4,
                     shiny::textInput(ns("subm_name"), "Name"),
                     ),
-      shiny::column(8,
+      shiny::column(8, style = 'margin-top:25px',
                     notes_ui(ns("subm_notes")),
                     media_links_ui(ns("subm_media"))
       )

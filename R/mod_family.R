@@ -111,8 +111,11 @@ family_server <- function(id, r) {
     })
     
     ref_numbers_server("famg_ref_numbers", r, "famg_rows")
+    notes_server("famg_notes", r, "famg_rows")
+    citations_server("famg_citations", r, "famg_rows")
+    media_links_server("famg_media", r, "famg_rows")
     family_summary_server("family_summary", r)
-    record_server("famg_raw", r, "famg_rows")
+    
     
     shiny::observeEvent({input$tabset == "Timeline"},once=TRUE,ignoreInit = TRUE, {
       timeline_server("famg_timeline", r, "famg_rows")
@@ -123,12 +126,10 @@ family_server <- function(id, r) {
     shiny::observeEvent({input$tabset == "Events"},once=TRUE,ignoreInit = TRUE, {
       family_events_server("family_events", r)
     })
-
-    notes_server("famg_notes", r, "famg_rows")
- 
-    citations_server("famg_citations", r, "famg_rows")
-
-    media_links_server("famg_media", r, "famg_rows")
+    shiny::observeEvent({input$tabset == "Raw data"},once=TRUE,ignoreInit = TRUE, {
+      record_server("famg_raw", r, "famg_rows")
+    })
+   
 
     
     

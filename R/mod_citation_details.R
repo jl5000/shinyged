@@ -142,6 +142,7 @@ citation_details_server <- function(id, r) {
     })
     
     shiny::observeEvent(input$event_type, ignoreNULL = FALSE, ignoreInit = TRUE, {
+      # some events have had a space added to make them unique
       event_type <- process_input(input$event_type) %>% stringr::str_trim()
       err <- tidyged.internals::chk_event_type_cited_from(event_type, 1)
       err1 <- is.null(input$event_type) & !is.null(input$role)
@@ -154,6 +155,7 @@ citation_details_server <- function(id, r) {
                        "EVEN", event_type, .pkgenv$tags_sour_cit)
     })
     
+   
     shiny::observeEvent(input$role, ignoreNULL = FALSE, ignoreInit = TRUE, {
       role <- process_input(input$role)
       if(!is.null(input$role) && input$role == "Other") {
@@ -166,21 +168,23 @@ citation_details_server <- function(id, r) {
         shinyFeedback::feedbackDanger("role", !is.null(err), err)
       }
       req(is.null(err), cancelOutput = TRUE)
-      update_ged_value(r, "citation_rows", 
+      update_ged_value(r, "citation_rows",
                        r$ged$record[r$citation_rows[1]],
-                       r$ged$level[r$citation_rows[1]] + 2, 
+                       r$ged$level[r$citation_rows[1]] + 2,
                        "ROLE", role, .pkgenv$tags_sour_cit)
     })
     
     shiny::observeEvent(input$custom_role, ignoreNULL = FALSE, ignoreInit = TRUE, {
       custom_role <- process_input(input$custom_role)
-      custom_role <- paste0("(", custom_role, ")")
+      if(!is.null(input$role) && input$role == "Other") {
+        role <- paste0("(", input$custom_role, ")")
+      }
       err <- tidyged.internals::chk_role_in_event(custom_role, 1)
       shinyFeedback::feedbackWarning("custom_role", !is.null(err), "Enter a custom role")
       req(is.null(err), cancelOutput = TRUE)
-      update_ged_value(r, "citation_rows", 
+      update_ged_value(r, "citation_rows",
                        r$ged$record[r$citation_rows[1]],
-                       r$ged$level[r$citation_rows[1]] + 2, 
+                       r$ged$level[r$citation_rows[1]] + 2,
                        "ROLE", custom_role, .pkgenv$tags_sour_cit)
     })
     

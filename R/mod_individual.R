@@ -50,6 +50,11 @@ individual_ui <- function(id) {
 individual_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
 
+    ref_numbers_server("indi_ref_numbers", r, "indi_rows")
+    notes_server("indi_notes", r, "indi_rows")
+    citations_server("indi_citations", r, "indi_rows")
+    media_links_server("indi_media", r, "indi_rows")
+    
     # Update list of individuals
     records <- shiny::reactive({
       req(r$ged)
@@ -121,9 +126,9 @@ individual_server <- function(id, r) {
     })
     
 
-    ref_numbers_server("indi_ref_numbers", r, "indi_rows")
+    
     individual_summary_server("indi_summary", r)
-    record_server("indi_raw", r, "indi_rows")
+    
     
     shiny::observeEvent({input$tabset == "Timeline"},once=TRUE,ignoreInit = TRUE, {
       timeline_server("indi_timeline", r, "indi_rows")
@@ -137,15 +142,9 @@ individual_server <- function(id, r) {
     shiny::observeEvent({input$tabset == "Links"},once=TRUE,ignoreInit = TRUE, {
       individual_links_server("indi_links", r)
     })
-
-    notes_server("indi_notes", r, "indi_rows")
-
-    citations_server("indi_citations", r, "indi_rows")
-
-    media_links_server("indi_media", r, "indi_rows")
-
-    
-    
+    shiny::observeEvent({input$tabset == "Raw data"},once=TRUE,ignoreInit = TRUE, {
+      record_server("indi_raw", r, "indi_rows")
+    })
     
   })
 }

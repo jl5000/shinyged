@@ -3,8 +3,10 @@
 media_links_ui <- function(id) {
   ns <- shiny::NS(id)
   
-  shiny::actionButton(ns("media_links"), label = NULL)
-}
+  shiny::tagList(
+    shiny::actionButton(ns("media_links"), label = NULL)
+  )
+  }
 
 media_links_server <- function(id, r, section_rows, parent_modal_fn = NULL) {
   moduleServer(id, function(input, output, session) {
@@ -50,7 +52,7 @@ media_links_server <- function(id, r, section_rows, parent_modal_fn = NULL) {
       if(is.null(parent_modal_fn)){
         shiny::removeModal()
       } else {
-        parent_modal_fn(ns)
+        parent_modal_fn(ns, r)
       }
     })
     

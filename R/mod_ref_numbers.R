@@ -8,8 +8,14 @@
 ref_numbers_ui <- function(id) {
   ns <- shiny::NS(id)
   
-  shiny::actionButton(ns("ref_numbers"), label = NULL)
-}
+  shiny::tagList(
+    shiny::actionButton(ns("ref_numbers"), label = NULL),
+    
+    shinyBS::bsModal("ref_numbers_modal", "Edit reference numbers", ns("ref_numbers"),
+                     shiny::uiOutput(ns("test"))
+                     )
+  )
+  }
 
 
 
@@ -17,22 +23,23 @@ ref_numbers_server <- function(id, r, section_rows) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
-    # Click the button to show popup
-    shiny::observeEvent(input$ref_numbers, {
-      
-      shiny::modalDialog(title = "Edit reference numbers",
-                         
-                         shiny::helpText("Each record can have any number of user-defined reference numbers associated with it."),
-                         shiny::hr(),
-                         DT::DTOutput(ns("table")),
-                         
-                         shiny::textInput(ns("ref_num"), label = "Reference number"),
-                         shiny::textInput(ns("ref_type"), label = "Reference type (optional)") %>% shinyjs::disabled(),
-                         shiny::actionButton(ns("add_ref_num"), "Add reference number") %>% shinyjs::disabled(),
-                         shiny::actionButton(ns("delete_ref_num"), "Delete reference number") %>% shinyjs::disabled(),
-                         shiny::actionButton(ns("update_ref_num"), "Update reference number") %>% shinyjs::disabled(),
-                         
-      ) %>% shiny::showModal()
+    # Click the button to show popup (commented out code is how to do it in shiny)
+    # shiny::observeEvent(input$ref_numbers, {
+    #   
+    #   shiny::modalDialog(title = "Edit reference numbers",
+    output$test <- shiny::renderUI({ # new
+      shiny::tagList(
+        shiny::helpText("Each record can have any number of user-defined reference numbers associated with it."),
+        shiny::hr(),
+        DT::DTOutput(ns("table")),
+        shiny::br(),
+        shiny::textInput(ns("ref_num"), label = "Reference number"),
+        shiny::textInput(ns("ref_type"), label = "Reference type (optional)") %>% shinyjs::disabled(),
+        shiny::actionButton(ns("add_ref_num"), "Add reference number") %>% shinyjs::disabled(),
+        shiny::actionButton(ns("delete_ref_num"), "Delete reference number") %>% shinyjs::disabled(),
+        shiny::actionButton(ns("update_ref_num"), "Update reference number") %>% shinyjs::disabled(),
+        
+      )# %>% shiny::showModal()
       
     })
     

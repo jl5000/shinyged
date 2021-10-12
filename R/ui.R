@@ -5,6 +5,7 @@
 shiny::shinyUI(shiny::fluidPage(
   shinyjs::useShinyjs(),
   shinyFeedback::useShinyFeedback(),
+  shinybusy::add_busy_spinner(spin = "fading-circle"),
   # Application title
   #tags$img(src = "logo.png"),
   shiny::titlePanel("shinyged"),
@@ -36,16 +37,16 @@ shiny::shinyUI(shiny::fluidPage(
   shiny::fluidRow(id = "tabs",
                   shiny::column(width = 12,
                                 shiny::tabsetPanel(id = "tabset",
-                                                   shiny::tabPanel("GEDCOM File", value = "file_tab", file_ui("file")),
-                                                   shiny::tabPanel("Submitter", value = "subm_tab", submitter_ui("subm")),
-                                                   shiny::tabPanel("Individuals", value = "indi_tab", individual_ui("indi")),
-                                                   shiny::tabPanel("Families", value = "famg_tab", family_ui("famg")),
-                                                   shiny::tabPanel("Notes", value = "note_tab", note_ui("note")),
-                                                   shiny::tabPanel("Multimedia", value = "media_tab", multimedia_ui("media")),
-                                                   shiny::tabPanel("Sources", value = "sour_tab", source_ui("sour")),
-                                                   shiny::tabPanel("Repositories", value = "repo_tab", repository_ui("repo")),
-                                                   shiny::tabPanel("Tools", value = "tools_tab", tools_ui("tools")),
-                                                   shiny::tabPanel("GEDCOM", value = "debug_tab", ged_debug_ui("debug")))
+                                                   shiny::tabPanel("GEDCOM File", file_ui("file")),
+                                                   shiny::tabPanel("Submitter", submitter_ui("subm")),
+                                                   shiny::tabPanel("Individuals", individual_ui("indi")),
+                                                   shiny::tabPanel("Families", family_ui("famg")),
+                                                   shiny::tabPanel("Notes", note_ui("note")),
+                                                   shiny::tabPanel("Multimedia", multimedia_ui("media")),
+                                                   shiny::tabPanel("Sources", source_ui("sour")),
+                                                   shiny::tabPanel("Repositories", repository_ui("repo")),
+                                                   shiny::tabPanel("Tools", tools_ui("tools")),
+                                                   shiny::tabPanel("GEDCOM", ged_debug_ui("debug")))
                   ) 
   ) %>% shinyjs::hidden()
   
