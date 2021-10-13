@@ -59,7 +59,7 @@ family_server <- function(id, r) {
     })
     
     # Update choices with list of families and select one
-    observeEvent(records(), {
+    observe({
       if(!is.null(records())) {
         
         if(is.null(r$famg_to_select)) {
@@ -73,7 +73,8 @@ family_server <- function(id, r) {
         shiny::updateSelectizeInput(session = session, inputId = "record", choices = character(), selected = character())
       }
       r$famg_to_select <- NULL
-    })
+    }) %>% 
+      shiny::bindEvent(records())
     
     # Update famg_rows
     shiny::observeEvent(priority = 2, {
@@ -86,29 +87,32 @@ family_server <- function(id, r) {
     })
     
     # Show/hide tabs and toggle delete button
-    shiny::observeEvent(input$record, ignoreNULL = FALSE, {
+    shiny::observe({
       shinyjs::toggle("famg_tabs", condition = !is.null(input$record))
       shinyjs::toggle("famg_data", condition = !is.null(input$record))
       shinyjs::toggleState("delete", !is.null(input$record))
       shinyjs::toggleState("and_members", !is.null(input$record))
-    })
+    }) %>% 
+      shiny::bindEvent(input$record, ignoreNULL = FALSE)
     
     # Add family and set a flag to ensure it is selected
-    observeEvent(input$add, {
+    observe({
       r$ged <- tidyged::add_famg(r$ged)
       famg_xrefs <- tidyged::xrefs_famg(r$ged)
       last_famg <- tail(famg_xrefs, 1)
       r$famg_to_select <- tidyged::describe_records(r$ged, last_famg, short_desc = TRUE)
-    })
+    }) %>% 
+      shiny::bindEvent(input$add)
     
     # Remove family and set a flag to ensure no family is selected
-    observeEvent(input$delete, {
+    observe({
       famg_xref <- stringr::str_extract(input$record, tidyged.internals::reg_xref(FALSE))
       r$ged <- tidyged::remove_famg(r$ged, famg_xref, remove_individuals = input$and_members)
       shiny::showNotification("Family deleted")
       if(input$and_members) shiny::showNotification("Family members deleted")
       r$famg_to_select <- NULL
-    })
+    }) %>% 
+      shiny::bindEvent(input$delete)
     
     ref_numbers_server("famg_ref_numbers", r, "famg_rows")
     notes_server("famg_notes", r, "famg_rows")
@@ -117,25 +121,18 @@ family_server <- function(id, r) {
     family_summary_server("family_summary", r)
     
     
-    shiny::observeEvent({input$tabset == "Timeline"},once=TRUE,ignoreInit = TRUE, {
-      timeline_server("famg_timeline", r, "famg_rows")
-    })
-    shiny::observeEvent({input$tabset == "Members"},once=TRUE,ignoreInit = TRUE, {
-      family_members_server("family_members", r)
-    })
-    shiny::observeEvent({input$tabset == "Events"},once=TRUE,ignoreInit = TRUE, {
-      family_events_server("family_events", r)
-    })
-    shiny::observeEvent({input$tabset == "Raw data"},once=TRUE,ignoreInit = TRUE, {
-      record_server("famg_raw", r, "famg_rows")
-    })
+    shiny::observe(timeline_server("famg_timeline", r, "famg_rows")) %>% 
+      shiny::bindEvent({input$tabset == "Timeline"}, once=TRUE, ignoreInit = TRUE)
+    
+    shiny::observe(family_members_server("family_members", r)) %>% 
+      shiny::bindEvent({input$tabset == "Members"}, once=TRUE, ignoreInit = TRUE)
+    
+    shiny::observe(family_events_server("family_events", r)) %>% 
+      shiny::bindEvent({input$tabset == "Events"}, once=TRUE, ignoreInit = TRUE)
+    
+    shiny::observe(record_server("famg_raw", r, "famg_rows")) %>% 
+      shiny::bindEvent({input$tabset == "Raw data"}, once=TRUE, ignoreInit = TRUE)
    
-
-    
-    
-   
-    
-    
     
   })
 }

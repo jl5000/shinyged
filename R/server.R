@@ -20,7 +20,7 @@ shiny::shinyServer(function(input, output, session) {
                                sour_rows = NULL,
                                repo_rows = NULL)
     
-    shiny::observeEvent(input$read_file, {
+    shiny::observe({
         if(!is.null(r$ged)) {
             
             shiny::modalDialog(
@@ -40,13 +40,15 @@ shiny::shinyServer(function(input, output, session) {
             r$ged <- tidyged.io::read_gedcom(input$read_file$datapath)
             r$file_count <- r$file_count + 1
         }
-    })
+    }) %>% 
+        shiny::bindEvent(input$read_file)
     
-    shiny::observeEvent(input$discard_and_read, {
+    shiny::observe({
         shiny::removeModal()
         r$ged <- tidyged.io::read_gedcom(input$read_file$datapath)
         r$file_count <- r$file_count + 1
-    })
+    }) %>% 
+        shiny::bindEvent(input$discard_and_read)
     
     shiny::observeEvent(input$create_gedcom, {
         if(!is.null(r$ged)) {
@@ -83,30 +85,29 @@ shiny::shinyServer(function(input, output, session) {
     
     file_server("file", r)
     
-    shiny::observeEvent({input$tabset == "Submitter"},once=TRUE,ignoreInit = TRUE, {
-        submitter_server("subm", r)
-    })
-    shiny::observeEvent({input$tabset == "Individuals"},once=TRUE,ignoreInit = TRUE, {
-        individual_server("indi", r)
-    })
-    shiny::observeEvent({input$tabset == "Families"},once=TRUE,ignoreInit = TRUE, {
-        family_server("famg", r)
-    })
-    shiny::observeEvent({input$tabset == "Sources"},once=TRUE,ignoreInit = TRUE, {
-        source_server("sour", r)
-    })
-    shiny::observeEvent({input$tabset == "Repositories"},once=TRUE,ignoreInit = TRUE, {
-        repository_server("repo", r)
-    })
-    shiny::observeEvent({input$tabset == "Notes"},once=TRUE,ignoreInit = TRUE, {
-        # note_server("note", r)
-    })
-    shiny::observeEvent({input$tabset == "Multimedia"},once=TRUE,ignoreInit = TRUE, {
-        multimedia_server("media", r)
-    })
-    shiny::observeEvent({input$tabset == "GEDCOM"},once=TRUE,ignoreInit = TRUE, {
-        ged_debug_server("debug", r)
-    })
+    shiny::observe(submitter_server("subm", r)) %>% 
+        shiny::bindEvent(input$tabset == "Submitter", once = TRUE, ignoreInit = TRUE)
+    
+    shiny::observe(individual_server("indi", r)) %>% 
+        shiny::bindEvent(input$tabset == "Individuals", once = TRUE, ignoreInit = TRUE)
+    
+    shiny::observe(family_server("famg", r)) %>% 
+        shiny::bindEvent(input$tabset == "Families", once = TRUE, ignoreInit = TRUE)
+    
+    shiny::observe(source_server("sour", r)) %>% 
+        shiny::bindEvent(input$tabset == "Sources", once = TRUE, ignoreInit = TRUE)
+    
+    shiny::observe(repository_server("repo", r)) %>% 
+        shiny::bindEvent(input$tabset == "Repositories", once = TRUE, ignoreInit = TRUE)
+    
+    # shiny::observe(note_server("note", r)) %>% 
+    #     shiny::bindEvent(input$tabset == "Notes", once = TRUE, ignoreInit = TRUE)
+   
+    shiny::observe(multimedia_server("media", r)) %>% 
+        shiny::bindEvent(input$tabset == "Multimedia", once = TRUE, ignoreInit = TRUE)
+    
+    shiny::observe(ged_debug_server("debug", r)) %>% 
+        shiny::bindEvent(input$tabset == "GEDCOM", once = TRUE, ignoreInit = TRUE)
     
     tools_server("tools", r)
     

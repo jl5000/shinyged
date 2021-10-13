@@ -24,7 +24,7 @@ ref_numbers_server <- function(id, r, section_rows) {
     ns <- session$ns
     
     # Click the button to show popup (commented out code is how to do it in shiny)
-    # shiny::observeEvent(input$ref_numbers, {
+    # shiny::observe({
     #   
     #   shiny::modalDialog(title = "Edit reference numbers",
     output$test <- shiny::renderUI({ # new
@@ -41,7 +41,8 @@ ref_numbers_server <- function(id, r, section_rows) {
         
       )# %>% shiny::showModal()
       
-    })
+    }) #%>% 
+    #  shiny::bindEvent(input$ref_numbers)
     
     # Derive a dataframe of ref numbers
     ref_number_df <- shiny::reactive({
@@ -74,13 +75,14 @@ ref_numbers_server <- function(id, r, section_rows) {
       ref_num_df
     })
     
-    shiny::observeEvent(ref_number_df(), {
+    shiny::observe({
       req(ref_number_df)
       
       lbl <- paste0(nrow(ref_number_df()), " reference numbers")
       if(nrow(ref_number_df()) == 1) lbl <- substr(lbl, 1, nchar(lbl) - 1)
       shiny::updateActionButton(inputId = "ref_numbers", label = lbl)
-    })
+    }) %>% 
+      shiny::bindEvent(ref_number_df())
     
     # Show the dataframe of ref numbers
     output$table <- DT::renderDataTable({
@@ -105,7 +107,7 @@ ref_numbers_server <- function(id, r, section_rows) {
     })
     
     
-    shiny::observeEvent(input$table_rows_selected, ignoreNULL = FALSE, {
+    shiny::observe({
       if(length(input$table_rows_selected) > 0) {
         shiny::updateTextInput(inputId = "ref_num", value = ref_number_df()[input$table_rows_selected,1])
         shiny::updateTextInput(inputId = "ref_type", value = ref_number_df()[input$table_rows_selected,2])
@@ -115,7 +117,8 @@ ref_numbers_server <- function(id, r, section_rows) {
       }
       shinyjs::toggleState("delete_ref_num", !is.null(input$table_rows_selected))
       shinyjs::toggleState("update_ref_num", !is.null(input$table_rows_selected))
-    })
+    }) %>% 
+      shiny::bindEvent(input$table_rows_selected, ignoreNULL = FALSE)
     
     selected_ged_rows <- shiny::reactive({
       ref_num <- ref_number_df()[input$table_rows_selected,1]
@@ -133,7 +136,7 @@ ref_numbers_server <- function(id, r, section_rows) {
     })
     
     # Add ref number to tidyged object
-    shiny::observeEvent(input$add_ref_num, {
+    shiny::observe({
 
       r$ged <- r$ged %>%
         tibble::add_row(tibble::tibble(record = r$ged$record[r[[section_rows]][1]], 
@@ -151,10 +154,11 @@ ref_numbers_server <- function(id, r, section_rows) {
       
       shiny::updateTextInput(inputId = "ref_num", value = "")
       shiny::updateTextInput(inputId = "ref_type", value = "")
-    })
+    }) %>% 
+      shiny::bindEvent(input$add_ref_num)
     
     # Update ref number in tidyged object
-    shiny::observeEvent(input$update_ref_num, {
+    shiny::observe({
       r$ged$value[selected_ged_rows()[1]] <- input$ref_num
       
       type_exists <- length(selected_ged_rows()) == 2
@@ -176,15 +180,17 @@ ref_numbers_server <- function(id, r, section_rows) {
         r$ged <- dplyr::slice(r$ged, -selected_ged_rows()[2])
       }
       
-    })
+    }) %>% 
+      shiny::bindEvent(input$update_ref_num)
     
     # Remove ref number from tidyged object
-    shiny::observeEvent(input$delete_ref_num, {
+    shiny::observe({
       r$ged <- dplyr::slice(r$ged, -selected_ged_rows())
       
       shiny::updateTextInput(inputId = "ref_num", value = "")
       shiny::updateTextInput(inputId = "ref_type", value = "")
-    })
+    }) %>% 
+      shiny::bindEvent(input$delete_ref_num)
     
   })
 }
