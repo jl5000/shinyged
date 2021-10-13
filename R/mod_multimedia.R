@@ -55,7 +55,7 @@ multimedia_server <- function(id, r) {
     })
     
     # Update choices with list of media and select one
-    observeEvent(records(), {
+    shiny::observe({
       if(!is.null(records())) {
         
         if(is.null(r$media_to_select)) {
@@ -69,7 +69,8 @@ multimedia_server <- function(id, r) {
         shiny::updateSelectizeInput(session = session, inputId = "record", choices = character(), selected = character())
       }
       r$media_to_select <- NULL
-    })
+    }) %>% 
+      shiny::bindEvent(records())
     
     # Update media_rows
     shiny::observeEvent(priority = 2, {
@@ -82,38 +83,40 @@ multimedia_server <- function(id, r) {
     })
     
     # Show/hide tabs and toggle delete button
-    shiny::observeEvent(input$record, ignoreNULL = FALSE, {
+    shiny::observe({
       shinyjs::toggle("media_tabs", condition = !is.null(input$record))
       shinyjs::toggleState("delete", !is.null(input$record))
-    })
+    }) %>% 
+      shiny::bindEvent(input$record, ignoreNULL = FALSE)
     
     # Add media and set a flag to ensure it is selected
-    observeEvent(input$add, {
+    shiny::observe({
       r$ged <- tidyged::add_media(r$ged) #TODO: Can't add empty media - need modal to choose file ref and format
       media_xrefs <- tidyged::xrefs_media(r$ged)
       last_media <- tail(media_xrefs, 1)
       r$media_to_select <- tidyged::describe_records(r$ged, last_media, short_desc = TRUE)
-    })
+    }) %>% 
+      shiny::bindEvent(input$add)
     
     # Remove media and set a flag to ensure no media is selected
-    observeEvent(input$delete, {
+    shiny::observe({
       media_xref <- stringr::str_extract(input$record, tidyged.internals::reg_xref(FALSE))
       r$ged <- tidyged::remove_media(r$ged, media_xref)
       shiny::showNotification("Multimedia deleted")
       r$media_to_select <- NULL
-    })
+    }) %>% 
+      shiny::bindEvent(input$delete)
     
     multimedia_summary_server("media_summary", r)
     record_server("media_raw", r, "media_rows")
     ref_numbers_server("media_ref_numbers", r, "media_rows")
-    
-    shiny::observeEvent({input$tabset == "Description"},once=TRUE,ignoreInit = TRUE, {
-      multimedia_description_server("media_description", r)
-    })
-
     notes_server("media_notes", r, "media_rows")
-
     citations_server("media_citations", r, "media_rows")
+    
+    shiny::observe(multimedia_description_server("media_description", r)) %>% 
+      shiny::bindEvent(input$tabset == "Description", once = TRUE, ignoreInit = TRUE)
+
+    
     
   })
 }

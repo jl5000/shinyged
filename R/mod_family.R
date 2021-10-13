@@ -19,10 +19,8 @@ family_ui <- function(id) {
     ),
 
     shiny::fluidRow(id = ns("famg_data"),
-                    shiny::column(width = 6,
-                                  ref_numbers_ui(ns("famg_ref_numbers"))
-                    ),
-                    shiny::column(width = 6,
+                    shiny::column(width = 12,
+                                  ref_numbers_ui(ns("famg_ref_numbers")),
                                   notes_ui(ns("famg_notes")),
                                   media_links_ui(ns("famg_media")),
                                   citations_ui(ns("famg_citations"))
@@ -59,7 +57,7 @@ family_server <- function(id, r) {
     })
     
     # Update choices with list of families and select one
-    observe({
+    shiny::observe({
       if(!is.null(records())) {
         
         if(is.null(r$famg_to_select)) {
@@ -96,7 +94,7 @@ family_server <- function(id, r) {
       shiny::bindEvent(input$record, ignoreNULL = FALSE)
     
     # Add family and set a flag to ensure it is selected
-    observe({
+    shiny::observe({
       r$ged <- tidyged::add_famg(r$ged)
       famg_xrefs <- tidyged::xrefs_famg(r$ged)
       last_famg <- tail(famg_xrefs, 1)
@@ -105,7 +103,7 @@ family_server <- function(id, r) {
       shiny::bindEvent(input$add)
     
     # Remove family and set a flag to ensure no family is selected
-    observe({
+    shiny::observe({
       famg_xref <- stringr::str_extract(input$record, tidyged.internals::reg_xref(FALSE))
       r$ged <- tidyged::remove_famg(r$ged, famg_xref, remove_individuals = input$and_members)
       shiny::showNotification("Family deleted")

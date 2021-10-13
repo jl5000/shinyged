@@ -13,12 +13,13 @@ media_links_server <- function(id, r, section_rows, parent_modal_fn = NULL) {
     ns <- session$ns
     
     # Disable media button if no media records to point to
-    shiny::observeEvent(r$ged, {
+    shiny::observe({
       shinyjs::toggleState("media_links", tidyged::num_media(r$ged) > 0)
-    })
+    }) %>% 
+      shiny::bindEvent(r$ged)
     
     # Click the button to show popup
-    shiny::observeEvent(input$media_links, {
+    shiny::observe({
       
       shiny::modalDialog(
         title = "Edit multimedia links",
@@ -46,15 +47,17 @@ media_links_server <- function(id, r, section_rows, parent_modal_fn = NULL) {
           )
         ),
       ) %>% shiny::showModal()
-    })
+    }) %>% 
+      shiny::bindEvent(input$media_links)
     
-    shiny::observeEvent(input$restoreModal, {
+    shiny::observe({
       if(is.null(parent_modal_fn)){
         shiny::removeModal()
       } else {
         parent_modal_fn(ns, r)
       }
-    })
+    }) %>% 
+      shiny::bindEvent(input$restoreModal)
     
     
     # The vector of media xrefs
@@ -66,12 +69,13 @@ media_links_server <- function(id, r, section_rows, parent_modal_fn = NULL) {
         dplyr::pull(value)
     })
     
-    shiny::observeEvent(media_xrefs(), {
+    shiny::observe({
       req(media_xrefs)
       
       lbl <- paste0(length(media_xrefs()), " media")
       shiny::updateActionButton(inputId = "media_links", label = lbl)
-    })
+    }) %>% 
+      shiny::bindEvent(media_xrefs())
     
     media_desc <- shiny::reactive({
       req(r$ged, media_xrefs)
@@ -79,11 +83,7 @@ media_links_server <- function(id, r, section_rows, parent_modal_fn = NULL) {
     })
 
     # The row of the tidyged object corresponding to the selected media link
-    selected_ged_row <- shiny::eventReactive({
-      r$ged
-      r[[section_rows]]
-      input$media_list_rows_selected
-    },{
+    selected_ged_row <- shiny::reactive({
       req(r$ged, r[[section_rows]], input$media_list_rows_selected)
       
       dplyr::mutate(r$ged, row = dplyr::row_number()) %>% 
@@ -91,7 +91,8 @@ media_links_server <- function(id, r, section_rows, parent_modal_fn = NULL) {
         dplyr::filter(level == .$level[1] + 1, tag == "OBJE") %>% 
         dplyr::slice(input$media_list_rows_selected) %>% 
         dplyr::pull(row)
-    })
+    }) %>% 
+      shiny::bindEvent(r$ged, r[[section_rows]], input$media_list_rows_selected)
     
     # Update table with media links
     output$media_list <- DT::renderDataTable({
@@ -101,9 +102,10 @@ media_links_server <- function(id, r, section_rows, parent_modal_fn = NULL) {
     
     
     # Disable remove_link button if nothing selected
-    shiny::observeEvent(input$media_list_rows_selected, ignoreNULL = FALSE, {
+    shiny::observe({
       shinyjs::toggleState("remove_link", !is.null(input$media_list_rows_selected))
-    })
+    }) %>% 
+      shiny::bindEvent(input$media_list_rows_selected, ignoreNULL = FALSE)
     
 
     # Disable add_link button if no media records or it's already been added
@@ -113,7 +115,7 @@ media_links_server <- function(id, r, section_rows, parent_modal_fn = NULL) {
     })
     
     # Add media reference
-    shiny::observeEvent(input$add_link, {
+    shiny::observe({
       media_xref <- stringr::str_extract(input$media_choice, tidyged.internals::reg_xref(FALSE))
       
       r$ged <- tibble::add_row(r$ged,
@@ -125,12 +127,14 @@ media_links_server <- function(id, r, section_rows, parent_modal_fn = NULL) {
                                # doesn't shift existing row numbers
                                .after = max(r[[section_rows]]))
       
-    })
+    }) %>% 
+      shiny::bindEvent(input$add_link)
     
     # Remove media link
-    shiny::observeEvent(input$remove_link, {
+    shiny::observe({
       r$ged <- dplyr::slice(r$ged, -selected_ged_row())
-    })
+    }) %>% 
+      shiny::bindEvent(input$remove_link)
     
 
   })

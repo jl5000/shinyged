@@ -1,7 +1,7 @@
 
 
-shiny::shinyServer(function(input, output, session) {
-
+function(input, output, session) {
+    
     # The tidyged object and rows of structures that could occur multiple times
     r <- shiny::reactiveValues(ged = NULL,
                                file_count = 0, # this increases every time r$ged changes and triggers re-population of inputs
@@ -50,7 +50,7 @@ shiny::shinyServer(function(input, output, session) {
     }) %>% 
         shiny::bindEvent(input$discard_and_read)
     
-    shiny::observeEvent(input$create_gedcom, {
+    shiny::observe({
         if(!is.null(r$ged)) {
             
             shiny::modalDialog(
@@ -70,18 +70,21 @@ shiny::shinyServer(function(input, output, session) {
             r$ged <- tidyged::gedcom()
             r$file_count <- r$file_count + 1
         }
-    })
+    }) %>% 
+        shiny::bindEvent(input$create_gedcom)
     
-    shiny::observeEvent(input$discard_and_create, {
+    shiny::observe({
         shiny::removeModal()
         r$ged <- tidyged::gedcom()
         r$file_count <- r$file_count + 1
-    })
+    }) %>% 
+        shiny::bindEvent(input$discard_and_create)
     
-    shiny::observeEvent(r$ged, {
+    shiny::observe({
         shinyjs::show("tabs")
         shinyjs::enable("export_gedcom")
-    })
+    }) %>% 
+        shiny::bindEvent(r$ged)
     
     file_server("file", r)
     
@@ -102,7 +105,7 @@ shiny::shinyServer(function(input, output, session) {
     
     # shiny::observe(note_server("note", r)) %>% 
     #     shiny::bindEvent(input$tabset == "Notes", once = TRUE, ignoreInit = TRUE)
-   
+    
     shiny::observe(multimedia_server("media", r)) %>% 
         shiny::bindEvent(input$tabset == "Multimedia", once = TRUE, ignoreInit = TRUE)
     
@@ -119,6 +122,6 @@ shiny::shinyServer(function(input, output, session) {
         }
     )
     
-
-})
+    
+}
 

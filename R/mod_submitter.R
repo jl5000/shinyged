@@ -37,19 +37,21 @@ submitter_server <- function(id, r) {
       r$ged[r$subm_rows,]
     })
     
-    shiny::observeEvent(r$file_count, {
+    shiny::observe({
       req(subm)
       shiny::updateTextInput(session = session, "subm_name",
                              value = dplyr::filter(subm(), tag == "NAME")$value)
-    })
+    }) %>% 
+      shiny::bindEvent(r$file_count)
     
-    shiny::observeEvent(input$subm_name, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    shiny::observe({
       subm_name <- process_input(input$subm_name, input_required = TRUE)
       err <- tidyged.internals::chk_submitter_name(subm_name, 1)
       shinyFeedback::feedbackDanger("subm_name", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, "subm_rows", subm()$record[1], 1, "NAME", subm_name)
-    })
+    }) %>% 
+      shiny::bindEvent(input$subm_name, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     address_server("subm_address", r, "subm_rows")
     notes_server("subm_notes", r, "subm_rows")

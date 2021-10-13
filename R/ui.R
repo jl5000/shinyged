@@ -2,7 +2,7 @@
 
 
 
-shiny::shinyUI(shiny::fluidPage(
+shiny::fluidPage(
   shinyjs::useShinyjs(),
   shinyFeedback::useShinyFeedback(),
   shinybusy::add_busy_spinner(spin = "fading-circle"),
@@ -50,5 +50,4 @@ shiny::shinyUI(shiny::fluidPage(
                   ) 
   ) %>% shinyjs::hidden()
   
-)
 )

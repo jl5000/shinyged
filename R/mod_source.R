@@ -54,7 +54,7 @@ source_server <- function(id, r) {
     })
     
     # Update choices with list of sources and select one
-    observeEvent(records(), {
+    shiny::observe({
       if(!is.null(records())) {
         
         if(is.null(r$sour_to_select)) {
@@ -68,7 +68,8 @@ source_server <- function(id, r) {
         shiny::updateSelectizeInput(session = session, inputId = "record", choices = character(), selected = character())
       }
       r$sour_to_select <- NULL
-    })
+    }) %>% 
+      shiny::bindEvent(records())
     
     # Update sour_rows
     shiny::observeEvent(priority = 2, {
@@ -81,42 +82,43 @@ source_server <- function(id, r) {
     })
     
     # Show/hide tabs and toggle delete button
-    shiny::observeEvent(input$record, ignoreNULL = FALSE, {
+    shiny::observe({
       shinyjs::toggle("sour_tabs", condition = !is.null(input$record))
       shinyjs::toggle("sour_data", condition = !is.null(input$record))
       shinyjs::toggleState("delete", !is.null(input$record))
-    })
+    }) %>% 
+      shiny::bindEvent(input$record, ignoreNULL = FALSE)
     
     # Add source and set a flag to ensure it is selected
-    observeEvent(input$add, {
+    shiny::observe({
       r$ged <- tidyged::add_sour(r$ged)
       sour_xrefs <- tidyged::xrefs_sour(r$ged)
       last_sour <- tail(sour_xrefs, 1)
       r$sour_to_select <- tidyged::describe_records(r$ged, last_sour, short_desc = TRUE)
-    })
+    }) %>% 
+      shiny::bindEvent(input$add)
     
     # Remove source and set a flag to ensure no source is selected
-    observeEvent(input$delete, {
+    shiny::observe({
       sour_xref <- stringr::str_extract(input$record, tidyged.internals::reg_xref(FALSE))
       r$ged <- tidyged::remove_sour(r$ged, sour_xref)
       shiny::showNotification("Source deleted")
       r$sour_to_select <- NULL
-    })
+    }) %>% 
+      shiny::bindEvent(input$delete)
     
     ref_numbers_server("sour_ref_numbers", r, "sour_rows")
     source_summary_server("sour_summary", r)
     record_server("sour_raw", r, "sour_rows")
     
-    shiny::observeEvent({input$tabset == "Data"},once=TRUE,ignoreInit = TRUE, {
-      source_data_server("sour_data", r)
-    })
-    shiny::observeEvent({input$tabset == "Details"},once=TRUE,ignoreInit = TRUE, {
-      source_details_server("sour_details", r)
-    })
+    shiny::observe(source_data_server("sour_data", r)) %>% 
+      shiny::bindEvent(input$tabset == "Data", once=TRUE, ignoreInit = TRUE)
+    
+    shiny::observe(source_details_server("sour_details", r)) %>% 
+      shiny::bindEvent(input$tabset == "Details", once=TRUE, ignoreInit = TRUE)
+    
 
     notes_server("sour_notes", r, "sour_rows")
-
-
     media_links_server("sour_media", r, "sour_rows")
 
     

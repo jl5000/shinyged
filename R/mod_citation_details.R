@@ -77,7 +77,7 @@ citation_details_server <- function(id, r) {
       r$ged$value[r$citation_rows[1]]
     })
     
-    shiny::observeEvent(sour_xref(), {
+    shiny::observe({
       
       shiny::updateTextInput(session = session, "page", 
                              value = tidyged.internals::gedcom_value(r$ged[r$citation_rows,], 
@@ -112,14 +112,15 @@ citation_details_server <- function(id, r) {
                                 value = tidyged.internals::gedcom_value(r$ged[r$citation_rows,], 
                                                                         r$ged$record[r$citation_rows[1]], "QUAY", 
                                                                         r$ged$level[r$citation_rows[1]] + 1))
-    })
+    }) %>% 
+      shiny::bindEvent(sour_xref())
     
     shiny::observe({
       shinyjs::toggleState("role", !is.null(input$event_type))
       shinyjs::toggleState("custom_role", !is.null(input$role) && input$role == "Other")
     })
     
-    shiny::observeEvent(input$page, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    shiny::observe({
       page <- process_input(input$page)
       err <- tidyged.internals::chk_where_within_source(page, 1)
       shinyFeedback::feedbackDanger("page", !is.null(err), err)
@@ -128,9 +129,10 @@ citation_details_server <- function(id, r) {
                        r$ged$record[r$citation_rows[1]],
                        r$ged$level[r$citation_rows[1]] + 1, 
                        "PAGE", page, .pkgenv$tags_sour_cit)
-    })
+    }) %>% 
+      shiny::bindEvent(input$page, ignoreNULL = FALSE, ignoreInit = TRUE)
     
-    shiny::observeEvent(input$entry_date, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    shiny::observe({
       entry_date <- process_input(input$entry_date)
       err <- tidyged.internals::chk_date_value(entry_date, 1)
       shinyFeedback::feedbackDanger("entry_date", !is.null(err), err)
@@ -139,9 +141,10 @@ citation_details_server <- function(id, r) {
                        r$ged$record[r$citation_rows[1]],
                        r$ged$level[r$citation_rows[1]] + 2, 
                        "DATE", entry_date, .pkgenv$tags_sour_cit)
-    })
+    }) %>% 
+      shiny::bindEvent(input$entry_date, ignoreNULL = FALSE, ignoreInit = TRUE)
     
-    shiny::observeEvent(input$event_type, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    shiny::observe({
       # some events have had a space added to make them unique
       event_type <- process_input(input$event_type) %>% stringr::str_trim()
       err <- tidyged.internals::chk_event_type_cited_from(event_type, 1)
@@ -153,10 +156,11 @@ citation_details_server <- function(id, r) {
                        r$ged$record[r$citation_rows[1]],
                        r$ged$level[r$citation_rows[1]] + 1, 
                        "EVEN", event_type, .pkgenv$tags_sour_cit)
-    })
+    }) %>% 
+      shiny::bindEvent(input$event_type, ignoreNULL = FALSE, ignoreInit = TRUE)
     
    
-    shiny::observeEvent(input$role, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    shiny::observe({
       role <- process_input(input$role)
       if(!is.null(input$role) && input$role == "Other") {
         role <- paste0("(", input$custom_role, ")")
@@ -172,9 +176,10 @@ citation_details_server <- function(id, r) {
                        r$ged$record[r$citation_rows[1]],
                        r$ged$level[r$citation_rows[1]] + 2,
                        "ROLE", role, .pkgenv$tags_sour_cit)
-    })
+    }) %>% 
+      shiny::bindEvent(input$role, ignoreNULL = FALSE, ignoreInit = TRUE)
     
-    shiny::observeEvent(input$custom_role, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    shiny::observe({
       custom_role <- process_input(input$custom_role)
       if(!is.null(input$role) && input$role == "Other") {
         role <- paste0("(", input$custom_role, ")")
@@ -186,9 +191,10 @@ citation_details_server <- function(id, r) {
                        r$ged$record[r$citation_rows[1]],
                        r$ged$level[r$citation_rows[1]] + 2,
                        "ROLE", custom_role, .pkgenv$tags_sour_cit)
-    })
+    }) %>% 
+      shiny::bindEvent(input$custom_role, ignoreNULL = FALSE, ignoreInit = TRUE)
     
-    shiny::observeEvent(input$source_text, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    shiny::observe({
       source_text <- process_input(input$source_text)
       err <- tidyged.internals::chk_text_from_source(source_text, 1)
       shinyFeedback::feedbackDanger("source_text", !is.null(err), err)
@@ -197,9 +203,10 @@ citation_details_server <- function(id, r) {
                        r$ged$record[r$citation_rows[1]],
                        r$ged$level[r$citation_rows[1]] + 2, 
                        "TEXT", source_text, .pkgenv$tags_sour_cit)
-    })
+    }) %>% 
+      shiny::bindEvent(input$source_text, ignoreNULL = FALSE, ignoreInit = TRUE)
     
-    shiny::observeEvent(input$certainty, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    shiny::observe({
       certainty <- process_input(input$certainty)
       err <- tidyged.internals::chk_certainty_assessment(certainty, 1)
       shinyFeedback::feedbackDanger("certainty", !is.null(err), err)
@@ -208,7 +215,8 @@ citation_details_server <- function(id, r) {
                        r$ged$record[r$citation_rows[1]],
                        r$ged$level[r$citation_rows[1]] + 1, 
                        "QUAY", certainty, .pkgenv$tags_sour_cit)
-    })
+    }) %>% 
+      shiny::bindEvent(input$certainty, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     
     

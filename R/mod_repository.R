@@ -52,7 +52,7 @@ repository_server <- function(id, r) {
     })
     
     # Update choices with list of repositories and select one
-    observe({
+    shiny::observe({
       if(!is.null(records())) {
         
         if(is.null(r$repo_to_select)) {
@@ -113,7 +113,7 @@ repository_server <- function(id, r) {
       shiny::bindEvent(input$repo_name, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     # Add repository
-    observe({
+    shiny::observe({
       r$ged <- tidyged::add_repo(r$ged, input$repo_name)
       repo_xrefs <- tidyged::xrefs_repo(r$ged)
       last_repo <- tail(repo_xrefs, 1)
@@ -123,7 +123,7 @@ repository_server <- function(id, r) {
       shiny::bindEvent(input$add_repo)
     
     # Remove repository and set a flag to ensure no repository is selected
-    observe({
+    shiny::observe({
       repo_xref <- stringr::str_extract(input$record, tidyged.internals::reg_xref(FALSE))
       r$ged <- tidyged::remove_repo(r$ged, repo_xref)
       shiny::showNotification("Repository deleted")
