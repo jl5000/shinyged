@@ -46,6 +46,17 @@ multimedia_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
+    multimedia_summary_server("media_summary", r)
+    ref_numbers_server("media_ref_numbers", r, "media_rows")
+    notes_server("media_notes", r, "media_rows")
+    citations_server("media_citations", r, "media_rows")
+    
+    shiny::observe({
+      if(input$tabset == "Description") multimedia_description_server("media_description", r)
+      if(input$tabset == "Raw data") record_server("media_raw", r, "media_rows")
+    }) %>% 
+      shiny::bindEvent(input$tabset, ignoreInit = TRUE)
+    
     # Update list of media
     records <- shiny::reactive({
       req(r$ged)
@@ -107,17 +118,7 @@ multimedia_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(input$delete)
     
-    multimedia_summary_server("media_summary", r)
-    record_server("media_raw", r, "media_rows")
-    ref_numbers_server("media_ref_numbers", r, "media_rows")
-    notes_server("media_notes", r, "media_rows")
-    citations_server("media_citations", r, "media_rows")
-    
-    shiny::observe(multimedia_description_server("media_description", r)) %>% 
-      shiny::bindEvent(input$tabset == "Description", once = TRUE, ignoreInit = TRUE)
-
-    
-    
+ 
   })
 }
 

@@ -16,25 +16,17 @@ repository_ui <- function(id) {
     ),
     
     shiny::fluidRow(id = ns("repo_data"),
-                    shiny::column(width = 6,
-                                  ref_numbers_ui(ns("repo_ref_numbers"))
-                    ),
-                    shiny::column(width = 6,
-                                  notes_ui(ns("repo_notes"))
-                    )
+      shiny::column(4,
+                    shiny::textInput(ns("repo_name"), "Name"),
+      ),
+      shiny::column(8, style = 'margin-top:25px',
+                    ref_numbers_ui(ns("repo_ref_numbers")),
+                    notes_ui(ns("repo_notes")),
+      )
     ) %>% shinyjs::hidden(),
     
-    shiny::br(),
+    address_ui(ns("repo_address")) %>% shinyjs::hidden(),
     
-    
-    shiny::fluidRow(id = ns("repo_tabs"),
-                    shiny::column(width = 12,
-                                  shiny::tabsetPanel(id = ns("tabset"),
-                                                     shiny::tabPanel("Summary", repository_summary_ui(ns("repo_summary"))),
-                                                     shiny::tabPanel("Details", repository_details_ui(ns("repo_details"))),
-                                                     shiny::tabPanel("Raw data", record_ui(ns("repo_raw"))))
-                    ) 
-    ) %>% shinyjs::hidden()
     
   )
 }
@@ -42,6 +34,11 @@ repository_ui <- function(id) {
 repository_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
+    
+    ref_numbers_server("repo_ref_numbers", r, "repo_rows")
+    notes_server("repo_notes", r, "repo_rows")
+    address_server("repo_address", r, "repo_rows")
+    
     
     # Update list of repositories
     records <- shiny::reactive({
@@ -81,7 +78,8 @@ repository_server <- function(id, r) {
     
     # Show/hide tabs and toggle delete button
     shiny::observe({
-      shinyjs::toggle("repo_tabs", condition = !is.null(input$record))
+      shinyjs::toggle("repo_data", condition = !is.null(input$record))
+      shinyjs::toggle("repo_address", condition = !is.null(input$record))
       shinyjs::toggleState("delete", !is.null(input$record))
     }) %>% 
       shiny::bindEvent(input$record, ignoreNULL = FALSE)
@@ -131,16 +129,9 @@ repository_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(input$delete)
     
-    ref_numbers_server("repo_ref_numbers", r, "repo_rows")
-    repository_summary_server("repo_summary", r)
-    record_server("repo_raw", r, "repo_rows")
-    
-    shiny::observe({
-      repository_details_server("repo_details", r)
-    }) %>% 
-      shiny::bindEvent({input$tabset == "Details"},once=TRUE,ignoreInit = TRUE)
+ 
 
-    notes_server("repo_notes", r, "repo_rows")
+    
 
     
     

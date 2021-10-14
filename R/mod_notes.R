@@ -18,7 +18,6 @@ notes_server <- function(id, r, section_rows, parent_modal_fn = NULL) {
       
       shiny::modalDialog(
         title = "Edit notes",
-        footer = actionButton(ns("restoreModal"),label = "Dismiss"),
         
         shiny::helpText("Here you can manage notes associated with an item. You can either add notes via the text box or point to existing note records.", 
                         "Use the buttons to add, remove, and edit notes via the text box and by selecting notes in the list."),
@@ -47,15 +46,6 @@ notes_server <- function(id, r, section_rows, parent_modal_fn = NULL) {
     }) %>% 
       shiny::bindEvent(input$notes)
   
-    
-  shiny::observe({
-    if(is.null(parent_modal_fn)){
-      shiny::removeModal()
-    } else {
-      parent_modal_fn(ns, r)
-    }
-  }) %>% 
-    shiny::bindEvent(input$restoreModal)
       
     # The vector of notes
     notes_raw <- shiny::reactive({

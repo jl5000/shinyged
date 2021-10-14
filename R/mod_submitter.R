@@ -26,6 +26,10 @@ submitter_ui <- function(id) {
 submitter_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     
+    address_server("subm_address", r, "subm_rows")
+    notes_server("subm_notes", r, "subm_rows")
+    media_links_server("subm_media", r, "subm_rows")
+    
     shiny::observeEvent(r$ged, priority = 2, { # want this to fire first
       req(r$ged)
       subm_xref <- tidyged::xrefs_subm(r$ged)
@@ -53,9 +57,6 @@ submitter_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(input$subm_name, ignoreNULL = FALSE, ignoreInit = TRUE)
     
-    address_server("subm_address", r, "subm_rows")
-    notes_server("subm_notes", r, "subm_rows")
-    media_links_server("subm_media", r, "subm_rows")
     
   })
 }

@@ -45,6 +45,19 @@ source_ui <- function(id) {
 source_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     
+    ref_numbers_server("sour_ref_numbers", r, "sour_rows")
+    notes_server("sour_notes", r, "sour_rows")
+    media_links_server("sour_media", r, "sour_rows")
+    source_summary_server("sour_summary", r)
+    
+    shiny::observe({
+      if(input$tabset == "Data") source_data_server("sour_data", r)
+      if(input$tabset == "Details") source_details_server("sour_details", r)
+      if(input$tabset == "Raw data") record_server("sour_raw", r, "sour_rows")
+    }) %>% 
+      shiny::bindEvent(input$tabset, ignoreInit = TRUE)
+    
+
     # Update list of sources
     records <- shiny::reactive({
       req(r$ged)
@@ -107,21 +120,7 @@ source_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(input$delete)
     
-    ref_numbers_server("sour_ref_numbers", r, "sour_rows")
-    source_summary_server("sour_summary", r)
-    record_server("sour_raw", r, "sour_rows")
-    
-    shiny::observe(source_data_server("sour_data", r)) %>% 
-      shiny::bindEvent(input$tabset == "Data", once=TRUE, ignoreInit = TRUE)
-    
-    shiny::observe(source_details_server("sour_details", r)) %>% 
-      shiny::bindEvent(input$tabset == "Details", once=TRUE, ignoreInit = TRUE)
-    
 
-    notes_server("sour_notes", r, "sour_rows")
-    media_links_server("sour_media", r, "sour_rows")
-
-    
   })
 }
 

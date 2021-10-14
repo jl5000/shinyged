@@ -20,6 +20,24 @@ function(input, output, session) {
                                sour_rows = NULL,
                                repo_rows = NULL)
     
+    
+    file_server("file", r)
+    tools_server("tools", r)
+    
+    # Only run modules if tab is clicked
+    shiny::observe({
+        if(input$tabset == "Submitter") submitter_server("subm", r)
+        if(input$tabset == "Individuals") individual_server("indi", r)
+        if(input$tabset == "Families") family_server("famg", r)
+        if(input$tabset == "Sources") source_server("sour", r)
+        if(input$tabset == "Repositories") repository_server("repo", r)
+        if(input$tabset == "Notes") note_server("note", r)
+        if(input$tabset == "Multimedia") multimedia_server("media", r)
+        if(input$tabset == "GEDCOM") ged_debug_server("debug", r)
+    }) %>% 
+        shiny::bindEvent(input$tabset, ignoreInit = TRUE)
+    
+    # Import file
     shiny::observe({
         if(!is.null(r$ged)) {
             
@@ -43,6 +61,7 @@ function(input, output, session) {
     }) %>% 
         shiny::bindEvent(input$read_file)
     
+    # Discard previous and import new
     shiny::observe({
         shiny::removeModal()
         r$ged <- tidyged.io::read_gedcom(input$read_file$datapath)
@@ -50,6 +69,7 @@ function(input, output, session) {
     }) %>% 
         shiny::bindEvent(input$discard_and_read)
     
+    # Create new
     shiny::observe({
         if(!is.null(r$ged)) {
             
@@ -73,6 +93,7 @@ function(input, output, session) {
     }) %>% 
         shiny::bindEvent(input$create_gedcom)
     
+    # Discard previous and create new
     shiny::observe({
         shiny::removeModal()
         r$ged <- tidyged::gedcom()
@@ -80,41 +101,14 @@ function(input, output, session) {
     }) %>% 
         shiny::bindEvent(input$discard_and_create)
     
+    # Show tabs
     shiny::observe({
         shinyjs::show("tabs")
         shinyjs::enable("export_gedcom")
     }) %>% 
         shiny::bindEvent(r$ged)
     
-    file_server("file", r)
-    
-    shiny::observe(submitter_server("subm", r)) %>% 
-        shiny::bindEvent(input$tabset == "Submitter", once = TRUE, ignoreInit = TRUE)
-    
-    shiny::observe(individual_server("indi", r)) %>% 
-        shiny::bindEvent(input$tabset == "Individuals", once = TRUE, ignoreInit = TRUE)
-    
-    shiny::observe(family_server("famg", r)) %>% 
-        shiny::bindEvent(input$tabset == "Families", once = TRUE, ignoreInit = TRUE)
-    
-    shiny::observe(source_server("sour", r)) %>% 
-        shiny::bindEvent(input$tabset == "Sources", once = TRUE, ignoreInit = TRUE)
-    
-    shiny::observe(repository_server("repo", r)) %>% 
-        shiny::bindEvent(input$tabset == "Repositories", once = TRUE, ignoreInit = TRUE)
-    
-    # shiny::observe(note_server("note", r)) %>% 
-    #     shiny::bindEvent(input$tabset == "Notes", once = TRUE, ignoreInit = TRUE)
-    
-    shiny::observe(multimedia_server("media", r)) %>% 
-        shiny::bindEvent(input$tabset == "Multimedia", once = TRUE, ignoreInit = TRUE)
-    
-    shiny::observe(ged_debug_server("debug", r)) %>% 
-        shiny::bindEvent(input$tabset == "GEDCOM", once = TRUE, ignoreInit = TRUE)
-    
-    tools_server("tools", r)
-    
-    
+    # Export
     output$export_gedcom <- shiny::downloadHandler(
         filename = "from_shinyged.ged",
         content = function(file) {

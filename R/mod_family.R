@@ -23,7 +23,6 @@ family_ui <- function(id) {
                                   ref_numbers_ui(ns("famg_ref_numbers")),
                                   notes_ui(ns("famg_notes")),
                                   media_links_ui(ns("famg_media")),
-                                  citations_ui(ns("famg_citations"))
                     )
     ) %>% shinyjs::hidden(),
     
@@ -36,6 +35,7 @@ family_ui <- function(id) {
                                                      shiny::tabPanel("Members", family_members_ui(ns("family_members"))),
                                                      shiny::tabPanel("Events", family_events_ui(ns("family_events"))),
                                                      shiny::tabPanel("Timeline", timeline_ui(ns("famg_timeline"))),
+                                                     shiny::tabPanel("Citations", citations_ui(ns("famg_citations"))),
                                                      shiny::tabPanel("Raw data", record_ui(ns("famg_raw"))))
                     )
     ) %>% shinyjs::hidden(),
@@ -48,6 +48,21 @@ family_ui <- function(id) {
 
 family_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
+    
+    ref_numbers_server("famg_ref_numbers", r, "famg_rows")
+    notes_server("famg_notes", r, "famg_rows")
+    media_links_server("famg_media", r, "famg_rows")
+    family_summary_server("family_summary", r)
+    
+    shiny::observe({
+      if(input$tabset == "Timeline") timeline_server("famg_timeline", r, "famg_rows")
+      if(input$tabset == "Members") family_members_server("family_members", r)
+      if(input$tabset == "Events") family_events_server("family_events", r)
+      if(input$tabset == "Citations") citations_server("famg_citations", r, "famg_rows")
+      if(input$tabset == "Raw data") record_server("famg_raw", r, "famg_rows")
+    }) %>% 
+      shiny::bindEvent(input$tabset, ignoreInit = TRUE)
+  
     
     # Update list of families
     records <- shiny::reactive({
@@ -111,26 +126,6 @@ family_server <- function(id, r) {
       r$famg_to_select <- NULL
     }) %>% 
       shiny::bindEvent(input$delete)
-    
-    ref_numbers_server("famg_ref_numbers", r, "famg_rows")
-    notes_server("famg_notes", r, "famg_rows")
-    citations_server("famg_citations", r, "famg_rows")
-    media_links_server("famg_media", r, "famg_rows")
-    family_summary_server("family_summary", r)
-    
-    
-    shiny::observe(timeline_server("famg_timeline", r, "famg_rows")) %>% 
-      shiny::bindEvent({input$tabset == "Timeline"}, once=TRUE, ignoreInit = TRUE)
-    
-    shiny::observe(family_members_server("family_members", r)) %>% 
-      shiny::bindEvent({input$tabset == "Members"}, once=TRUE, ignoreInit = TRUE)
-    
-    shiny::observe(family_events_server("family_events", r)) %>% 
-      shiny::bindEvent({input$tabset == "Events"}, once=TRUE, ignoreInit = TRUE)
-    
-    shiny::observe(record_server("famg_raw", r, "famg_rows")) %>% 
-      shiny::bindEvent({input$tabset == "Raw data"}, once=TRUE, ignoreInit = TRUE)
-   
     
   })
 }

@@ -19,6 +19,16 @@ file_ui <- function(id) {
 file_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     
+    file_summary_server("file_summary", r)
+    
+    shiny::observe({
+      if(input$tabset == "File details") file_details_server("file_details", r)
+      if(input$tabset == "Source data details") file_data_server("file_data", r)
+      if(input$tabset == "Raw data") record_server("file_raw", r, "head_rows")
+    }) %>% 
+      shiny::bindEvent(input$tabset, ignoreInit = TRUE)
+    
+
     shiny::observeEvent(r$ged, priority = 2, { # want this to fire first
       req(r$ged)
       r$head_rows <- which(r$ged$record == "HD")
@@ -26,18 +36,7 @@ file_server <- function(id, r) {
                                                                    xrefs = "HD", first_only = TRUE)
     })
     
-    file_summary_server("file_summary", r)
-    
-    shiny::observe(file_details_server("file_details", r)) %>% 
-      shiny::bindEvent(input$tabset == "File details", once = TRUE, ignoreInit = TRUE)
-    
-    shiny::observe(file_data_server("file_data", r)) %>% 
-      shiny::bindEvent(input$tabset == "Source data details", once = TRUE, ignoreInit = TRUE)
-    
-    shiny::observe(record_server("file_raw", r, "head_rows")) %>% 
-      shiny::bindEvent(input$tabset == "Raw data", once = TRUE, ignoreInit = TRUE)
-    
-    
+
   })
 }
 

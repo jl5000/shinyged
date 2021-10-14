@@ -25,7 +25,6 @@ individual_ui <- function(id) {
                                   ref_numbers_ui(ns("indi_ref_numbers")),
                                   notes_ui(ns("indi_notes")),
                                   media_links_ui(ns("indi_media")),
-                                  citations_ui(ns("indi_citations"))
                     ),
 
     ) %>% shinyjs::hidden(),
@@ -40,6 +39,7 @@ individual_ui <- function(id) {
                                                      shiny::tabPanel("Facts", individual_facts_ui(ns("indi_facts"))),
                                                      shiny::tabPanel("Timeline", timeline_ui(ns("indi_timeline"))),
                                                      shiny::tabPanel("Links", individual_links_ui(ns("indi_links"))),
+                                                     shiny::tabPanel("Citations", citations_ui(ns("indi_citations"))),
                                                      shiny::tabPanel("Raw data", record_ui(ns("indi_raw"))))
                     )
     ) %>% shinyjs::hidden()
@@ -52,8 +52,19 @@ individual_server <- function(id, r) {
 
     ref_numbers_server("indi_ref_numbers", r, "indi_rows")
     notes_server("indi_notes", r, "indi_rows")
-    citations_server("indi_citations", r, "indi_rows")
     media_links_server("indi_media", r, "indi_rows")
+    individual_summary_server("indi_summary", r)
+    
+    shiny::observe({
+      if(input$tabset == "Timeline") timeline_server("indi_timeline", r, "indi_rows")
+      if(input$tabset == "Names") individual_names_server("indi_names", r)
+      if(input$tabset == "Facts") individual_facts_server("indi_facts", r)
+      if(input$tabset == "Links") individual_links_server("indi_links", r)
+      if(input$tabset == "Raw data") record_server("indi_raw", r, "indi_rows")
+      if(input$tabset == "Citations") citations_server("indi_citations", r, "indi_rows")
+    }) %>% 
+      shiny::bindEvent(input$tabset, ignoreInit = TRUE)
+ 
     
     # Update list of individuals
     records <- shiny::reactive({
@@ -131,25 +142,6 @@ individual_server <- function(id, r) {
       shiny::bindEvent(input$sex, ignoreNULL = FALSE, ignoreInit = TRUE)
     
 
-    
-    individual_summary_server("indi_summary", r)
-    
-    shiny::observe(timeline_server("indi_timeline", r, "indi_rows")) %>% 
-      shiny::bindEvent(input$tabset == "Timeline", once = TRUE, ignoreInit = TRUE)
-    
-    shiny::observe(individual_names_server("indi_names", r)) %>% 
-      shiny::bindEvent(input$tabset == "Names", once = TRUE, ignoreInit = TRUE)
-    
-    shiny::observe(individual_facts_server("indi_facts", r)) %>% 
-      shiny::bindEvent(input$tabset == "Facts", once = TRUE, ignoreInit = TRUE)
-    
-    shiny::observe(individual_links_server("indi_links", r)) %>% 
-      shiny::bindEvent(input$tabset == "Links", once = TRUE, ignoreInit = TRUE)
-    
-    shiny::observe(record_server("indi_raw", r, "indi_rows")) %>% 
-      shiny::bindEvent(input$tabset == "Raw data", once = TRUE, ignoreInit = TRUE)
-    
-    
   })
 }
 

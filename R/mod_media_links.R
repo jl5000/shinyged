@@ -23,7 +23,6 @@ media_links_server <- function(id, r, section_rows, parent_modal_fn = NULL) {
       
       shiny::modalDialog(
         title = "Edit multimedia links",
-        footer = actionButton(ns("restoreModal"),label = "Dismiss"),
         
         shiny::helpText("Here you can manage links to multimedia associated with an item.", 
                         "Use the buttons to add and remove links by selecting items in the list."),
@@ -50,16 +49,7 @@ media_links_server <- function(id, r, section_rows, parent_modal_fn = NULL) {
     }) %>% 
       shiny::bindEvent(input$media_links)
     
-    shiny::observe({
-      if(is.null(parent_modal_fn)){
-        shiny::removeModal()
-      } else {
-        parent_modal_fn(ns, r)
-      }
-    }) %>% 
-      shiny::bindEvent(input$restoreModal)
-    
-    
+
     # The vector of media xrefs
     media_xrefs <- shiny::reactive({
       req(r$ged, r[[section_rows]])

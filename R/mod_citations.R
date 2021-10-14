@@ -5,7 +5,34 @@ citations_ui <- function(id) {
   ns <- shiny::NS(id)
   
   shiny::tagList(
-    shiny::actionButton(ns("citations"), label = NULL)
+    shiny::br(),
+    shiny::helpText("Here you can manage citations associated with an item.",
+                    "Citations are links to sources that provide evidence for the item."),
+    shiny::tags$hr(),
+    shiny::selectizeInput(ns("citation"), label = NULL, choices = NULL,
+                          multiple = TRUE, width = "750px", options = list(maxItems = 1)),
+    shiny::fluidRow(
+      shiny::column(12,
+                    shiny::actionButton(ns("add_citation"), "Add citation"),
+                    shiny::actionButton(ns("remove_citation"), "Delete citation")
+      )
+    ),
+    
+    shiny::tags$hr(),
+    
+    shiny::fluidRow(id = ns("citation_section"),
+                    shiny::column(12,
+                                  notes_ui(ns("citation_notes")),
+                                  media_links_ui(ns("citation_media")),
+                                  
+                    ),
+                    shiny::column(12,
+                                  citation_details_ui(ns("citation_details"))
+                    )
+    ) %>% shinyjs::hidden()
+    
+    
+    
   )
 }
 
@@ -14,17 +41,17 @@ citations_server <- function(id, r, section_rows) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    # Disable citations button if no source records to point to
-    shiny::observe({
-      shinyjs::toggleState("citations", tidyged::num_sour(r$ged) > 0)
-    }) %>% 
-      shiny::bindEvent(r$ged)
+    notes_server("citation_notes", r, "citation_rows", show_citations_modal)
+    media_links_server("citation_media", r, "citation_rows", show_citations_modal)
     
-    # Show modal
-    shiny::observe({
-      show_citations_modal(ns, r)
-    }) %>% 
-      shiny::bindEvent(input$citations)
+    shiny::observe(citation_details_server("citation_details", r)) %>% 
+      shiny::bindEvent(!is.null(input$citation), once = TRUE, ignoreInit = TRUE)
+    
+    # Disable citations button if no source records to point to
+    # shiny::observe({
+    #   shinyjs::toggleState("citations", tidyged::num_sour(r$ged) > 0)
+    # }) %>% 
+    #   shiny::bindEvent(r$ged)
     
     
     # The list of rows in the tidyged object for each citation
@@ -75,7 +102,7 @@ citations_server <- function(id, r, section_rows) {
         paste0(seq_along(.), ". ", .) # 1. 2. 3. etc.
 
     })
-    #TODO: Try to get same citation selected when modal is returned to
+    
     citation_to_select <- shiny::reactive({
       if(is.null(r$cit_to_select)) {
         input$citation
@@ -100,7 +127,7 @@ citations_server <- function(id, r, section_rows) {
     # Update citation_rows with rows of selected citation
     shiny::observe({
       req(input$citation, citations_rows, citations)
-      
+
       r$citation_rows <- citations_rows()[[which(citations() == input$citation)]]
     }) %>% 
       shiny::bindEvent(input$citation)
@@ -161,49 +188,10 @@ citations_server <- function(id, r, section_rows) {
     }) %>% 
       shiny::bindEvent(input$remove_citation)
     
-    shiny::observeEvent(r$cit_to_select, ignoreNULL = FALSE, {
-      print(r$cit_to_select)
-    })
-
-    citation_details_server("citation_details", r)
-    notes_server("citation_notes", r, "citation_rows", show_citations_modal)
-    media_links_server("citation_media", r, "citation_rows", show_citations_modal)
+   
+    
+    
 
 
   })
-}
-
-show_citations_modal <- function(ns, r){
-  
-  shiny::modalDialog(
-    title = "Edit source citations",
-    
-    shiny::helpText("Here you can manage citations associated with an item.",
-                    "Citations are links to sources that provide evidence for the item."),
-    shiny::tags$hr(),
-    shiny::selectizeInput(ns("citation"), label = NULL, choices = r$cits, selected = r$cit_to_select,
-                          multiple = TRUE, width = "750px", options = list(maxItems = 1)),
-    shiny::fluidRow(
-      shiny::column(12,
-                    shiny::actionButton(ns("add_citation"), "Add citation"),
-                    shiny::actionButton(ns("remove_citation"), "Delete citation")
-      )
-    ),
-    
-    shiny::tags$hr(),
-    
-    shiny::fluidRow(id = ns("citation_section"),
-                    shiny::column(12,
-                                  notes_ui(ns("citation_notes")),
-                                  media_links_ui(ns("citation_media")),
-                                  
-                    ),
-                    shiny::column(12,
-                                  citation_details_ui(ns("citation_details"))
-                    )
-    ) %>% shinyjs::hidden()
-    
-    
-  ) %>% shiny::showModal()
-  
 }
