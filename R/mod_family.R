@@ -56,10 +56,10 @@ family_server <- function(id, r) {
     
     shiny::observe({
       if(input$tabset == "Timeline") timeline_server("famg_timeline", r, "famg_rows")
-      if(input$tabset == "Members") family_members_server("family_members", r)
-      if(input$tabset == "Events") family_events_server("family_events", r)
-      if(input$tabset == "Citations") citations_server("famg_citations", r, "famg_rows")
-      if(input$tabset == "Raw data") record_server("famg_raw", r, "famg_rows")
+      else if(input$tabset == "Members") family_members_server("family_members", r)
+      else if(input$tabset == "Events") family_events_server("family_events", r)
+      else if(input$tabset == "Citations") citations_server("famg_citations", r, "famg_rows")
+      else if(input$tabset == "Raw data") record_server("famg_raw", r, "famg_rows")
     }) %>% 
       shiny::bindEvent(input$tabset, ignoreInit = TRUE)
   

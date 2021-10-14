@@ -23,8 +23,8 @@ file_server <- function(id, r) {
     
     shiny::observe({
       if(input$tabset == "File details") file_details_server("file_details", r)
-      if(input$tabset == "Source data details") file_data_server("file_data", r)
-      if(input$tabset == "Raw data") record_server("file_raw", r, "head_rows")
+      else if(input$tabset == "Source data details") file_data_server("file_data", r)
+      else if(input$tabset == "Raw data") record_server("file_raw", r, "head_rows")
     }) %>% 
       shiny::bindEvent(input$tabset, ignoreInit = TRUE)
     

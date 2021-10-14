@@ -27,13 +27,13 @@ function(input, output, session) {
     # Only run modules if tab is clicked
     shiny::observe({
         if(input$tabset == "Submitter") submitter_server("subm", r)
-        if(input$tabset == "Individuals") individual_server("indi", r)
-        if(input$tabset == "Families") family_server("famg", r)
-        if(input$tabset == "Sources") source_server("sour", r)
-        if(input$tabset == "Repositories") repository_server("repo", r)
-        if(input$tabset == "Notes") note_server("note", r)
-        if(input$tabset == "Multimedia") multimedia_server("media", r)
-        if(input$tabset == "GEDCOM") ged_debug_server("debug", r)
+        else if(input$tabset == "Individuals") individual_server("indi", r)
+        else if(input$tabset == "Families") family_server("famg", r)
+        else if(input$tabset == "Sources") source_server("sour", r)
+        else if(input$tabset == "Repositories") repository_server("repo", r)
+        else if(input$tabset == "Notes") note_server("note", r)
+        else if(input$tabset == "Multimedia") multimedia_server("media", r)
+        else if(input$tabset == "GEDCOM") ged_debug_server("debug", r)
     }) %>% 
         shiny::bindEvent(input$tabset, ignoreInit = TRUE)
     

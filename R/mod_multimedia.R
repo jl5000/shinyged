@@ -53,7 +53,7 @@ multimedia_server <- function(id, r) {
     
     shiny::observe({
       if(input$tabset == "Description") multimedia_description_server("media_description", r)
-      if(input$tabset == "Raw data") record_server("media_raw", r, "media_rows")
+      else if(input$tabset == "Raw data") record_server("media_raw", r, "media_rows")
     }) %>% 
       shiny::bindEvent(input$tabset, ignoreInit = TRUE)
     

@@ -52,8 +52,8 @@ source_server <- function(id, r) {
     
     shiny::observe({
       if(input$tabset == "Data") source_data_server("sour_data", r)
-      if(input$tabset == "Details") source_details_server("sour_details", r)
-      if(input$tabset == "Raw data") record_server("sour_raw", r, "sour_rows")
+      else if(input$tabset == "Details") source_details_server("sour_details", r)
+      else if(input$tabset == "Raw data") record_server("sour_raw", r, "sour_rows")
     }) %>% 
       shiny::bindEvent(input$tabset, ignoreInit = TRUE)
     

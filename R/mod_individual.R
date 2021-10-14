@@ -57,11 +57,11 @@ individual_server <- function(id, r) {
     
     shiny::observe({
       if(input$tabset == "Timeline") timeline_server("indi_timeline", r, "indi_rows")
-      if(input$tabset == "Names") individual_names_server("indi_names", r)
-      if(input$tabset == "Facts") individual_facts_server("indi_facts", r)
-      if(input$tabset == "Links") individual_links_server("indi_links", r)
-      if(input$tabset == "Raw data") record_server("indi_raw", r, "indi_rows")
-      if(input$tabset == "Citations") citations_server("indi_citations", r, "indi_rows")
+      else if(input$tabset == "Names") individual_names_server("indi_names", r)
+      else if(input$tabset == "Facts") individual_facts_server("indi_facts", r)
+      else if(input$tabset == "Links") individual_links_server("indi_links", r)
+      else if(input$tabset == "Raw data") record_server("indi_raw", r, "indi_rows")
+      else if(input$tabset == "Citations") citations_server("indi_citations", r, "indi_rows")
     }) %>% 
       shiny::bindEvent(input$tabset, ignoreInit = TRUE)
  
