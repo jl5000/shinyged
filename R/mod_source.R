@@ -85,14 +85,12 @@ source_server <- function(id, r) {
       shiny::bindEvent(records())
     
     # Update sour_rows
-    shiny::observeEvent(priority = 2, {
-      input$record
-      r$ged
-    }, {
+    shiny::observe(priority = 2, {
       req(input$record)
       sour_xref <- stringr::str_extract(input$record, tidyged.internals::reg_xref(FALSE))
       r$sour_rows <- which(r$ged$record == sour_xref)
-    })
+    }) %>% 
+      shiny::bindEvent(input$record, r$ged)
     
     # Show/hide tabs and toggle delete button
     shiny::observe({

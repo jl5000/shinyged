@@ -62,7 +62,7 @@ citation_details_ui <- function(id) {
 citation_details_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     
-    shiny::observeEvent(r$ged, priority = 2, {
+    shiny::observe(priority = 2, {
       req(r$ged, r$citation_rows)
       r$citation_rows <- tidyged.internals::identify_section(r$ged,
                                                              r$ged$level[r$citation_rows[1]],
@@ -70,7 +70,8 @@ citation_details_server <- function(id, r) {
                                                              r$ged$value[r$citation_rows[1]],
                                                              r$ged$record[r$citation_rows[1]],
                                                              first_only = TRUE)
-    })
+    }) %>% 
+      shiny::bindEvent(r$ged)
     
     sour_xref <- shiny::reactive({
       req(r$ged, r$citation_rows)

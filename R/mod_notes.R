@@ -4,14 +4,22 @@ notes_ui <- function(id) {
   ns <- shiny::NS(id)
   
   shiny::tagList(
-    shiny::actionButton(ns("notes"), label = NULL)
+    shiny::actionButton(ns("notes"), label = "Notes")
   )
 }
 
 
-notes_server <- function(id, r, section_rows, parent_modal_fn = NULL) {
+notes_server <- function(id, r, section_rows) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
+    
+    # Enable/disable notes button
+    shiny::observe({
+      shinyjs::toggleState("notes", !is.null(r[[section_rows]]))
+      if(is.null(r[[section_rows]]))
+        shiny::updateActionButton(inputId = "notes", label = "Notes")
+    }) %>% 
+      shiny::bindEvent(r[[section_rows]], ignoreNULL = FALSE)
     
     # Click the button to show popup
     shiny::observe({
@@ -50,12 +58,13 @@ notes_server <- function(id, r, section_rows, parent_modal_fn = NULL) {
     # The vector of notes
     notes_raw <- shiny::reactive({
       req(r$ged, r[[section_rows]])
-      
+
       dplyr::slice(r$ged, r[[section_rows]]) %>%
         dplyr::filter(level == .$level[1] + 1, tag == "NOTE") %>% 
         dplyr::pull(value)
     })
     
+    # Update notes button label with number of notes
     shiny::observe({
       req(notes_raw)
       

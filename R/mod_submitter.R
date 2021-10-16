@@ -30,11 +30,12 @@ submitter_server <- function(id, r) {
     notes_server("subm_notes", r, "subm_rows")
     media_links_server("subm_media", r, "subm_rows")
     
-    shiny::observeEvent(r$ged, priority = 2, { # want this to fire first
+    shiny::observe(priority = 2, { # want this to fire first
       req(r$ged)
       subm_xref <- tidyged::xrefs_subm(r$ged)
       r$subm_rows <- which(r$ged$record == subm_xref)
-    })
+    }) %>% 
+      shiny::bindEvent(r$ged)
 
     subm <- shiny::reactive({
       req(r$ged, r$subm_rows)

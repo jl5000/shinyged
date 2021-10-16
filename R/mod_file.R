@@ -29,12 +29,13 @@ file_server <- function(id, r) {
       shiny::bindEvent(input$tabset, ignoreInit = TRUE)
     
 
-    shiny::observeEvent(r$ged, priority = 2, { # want this to fire first
+    shiny::observe(priority = 2, { # want this to fire first
       req(r$ged)
       r$head_rows <- which(r$ged$record == "HD")
       r$head_file_sour_rows <- tidyged.internals::identify_section(r$ged, 1, "SOUR", 
                                                                    xrefs = "HD", first_only = TRUE)
-    })
+    }) %>% 
+      shiny::bindEvent(r$ged)
     
 
   })

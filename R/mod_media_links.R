@@ -8,7 +8,7 @@ media_links_ui <- function(id) {
   )
   }
 
-media_links_server <- function(id, r, section_rows, parent_modal_fn = NULL) {
+media_links_server <- function(id, r, section_rows) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     

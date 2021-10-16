@@ -41,8 +41,8 @@ citations_server <- function(id, r, section_rows) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    notes_server("citation_notes", r, "citation_rows", show_citations_modal)
-    media_links_server("citation_media", r, "citation_rows", show_citations_modal)
+    notes_server("citation_notes", r, "citation_rows")
+    media_links_server("citation_media", r, "citation_rows")
     
     shiny::observe(citation_details_server("citation_details", r)) %>% 
       shiny::bindEvent(!is.null(input$citation), once = TRUE, ignoreInit = TRUE)

@@ -90,14 +90,12 @@ family_server <- function(id, r) {
       shiny::bindEvent(records())
     
     # Update famg_rows
-    shiny::observeEvent(priority = 2, {
-      r$ged
-      input$record
-    }, {
+    shiny::observe(priority = 2, {
       req(input$record)
       famg_xref <- stringr::str_extract(input$record, tidyged.internals::reg_xref(FALSE))
       r$famg_rows <- which(r$ged$record == famg_xref)
-    })
+    }) %>% 
+      shiny::bindEvent(r$ged, input$record)
     
     # Show/hide tabs and toggle delete button
     shiny::observe({
