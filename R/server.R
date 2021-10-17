@@ -25,8 +25,7 @@ function(input, output, session) {
     tools_server("tools", r)
     
     shiny::observe({
-        if(input$tabset == "Submitter") submitter_server("subm", r)
-        else if(input$tabset == "Individuals") individual_server("indi", r)
+        if(input$tabset == "Individuals") individual_server("indi", r)
         else if(input$tabset == "Families") family_server("famg", r)
         else if(input$tabset == "Sources") source_server("sour", r)
         else if(input$tabset == "Repositories") repository_server("repo", r)

@@ -4,7 +4,7 @@ media_links_ui <- function(id) {
   ns <- shiny::NS(id)
   
   shiny::tagList(
-    shiny::actionButton(ns("media_links"), label = NULL)
+    shiny::actionButton(ns("media_links"), label = "Media")
   )
   }
 

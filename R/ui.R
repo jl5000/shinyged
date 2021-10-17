@@ -38,7 +38,6 @@ shiny::fluidPage(
                   shiny::column(width = 12,
                                 shiny::tabsetPanel(id = "tabset",
                                                    shiny::tabPanel("GEDCOM File", file_ui("file")),
-                                                   shiny::tabPanel("Submitter", submitter_ui("subm")),
                                                    shiny::tabPanel("Individuals", individual_ui("indi")),
                                                    shiny::tabPanel("Families", family_ui("famg")),
                                                    shiny::tabPanel("Notes", note_ui("note")),
