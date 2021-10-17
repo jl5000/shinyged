@@ -66,7 +66,8 @@ individual_server <- function(id, r) {
       shiny::bindEvent(input$tabset, ignoreInit = TRUE)
  
     
-    # Update list of individuals
+
+    # Update list of individuals ----------------------------------------------
     records <- shiny::reactive({
       req(r$ged)
 
@@ -74,7 +75,7 @@ individual_server <- function(id, r) {
         tidyged::describe_records(r$ged, ., short_desc = TRUE)
     })
     
-    # Update choices with list of individuals and select one
+    # Update choices with list of individuals and select one -------------------
     shiny::observe({
       if(!is.null(records())) {
         
@@ -92,7 +93,7 @@ individual_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(records())
     
-    # Update indi_rows
+    # Update indi_rows ----------------------------------------------------------
     shiny::observe(priority = 2, {
       req(input$record)
       indi_xref <- stringr::str_extract(input$record, tidyged.internals::reg_xref(FALSE))
@@ -100,7 +101,7 @@ individual_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(input$record, r$ged)
     
-    # Show/hide tabs and toggle delete button
+    # Show/hide tabs and toggle delete button ----------------------------------
     shiny::observe({
       shinyjs::toggle("indi_tabs", condition = !is.null(input$record))
       shinyjs::toggle("indi_data", condition = !is.null(input$record))
@@ -112,7 +113,7 @@ individual_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(input$record, ignoreNULL = FALSE)
     
-    # Add individual and set a flag to ensure it is selected
+    # Add individual and set a flag to ensure it is selected -------------------
     shiny::observe({
       r$ged <- tidyged::add_indi(r$ged)
       indi_xrefs <- tidyged::xrefs_indi(r$ged)
@@ -121,7 +122,7 @@ individual_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(input$add)
     
-    # Remove individual and set a flag to ensure no individual is selected
+    # Remove individual and set a flag to ensure no individual is selected --------
     shiny::observe({
       indi_xref <- stringr::str_extract(input$record, tidyged.internals::reg_xref(FALSE))
       r$ged <- tidyged::remove_indi(r$ged, indi_xref)
@@ -130,6 +131,7 @@ individual_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(input$delete)
     
+    # Update sex value ------------------------------------------------------------
     shiny::observe({
       sex <- process_input(input$sex)
       err <- tidyged.internals::chk_sex_value(sex, 1)

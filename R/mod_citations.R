@@ -47,14 +47,8 @@ citations_server <- function(id, r, section_rows) {
     shiny::observe(citation_details_server("citation_details", r)) %>% 
       shiny::bindEvent(!is.null(input$citation), once = TRUE, ignoreInit = TRUE)
     
-    # Disable citations button if no source records to point to
-    # shiny::observe({
-    #   shinyjs::toggleState("citations", tidyged::num_sour(r$ged) > 0)
-    # }) %>% 
-    #   shiny::bindEvent(r$ged)
-    
-    
-    # The list of rows in the tidyged object for each citation
+
+    # The list of rows in the tidyged object for each citation ----------------
     citations_rows <- shiny::reactive({
       req(r$ged, r[[section_rows]])
 
@@ -67,7 +61,7 @@ citations_server <- function(id, r, section_rows) {
 
     })
     
-    # Update button label with number of citations
+    # Update button label with number of citations -----------------------------
     shiny::observe({
       req(citations_rows)
 
@@ -77,7 +71,7 @@ citations_server <- function(id, r, section_rows) {
     }) %>% 
       shiny::bindEvent(citations_rows())
 
-    # The vector of citation descriptions
+    # The vector of citation descriptions --------------------------------------
     citations <- shiny::reactive({
       req(r$ged, citations_rows)
       
@@ -103,6 +97,7 @@ citations_server <- function(id, r, section_rows) {
 
     })
     
+    # The citation to select after changes -------------------------------------
     citation_to_select <- shiny::reactive({
       if(is.null(r$cit_to_select)) {
         input$citation
@@ -111,7 +106,7 @@ citations_server <- function(id, r, section_rows) {
       }
     })
     
-    # Update choices with list of individuals and select one
+    # Update choices with list of citations and select one -------------------
     shiny::observe({
       r$cits <- citations()
       if(!is.null(citations())) {
@@ -124,7 +119,7 @@ citations_server <- function(id, r, section_rows) {
       r$cit_to_select <- input$citation
     })
 
-    # Update citation_rows with rows of selected citation
+    # Update citation_rows with rows of selected citation --------------------
     shiny::observe({
       req(input$citation, citations_rows, citations)
 
@@ -133,14 +128,14 @@ citations_server <- function(id, r, section_rows) {
       shiny::bindEvent(input$citation)
 
 
-    # Show/hide tabs and toggle delete button if no citation
+    # Show/hide tabs and toggle delete button if no citation -----------------
     shiny::observe({
       shinyjs::toggle("citation_section", condition = !is.null(input$citation))
       shinyjs::toggleState("remove_citation", !is.null(input$citation))
     }) %>% 
       shiny::bindEvent(input$citation, ignoreNULL = FALSE)
     
-    # Show dialog to choose a source record
+    # Show dialog to choose a source record ---------------------------------
     shiny::observe({
       req(r$ged)
       
@@ -157,13 +152,13 @@ citations_server <- function(id, r, section_rows) {
     }) %>% 
       shiny::bindEvent(input$add_citation)
 
-    # Disable add_sour_citation button if no source records
+    # Disable add_sour_citation button if no source records --------------------
     shiny::observe({
       shinyjs::toggleState("add_sour_citation", !is.null(input$source_select))
     }) %>% 
       shiny::bindEvent(input$source_select, ignoreNULL = FALSE)
 
-    # Add source citation
+    # Add source citation ------------------------------------------------------
     shiny::observe({
       sour_xref <- stringr::str_extract(input$source_select, tidyged.internals::reg_xref(FALSE))
 
@@ -181,7 +176,7 @@ citations_server <- function(id, r, section_rows) {
     }) %>% 
       shiny::bindEvent(input$add_sour_citation)
 
-    # Remove citation
+    # Remove citation -------------------------------------------------------------
     shiny::observe({
       r$ged <- dplyr::slice(r$ged, -r$citation_rows)
       r$cit_to_select <- NULL

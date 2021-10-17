@@ -24,7 +24,6 @@ function(input, output, session) {
     file_server("file", r)
     tools_server("tools", r)
     
-    # Only run modules if tab is clicked
     shiny::observe({
         if(input$tabset == "Submitter") submitter_server("subm", r)
         else if(input$tabset == "Individuals") individual_server("indi", r)
@@ -34,10 +33,11 @@ function(input, output, session) {
         else if(input$tabset == "Notes") note_server("note", r)
         else if(input$tabset == "Multimedia") multimedia_server("media", r)
         else if(input$tabset == "GEDCOM") ged_debug_server("debug", r)
-    }) %>% 
+    }) %>%
         shiny::bindEvent(input$tabset, ignoreInit = TRUE)
     
-    # Import file
+
+    # Import file -------------------------------------------------------------
     shiny::observe({
         if(!is.null(r$ged)) {
             
@@ -61,7 +61,7 @@ function(input, output, session) {
     }) %>% 
         shiny::bindEvent(input$read_file)
     
-    # Discard previous and import new
+    # Discard previous and import new ----------------------------------------
     shiny::observe({
         shiny::removeModal()
         r$ged <- tidyged.io::read_gedcom(input$read_file$datapath)
@@ -69,7 +69,7 @@ function(input, output, session) {
     }) %>% 
         shiny::bindEvent(input$discard_and_read)
     
-    # Create new
+    # Create new -------------------------------------------------------------
     shiny::observe({
         if(!is.null(r$ged)) {
             
@@ -93,7 +93,7 @@ function(input, output, session) {
     }) %>% 
         shiny::bindEvent(input$create_gedcom)
     
-    # Discard previous and create new
+    # Discard previous and create new --------------------------------------
     shiny::observe({
         shiny::removeModal()
         r$ged <- tidyged::gedcom()
@@ -101,14 +101,14 @@ function(input, output, session) {
     }) %>% 
         shiny::bindEvent(input$discard_and_create)
     
-    # Show tabs
+    # Show tabs -----------------------------------------------------------
     shiny::observe({
         shinyjs::show("tabs")
         shinyjs::enable("export_gedcom")
     }) %>% 
         shiny::bindEvent(r$ged)
     
-    # Export
+    # Export --------------------------------------------------------------
     output$export_gedcom <- shiny::downloadHandler(
         filename = "from_shinyged.ged",
         content = function(file) {

@@ -12,13 +12,15 @@ media_links_server <- function(id, r, section_rows) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
-    # Disable media button if no media records to point to
+
+    # Disable media button if no media records to point to --------------------
     shiny::observe({
       shinyjs::toggleState("media_links", tidyged::num_media(r$ged) > 0)
     }) %>% 
       shiny::bindEvent(r$ged)
     
-    # Click the button to show popup
+
+    # Click the button to show popup ------------------------------------------
     shiny::observe({
       
       shiny::modalDialog(
@@ -50,7 +52,8 @@ media_links_server <- function(id, r, section_rows) {
       shiny::bindEvent(input$media_links)
     
 
-    # The vector of media xrefs
+
+    # The vector of media xrefs -----------------------------------------------
     media_xrefs <- shiny::reactive({
       req(r$ged, r[[section_rows]])
       
@@ -59,6 +62,8 @@ media_links_server <- function(id, r, section_rows) {
         dplyr::pull(value)
     })
     
+
+    # Update button label with number of links --------------------------------   
     shiny::observe({
       req(media_xrefs)
       
@@ -67,12 +72,15 @@ media_links_server <- function(id, r, section_rows) {
     }) %>% 
       shiny::bindEvent(media_xrefs())
     
+
+    # The vector of media descriptions ----------------------------------------
     media_desc <- shiny::reactive({
       req(r$ged, media_xrefs)
       tidyged::describe_records(r$ged, media_xrefs())
     })
 
-    # The row of the tidyged object corresponding to the selected media link
+
+    # The row of the tidyged object corresponding to the selected media --------
     selected_ged_row <- shiny::reactive({
       req(r$ged, r[[section_rows]], input$media_list_rows_selected)
       
@@ -84,27 +92,26 @@ media_links_server <- function(id, r, section_rows) {
     }) %>% 
       shiny::bindEvent(r$ged, r[[section_rows]], input$media_list_rows_selected)
     
-    # Update table with media links
+    # Update table with media links -------------------------------------------
     output$media_list <- DT::renderDataTable({
       DT::datatable(data.frame(Multimedia = media_desc()), rownames = FALSE, selection = "single")
     })
     
     
-    
-    # Disable remove_link button if nothing selected
+    # Disable remove_link button if nothing selected --------------------------
     shiny::observe({
       shinyjs::toggleState("remove_link", !is.null(input$media_list_rows_selected))
     }) %>% 
       shiny::bindEvent(input$media_list_rows_selected, ignoreNULL = FALSE)
     
 
-    # Disable add_link button if no media records or it's already been added
+    # Disable add_link button if no media records or it's already been added -----
     shiny::observe({
       shinyjs::toggleState("add_link", !is.null(input$media_choice) && 
                              !input$media_choice %in% media_desc())
     })
     
-    # Add media reference
+    # Add media reference ------------------------------------------------------
     shiny::observe({
       media_xref <- stringr::str_extract(input$media_choice, tidyged.internals::reg_xref(FALSE))
       
@@ -120,7 +127,7 @@ media_links_server <- function(id, r, section_rows) {
     }) %>% 
       shiny::bindEvent(input$add_link)
     
-    # Remove media link
+    # Remove media link ----------------------------------------------------------
     shiny::observe({
       r$ged <- dplyr::slice(r$ged, -selected_ged_row())
     }) %>% 

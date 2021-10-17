@@ -115,18 +115,32 @@ family_members_server <- function(id, r) {
           )
         ),
         
+        shiny::fluidRow(id = ns("new_child_summary_section"),
+                        shiny::column(12,
+                                      individual_summary_ui(ns("new_child_summary"))
+                        )
+        ) %>% shinyjs::hidden()
+        
       ) %>% shiny::showModal()
       
     }) %>% 
       shiny::bindEvent(input$add_child)
     
 
-    # Enable/disable add child button -----------------------------------------
+    # Enable/disable add child button and show person summary -------------------------
     shiny::observe({
       xref <- stringr::str_extract(input$new_child, tidyged.internals::reg_xref(FALSE))
 
       shinyjs::toggleState("add_child_now", !is.null(input$new_child) &&
                              !xref %in% members_table()$xref)
+      
+      shinyjs::toggle("new_child_summary_section", condition = !is.null(input$new_child))
+      
+      if(!is.null(input$new_child)){
+        r$indi_rows <- which(r$ged$record == xref)
+        individual_summary_server("new_child_summary", r)
+      } 
+      
     }) %>% 
       shiny::bindEvent(input$new_child, ignoreNULL = FALSE)
     
@@ -165,7 +179,13 @@ family_members_server <- function(id, r) {
           )
         ),
         
-        shiny::helpText("You can change the relationship type in the Events tab.")
+        shiny::helpText("You can change the relationship type in the Events tab."),
+        
+        shiny::fluidRow(id = ns("new_partner_summary_section"),
+                        shiny::column(12,
+                                      individual_summary_ui(ns("new_partner_summary"))
+                        )
+        ) %>% shinyjs::hidden()
         
       ) %>% shiny::showModal()
       
@@ -173,12 +193,19 @@ family_members_server <- function(id, r) {
       shiny::bindEvent(input$add_partner)
     
 
-    # Enable/disable add partner button ---------------------------------------
+    # Enable/disable add partner button and show person summary -------------
     shiny::observe({
       xref <- stringr::str_extract(input$new_partner, tidyged.internals::reg_xref(FALSE))
       
       shinyjs::toggleState("add_partner_now", !is.null(input$new_partner) &&
                              !xref %in% members_table()$xref)
+      
+      shinyjs::toggle("new_partner_summary_section", condition = !is.null(input$new_partner))
+      
+      if(!is.null(input$new_partner)){
+        r$indi_rows <- which(r$ged$record == xref)
+        individual_summary_server("new_partner_summary", r)
+      } 
     }) %>% 
       shiny::bindEvent(input$new_partner, ignoreNULL = FALSE)
     
