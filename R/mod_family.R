@@ -49,10 +49,10 @@ family_ui <- function(id) {
 family_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     
+    family_summary_server("family_summary", r)
     ref_numbers_server("famg_ref_numbers", r, "famg_rows")
     notes_server("famg_notes", r, "famg_rows")
     media_links_server("famg_media", r, "famg_rows")
-    family_summary_server("family_summary", r)
     
     shiny::observe({
       if(input$tabset == "Timeline") timeline_server("famg_timeline", r, "famg_rows")

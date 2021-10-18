@@ -50,10 +50,11 @@ individual_ui <- function(id) {
 individual_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
 
+    
+    individual_summary_server("indi_summary", r)
     ref_numbers_server("indi_ref_numbers", r, "indi_rows")
     notes_server("indi_notes", r, "indi_rows")
     media_links_server("indi_media", r, "indi_rows")
-    individual_summary_server("indi_summary", r)
     
     shiny::observe({
       if(input$tabset == "Timeline") timeline_server("indi_timeline", r, "indi_rows")

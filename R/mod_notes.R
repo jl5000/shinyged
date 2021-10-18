@@ -19,7 +19,7 @@ notes_server <- function(id, r, section_rows) {
       shinyjs::toggleState("notes", !is.null(r[[section_rows]]))
       if(is.null(r[[section_rows]]))
         shiny::updateActionButton(inputId = "notes", label = "Notes")
-    }) %>% 
+    }) %>%
       shiny::bindEvent(r[[section_rows]], ignoreNULL = FALSE)
     
     # Click the button to show popup ------------------------------------------

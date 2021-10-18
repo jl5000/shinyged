@@ -17,12 +17,9 @@ multimedia_ui <- function(id) {
     ),
     
     shiny::fluidRow(id = ns("media_data"),
-                    shiny::column(width = 6,
-                                  ref_numbers_ui(ns("media_ref_numbers"))
-                    ),
-                    shiny::column(width = 6,
+                    shiny::column(width = 12,
+                                  ref_numbers_ui(ns("media_ref_numbers")),
                                   notes_ui(ns("media_notes")),
-                                  citations_ui(ns("media_citations"))
                     )
     ) %>% shinyjs::hidden(),
     
@@ -34,6 +31,7 @@ multimedia_ui <- function(id) {
                                     shiny::tabsetPanel(id = ns("tabset"),
                                       shiny::tabPanel("Summary", multimedia_summary_ui(ns("media_summary"))),
                                       shiny::tabPanel("Description", multimedia_description_ui(ns("media_description"))),
+                                      shiny::tabPanel("Citations", citations_ui(ns("media_citations"))),
                                       shiny::tabPanel("Raw data", record_ui(ns("media_raw")))
                                     )
                       )
@@ -49,11 +47,11 @@ multimedia_server <- function(id, r) {
     multimedia_summary_server("media_summary", r)
     ref_numbers_server("media_ref_numbers", r, "media_rows")
     notes_server("media_notes", r, "media_rows")
-    citations_server("media_citations", r, "media_rows")
     
     shiny::observe({
       if(input$tabset == "Description") multimedia_description_server("media_description", r)
       else if(input$tabset == "Raw data") record_server("media_raw", r, "media_rows")
+      else if(input$tabset == "Citations") citations_server("media_citations", r, "media_rows")
     }) %>% 
       shiny::bindEvent(input$tabset, ignoreInit = TRUE)
     
@@ -94,6 +92,7 @@ multimedia_server <- function(id, r) {
     # Show/hide tabs and toggle delete button
     shiny::observe({
       shinyjs::toggle("media_tabs", condition = !is.null(input$record))
+      shinyjs::toggle("media_data", condition = !is.null(input$record))
       shinyjs::toggleState("delete", !is.null(input$record))
     }) %>% 
       shiny::bindEvent(input$record, ignoreNULL = FALSE)

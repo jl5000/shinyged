@@ -22,7 +22,7 @@ media_links_server <- function(id, r, section_rows) {
 
     # Click the button to show popup ------------------------------------------
     shiny::observe({
-      
+   
       shiny::modalDialog(
         title = "Edit multimedia links",
         

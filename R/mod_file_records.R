@@ -7,9 +7,17 @@ file_records_ui <- function(id) {
     shiny::br(),
     
     shiny::fluidRow(
-      shiny::column(6,
+      shiny::column(3,
                     shiny::selectInput(ns("record_type"), label = "Choose a record type",
-                                       choices = c("Individuals","Family Groups","Multimedia","Sources","Repositories","Notes"))
+                                       choices = c("Individuals","Family Groups","Multimedia","Sources","Repositories","Notes")),
+                    
+                    
+      ),
+      shiny::column(2, style = 'margin-top:25px',
+        shiny::actionButton(ns("refresh"), "Display"),
+      ),
+      shiny::column(7, style = 'margin-top:25px',
+        shiny::helpText("Note: Summary tables can take several seconds to generate (depending on size)")
       )
     ),
     
@@ -47,7 +55,8 @@ file_records_server <- function(id, r) {
       }
         
       DT::datatable(tbl, rownames = FALSE)
-    })
+    }) %>% 
+      shiny::bindEvent(input$refresh)
     
   })
 }

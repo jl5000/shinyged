@@ -45,7 +45,7 @@ citations_server <- function(id, r, section_rows) {
     media_links_server("citation_media", r, "citation_rows")
     
     shiny::observe(citation_details_server("citation_details", r)) %>% 
-      shiny::bindEvent(!is.null(input$citation), once = TRUE, ignoreInit = TRUE)
+      shiny::bindEvent(input$citation)
     
 
     # The list of rows in the tidyged object for each citation ----------------
