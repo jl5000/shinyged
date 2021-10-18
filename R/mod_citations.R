@@ -61,15 +61,6 @@ citations_server <- function(id, r, section_rows) {
 
     })
     
-    # Update button label with number of citations -----------------------------
-    shiny::observe({
-      req(citations_rows)
-
-      lbl <- paste0(length(citations_rows()), " citations")
-      if(length(citations_rows()) == 1) lbl <- substr(lbl, 1, nchar(lbl) - 1)
-      shiny::updateActionButton(inputId = "citations", label = lbl)
-    }) %>% 
-      shiny::bindEvent(citations_rows())
 
     # The vector of citation descriptions --------------------------------------
     citations <- shiny::reactive({

@@ -22,7 +22,8 @@ file_details_ui <- function(id) {
 file_details_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     
-    
+
+    # Load in data from gedcom object -----------------------------------------
     shiny::observe({
       req(r$ged)
       shiny::updateTextInput(session = session, "receiving_sys", 
@@ -36,6 +37,7 @@ file_details_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(r$file_count)
     
+    # Edit receiving system --------------------------------------------------
     shiny::observe({
       receiving_sys <- process_input(input$receiving_sys)
       err <- tidyged.internals::chk_receiving_system_name(receiving_sys, 1)
@@ -45,6 +47,7 @@ file_details_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(input$receiving_sys, ignoreNULL = FALSE, ignoreInit = TRUE)
     
+    # Edit language ----------------------------------------------------------
     shiny::observe({
       language <- process_input(input$language)
       err <- tidyged.internals::chk_language_of_text(language, 1)
@@ -54,6 +57,7 @@ file_details_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(input$language, ignoreNULL = FALSE, ignoreInit = TRUE)
     
+    # Edit description --------------------------------------------------------
     shiny::observe({
       ged_desc <- process_input(input$ged_desc)
       err <- tidyged.internals::chk_gedcom_content_description(ged_desc, 1)
@@ -63,6 +67,7 @@ file_details_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(input$ged_desc, ignoreNULL = FALSE, ignoreInit = TRUE)
     
+    # Edit copyright -----------------------------------------------------------
     shiny::observe({
       ged_copy <- process_input(input$ged_copy)
       err <- tidyged.internals::chk_copyright_gedcom_file(ged_copy, 1)

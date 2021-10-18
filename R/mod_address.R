@@ -23,6 +23,8 @@ address_server <- function(id, r, section_rows) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
+
+    # The address dataframe ---------------------------------------------------   
     addr <- shiny::reactive({
       req(r$ged, r[[section_rows]])
 
@@ -31,6 +33,8 @@ address_server <- function(id, r, section_rows) {
       r$ged[r$addr_rows,]
     })
 
+
+    # Address output ----------------------------------------------------------
     output$address <- shiny::renderUI({
       req(addr)
       if(nrow(addr()) > 1) {
@@ -54,6 +58,8 @@ address_server <- function(id, r, section_rows) {
       shiny::HTML(details)
     }) %>% shiny::bindEvent(input$apply, r$file_count)
 
+
+    # Open modal to edit address ----------------------------------------------
     shiny::observe({
       req(r$ged)
       
@@ -105,6 +111,8 @@ address_server <- function(id, r, section_rows) {
     }) %>% 
       shiny::bindEvent(input$edit_address)
     
+
+    # Edit address lines ------------------------------------------------------
     shiny::observe({
       adr <- process_input(input$adr)
       err <- tidyged.internals::chk_address_lines(adr, 3)
@@ -115,6 +123,7 @@ address_server <- function(id, r, section_rows) {
     }) %>% 
       shiny::bindEvent(input$adr, ignoreNULL = FALSE, ignoreInit = TRUE)
     
+    # Edit city ----------------------------------------------------------------
     shiny::observe({
       city <- process_input(input$city)
       err <- tidyged.internals::chk_address_city(city, 1)
@@ -125,6 +134,7 @@ address_server <- function(id, r, section_rows) {
     }) %>% 
       shiny::bindEvent(input$city, ignoreNULL = FALSE, ignoreInit = TRUE)
     
+    # Edit state --------------------------------------------------------------
     shiny::observe({
       state <- process_input(input$state)
       err <- tidyged.internals::chk_address_state(state, 1)
@@ -135,6 +145,7 @@ address_server <- function(id, r, section_rows) {
     }) %>% 
       shiny::bindEvent(input$state, ignoreNULL = FALSE, ignoreInit = TRUE)
     
+    # Edit postcode -----------------------------------------------------------
     shiny::observe({
       postcode <- process_input(input$postcode)
       err <- tidyged.internals::chk_address_postal_code(postcode, 1)
@@ -145,6 +156,7 @@ address_server <- function(id, r, section_rows) {
     }) %>% 
       shiny::bindEvent(input$postcode, ignoreNULL = FALSE, ignoreInit = TRUE)
     
+    # Edit country -----------------------------------------------------------
     shiny::observe({
       country <- process_input(input$country)
       err <- tidyged.internals::chk_address_country(country, 1)
@@ -155,6 +167,7 @@ address_server <- function(id, r, section_rows) {
     }) %>% 
       shiny::bindEvent(input$country, ignoreNULL = FALSE, ignoreInit = TRUE)
     
+    # Edit emails ------------------------------------------------------------
     shiny::observe({
       emails <- process_input(input$emails)
       err <- tidyged.internals::chk_address_email(emails, 3)
@@ -165,6 +178,7 @@ address_server <- function(id, r, section_rows) {
     }) %>% 
       shiny::bindEvent(input$emails, ignoreNULL = FALSE, ignoreInit = TRUE)
     
+    # Edit phone numbers ------------------------------------------------------
     shiny::observe({
       phones <- process_input(input$phones)
       err <- tidyged.internals::chk_phone_number(phones, 3)
@@ -175,6 +189,7 @@ address_server <- function(id, r, section_rows) {
     }) %>% 
       shiny::bindEvent(input$phones, ignoreNULL = FALSE, ignoreInit = TRUE)
     
+    # Edit faxes --------------------------------------------------------------
     shiny::observe({
       faxes <- process_input(input$faxes)
       err <- tidyged.internals::chk_address_fax(faxes, 3)
@@ -185,6 +200,7 @@ address_server <- function(id, r, section_rows) {
     }) %>% 
       shiny::bindEvent(input$faxes, ignoreNULL = FALSE, ignoreInit = TRUE)
     
+    # Edit websites -----------------------------------------------------------
     shiny::observe({
       websites <- process_input(input$websites)
       err <- tidyged.internals::chk_address_web_page(websites, 3)

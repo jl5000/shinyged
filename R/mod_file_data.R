@@ -22,6 +22,8 @@ file_data_ui <- function(id) {
 file_data_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     
+
+    # Load in data from gedcom object -----------------------------------------
     shiny::observe({
       req(r$ged)
       shiny::updateTextInput(session = session, "ged_source_name", 
@@ -34,6 +36,7 @@ file_data_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(r$file_count)
     
+    # Edit source name --------------------------------------------------------
     shiny::observe({
       ged_source_name <- process_input(input$ged_source_name)
       err <- tidyged.internals::chk_name_of_source_data(ged_source_name, 1)
@@ -47,6 +50,7 @@ file_data_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(input$ged_source_name, ignoreNULL = FALSE, ignoreInit = TRUE)
       
+    # Edit source date -------------------------------------------------------
     shiny::observe({
       ged_source_date <- process_input(input$ged_source_date)
       err <- tidyged.internals::chk_date_exact(ged_source_date, 1)
@@ -56,6 +60,7 @@ file_data_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(input$ged_source_date, ignoreNULL = FALSE, ignoreInit = TRUE)
     
+    # Edit data copyright ---------------------------------------------------
     shiny::observe({
       ged_source_copy <- process_input(input$ged_source_copy)
       err <- tidyged.internals::chk_copyright_source_data(ged_source_copy, 1)
@@ -65,6 +70,7 @@ file_data_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(input$ged_source_copy, ignoreNULL = FALSE, ignoreInit = TRUE)
     
+     # Enable/disable date and copyright ------------------------------------
     shiny::observe({
       shinyjs::toggleState("ged_source_date", input$ged_source_name != "")
       shinyjs::toggleState("ged_source_copy", input$ged_source_name != "")
