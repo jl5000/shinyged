@@ -50,13 +50,14 @@ source_server <- function(id, r) {
     media_links_server("sour_media", r, "sour_rows")
     source_summary_server("sour_summary", r)
     
-    shiny::observe({
-      if(input$tabset == "Data") source_data_server("sour_data", r)
-      else if(input$tabset == "Details") source_details_server("sour_details", r)
-      else if(input$tabset == "Raw data") record_server("sour_raw", r, "sour_rows")
-    }) %>% 
-      shiny::bindEvent(input$tabset, ignoreInit = TRUE)
+    shiny::observe(source_data_server("sour_data", r)) %>%
+      shiny::bindEvent(input$tabset == "Data", once = TRUE, ignoreInit = TRUE)
     
+    shiny::observe(source_details_server("sour_details", r)) %>%
+      shiny::bindEvent(input$tabset == "Details", once = TRUE, ignoreInit = TRUE)
+    
+    shiny::observe(record_server("sour_raw", r, "sour_rows")) %>%
+      shiny::bindEvent(input$tabset == "Raw data", once = TRUE, ignoreInit = TRUE)
 
     # Update list of sources
     records <- shiny::reactive({

@@ -24,16 +24,27 @@ function(input, output, session) {
     file_server("file", r)
     tools_server("tools", r)
     
-    shiny::observe({
-        if(input$tabset == "Individuals") individual_server("indi", r)
-        else if(input$tabset == "Families") family_server("famg", r)
-        else if(input$tabset == "Sources") source_server("sour", r)
-        else if(input$tabset == "Repositories") repository_server("repo", r)
-        else if(input$tabset == "Notes") note_server("note", r)
-        else if(input$tabset == "Multimedia") multimedia_server("media", r)
-        else if(input$tabset == "GEDCOM") ged_debug_server("debug", r)
-    }) %>%
-        shiny::bindEvent(input$tabset, ignoreInit = TRUE)
+
+    shiny::observe(individual_server("indi", r)) %>%
+        shiny::bindEvent(input$tabset == "Individuals", once = TRUE, ignoreInit = TRUE)
+
+    shiny::observe(family_server("famg", r)) %>%
+        shiny::bindEvent(input$tabset == "Families", once = TRUE, ignoreInit = TRUE)
+
+    shiny::observe(source_server("sour", r)) %>%
+        shiny::bindEvent(input$tabset == "Sources", once = TRUE, ignoreInit = TRUE)
+
+    shiny::observe(repository_server("repo", r)) %>%
+        shiny::bindEvent(input$tabset == "Repositories", once = TRUE, ignoreInit = TRUE)
+
+    # shiny::observe(note_server("note", r)) %>%
+    #     shiny::bindEvent(input$tabset == "Notes", once = TRUE, ignoreInit = TRUE)
+
+    shiny::observe(multimedia_server("media", r)) %>%
+        shiny::bindEvent(input$tabset == "Multimedia", once = TRUE, ignoreInit = TRUE)
+
+    shiny::observe(ged_debug_server("debug", r)) %>%
+        shiny::bindEvent(input$tabset == "GEDCOM", once = TRUE, ignoreInit = TRUE)
     
 
     # Import file -------------------------------------------------------------

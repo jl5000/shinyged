@@ -56,16 +56,23 @@ individual_server <- function(id, r) {
     notes_server("indi_notes", r, "indi_rows")
     media_links_server("indi_media", r, "indi_rows")
     
-    shiny::observe({
-      if(input$tabset == "Timeline") timeline_server("indi_timeline", r, "indi_rows")
-      else if(input$tabset == "Names") individual_names_server("indi_names", r)
-      else if(input$tabset == "Facts") individual_facts_server("indi_facts", r)
-      else if(input$tabset == "Links") individual_links_server("indi_links", r)
-      else if(input$tabset == "Raw data") record_server("indi_raw", r, "indi_rows")
-      else if(input$tabset == "Citations") citations_server("indi_citations", r, "indi_rows")
-    }) %>% 
-      shiny::bindEvent(input$tabset, ignoreInit = TRUE)
- 
+    shiny::observe(timeline_server("indi_timeline", r, "indi_rows")) %>%
+      shiny::bindEvent(input$tabset == "Timeline", once = TRUE, ignoreInit = TRUE)
+    
+    shiny::observe(individual_names_server("indi_names", r)) %>%
+      shiny::bindEvent(input$tabset == "Names", once = TRUE, ignoreInit = TRUE)
+    
+    shiny::observe(individual_facts_server("indi_facts", r)) %>%
+      shiny::bindEvent(input$tabset == "Facts", once = TRUE, ignoreInit = TRUE)
+    
+    shiny::observe(individual_links_server("indi_links", r)) %>%
+      shiny::bindEvent(input$tabset == "Links", once = TRUE, ignoreInit = TRUE)
+    
+    shiny::observe(record_server("indi_raw", r, "indi_rows")) %>%
+      shiny::bindEvent(input$tabset == "Raw data", once = TRUE, ignoreInit = TRUE)
+    
+    shiny::observe(citations_server("indi_citations", r, "indi_rows")) %>%
+      shiny::bindEvent(input$tabset == "Citations", once = TRUE, ignoreInit = TRUE)
     
 
     # Update list of individuals ----------------------------------------------

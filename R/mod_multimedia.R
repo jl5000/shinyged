@@ -47,13 +47,15 @@ multimedia_server <- function(id, r) {
     multimedia_summary_server("media_summary", r)
     ref_numbers_server("media_ref_numbers", r, "media_rows")
     notes_server("media_notes", r, "media_rows")
+
+    shiny::observe(multimedia_description_server("media_description", r)) %>%
+      shiny::bindEvent(input$tabset == "Description", once = TRUE, ignoreInit = TRUE)
     
-    shiny::observe({
-      if(input$tabset == "Description") multimedia_description_server("media_description", r)
-      else if(input$tabset == "Raw data") record_server("media_raw", r, "media_rows")
-      else if(input$tabset == "Citations") citations_server("media_citations", r, "media_rows")
-    }) %>% 
-      shiny::bindEvent(input$tabset, ignoreInit = TRUE)
+    shiny::observe(record_server("media_raw", r, "media_rows")) %>%
+      shiny::bindEvent(input$tabset == "Raw data", once = TRUE, ignoreInit = TRUE)
+    
+    shiny::observe(citations_server("media_citations", r, "media_rows")) %>%
+      shiny::bindEvent(input$tabset == "Citations", once = TRUE, ignoreInit = TRUE)
     
     # Update list of media
     records <- shiny::reactive({

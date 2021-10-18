@@ -23,14 +23,20 @@ file_server <- function(id, r) {
     
     file_summary_server("file_summary", r)
     
-    shiny::observe({
-      if(input$tabset == "File details") file_details_server("file_details", r)
-      else if(input$tabset == "Records") file_records_server("file_records", r)
-      else if(input$tabset == "Submitter") submitter_server("subm", r)
-      else if(input$tabset == "Source data details") file_data_server("file_data", r)
-      else if(input$tabset == "Raw data") record_server("file_raw", r, "head_rows")
-    }) %>% 
-      shiny::bindEvent(input$tabset, ignoreInit = TRUE)
+    shiny::observe(file_details_server("file_details", r)) %>%
+      shiny::bindEvent(input$tabset == "File details", once = TRUE, ignoreInit = TRUE)
+    
+    shiny::observe(file_records_server("file_records", r)) %>%
+      shiny::bindEvent(input$tabset == "Records", once = TRUE, ignoreInit = TRUE)
+    
+    shiny::observe(submitter_server("subm", r)) %>%
+      shiny::bindEvent(input$tabset == "Submitter", once = TRUE, ignoreInit = TRUE)
+    
+    shiny::observe(file_data_server("file_data", r)) %>%
+      shiny::bindEvent(input$tabset == "Source data details", once = TRUE, ignoreInit = TRUE)
+    
+    shiny::observe(record_server("file_raw", r, "head_rows")) %>%
+      shiny::bindEvent(input$tabset == "Raw data", once = TRUE, ignoreInit = TRUE)
     
 
     shiny::observe(priority = 2, { # want this to fire first

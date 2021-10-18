@@ -54,19 +54,26 @@ family_server <- function(id, r) {
     notes_server("famg_notes", r, "famg_rows")
     media_links_server("famg_media", r, "famg_rows")
     
-    shiny::observe({
-      if(input$tabset == "Timeline") timeline_server("famg_timeline", r, "famg_rows")
-      else if(input$tabset == "Members") family_members_server("family_members", r)
-      else if(input$tabset == "Events") family_events_server("family_events", r)
-      else if(input$tabset == "Citations") citations_server("famg_citations", r, "famg_rows")
-      else if(input$tabset == "Raw data") record_server("famg_raw", r, "famg_rows")
-    }) %>% 
-      shiny::bindEvent(input$tabset, ignoreInit = TRUE)
+    shiny::observe(timeline_server("famg_timeline", r, "famg_rows")) %>%
+      shiny::bindEvent(input$tabset == "Timeline", once = TRUE, ignoreInit = TRUE)
+    
+    shiny::observe(family_members_server("family_members", r)) %>%
+      shiny::bindEvent(input$tabset == "Members", once = TRUE, ignoreInit = TRUE)
+    
+    shiny::observe(family_events_server("family_events", r)) %>%
+      shiny::bindEvent(input$tabset == "Events", once = TRUE, ignoreInit = TRUE)
+    
+    shiny::observe(citations_server("famg_citations", r, "famg_rows")) %>%
+      shiny::bindEvent(input$tabset == "Citations", once = TRUE, ignoreInit = TRUE)
+    
+    shiny::observe(record_server("famg_raw", r, "famg_rows")) %>%
+      shiny::bindEvent(input$tabset == "Raw data", once = TRUE, ignoreInit = TRUE)
   
     
     # Update list of families -------------------------------------------------------
     records <- shiny::reactive({
       req(r$ged)
+
       tidyged::xrefs_famg(r$ged) %>% 
         tidyged::describe_records(r$ged, ., short_desc = TRUE)
     })
