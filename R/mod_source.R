@@ -17,12 +17,10 @@ source_ui <- function(id) {
     ),
     
     shiny::fluidRow(id = ns("sour_data"),
-                    shiny::column(width = 6,
-                                  ref_numbers_ui(ns("sour_ref_numbers"))
-                    ),
-                    shiny::column(width = 6,
+                    shiny::column(12,
+                                  ref_numbers_ui(ns("sour_ref_numbers")),
                                   notes_ui(ns("sour_notes")),
-                                  media_links_ui(ns("sour_media"))
+                                  media_links_ui(ns("sour_media")),
                     )
     ) %>% shinyjs::hidden(),
     
@@ -59,7 +57,7 @@ source_server <- function(id, r) {
     shiny::observe(record_server("sour_raw", r, "sour_rows")) %>%
       shiny::bindEvent(input$tabset == "Raw data", once = TRUE, ignoreInit = TRUE)
 
-    # Update list of sources
+    # Update list of sources ---------------------------------------------------------------
     records <- shiny::reactive({
       req(r$ged)
       
@@ -67,7 +65,7 @@ source_server <- function(id, r) {
         tidyged::describe_records(r$ged, ., short_desc = TRUE)
     })
     
-    # Update choices with list of sources and select one
+    # Update choices with list of sources and select one ----------------------------------
     shiny::observe({
       if(!is.null(records())) {
         
@@ -85,7 +83,7 @@ source_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(records())
     
-    # Update sour_rows
+    # Update sour_rows --------------------------------------------------------------------
     shiny::observe(priority = 2, {
       req(input$record)
       sour_xref <- stringr::str_extract(input$record, tidyged.internals::reg_xref(FALSE))
@@ -93,7 +91,7 @@ source_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(input$record, r$ged)
     
-    # Show/hide tabs and toggle delete button
+    # Show/hide tabs and toggle delete button ---------------------------------------------
     shiny::observe({
       shinyjs::toggle("sour_tabs", condition = !is.null(input$record))
       shinyjs::toggle("sour_data", condition = !is.null(input$record))
@@ -101,7 +99,7 @@ source_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(input$record, ignoreNULL = FALSE)
     
-    # Add source and set a flag to ensure it is selected
+    # Add source and set a flag to ensure it is selected ---------------------------------
     shiny::observe({
       r$ged <- tidyged::add_sour(r$ged)
       sour_xrefs <- tidyged::xrefs_sour(r$ged)
@@ -110,7 +108,7 @@ source_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(input$add)
     
-    # Remove source and set a flag to ensure no source is selected
+    # Remove source and set a flag to ensure no source is selected -----------------------
     shiny::observe({
       sour_xref <- stringr::str_extract(input$record, tidyged.internals::reg_xref(FALSE))
       r$ged <- tidyged::remove_sour(r$ged, sour_xref)

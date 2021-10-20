@@ -175,9 +175,5 @@ citations_server <- function(id, r, section_rows) {
       shiny::bindEvent(input$remove_citation)
     
    
-    
-    
-
-
   })
 }

@@ -10,10 +10,9 @@ file_ui <- function(id) {
     shiny::tabsetPanel(id = ns("tabset"),
       shiny::tabPanel("Summary", file_summary_ui(ns("file_summary"))),
       shiny::tabPanel("Records", file_records_ui(ns("file_records"))),
-      shiny::tabPanel("Submitter", submitter_ui(ns("subm"))),
       shiny::tabPanel("File details", file_details_ui(ns("file_details"))),
       shiny::tabPanel("Source data details", file_data_ui(ns("file_data"))),
-      shiny::tabPanel("Raw data", record_ui(ns("file_raw")))
+      shiny::tabPanel("Submitter", submitter_ui(ns("subm")))
     )
   )
 }
@@ -34,10 +33,6 @@ file_server <- function(id, r) {
     
     shiny::observe(file_data_server("file_data", r)) %>%
       shiny::bindEvent(input$tabset == "Source data details", once = TRUE, ignoreInit = TRUE)
-    
-    shiny::observe(record_server("file_raw", r, "head_rows")) %>%
-      shiny::bindEvent(input$tabset == "Raw data", once = TRUE, ignoreInit = TRUE)
-    
 
     shiny::observe(priority = 2, { # want this to fire first
       req(r$ged)

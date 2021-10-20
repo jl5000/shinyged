@@ -56,7 +56,7 @@ address_server <- function(id, r, section_rows) {
         details <- "None defined"
       }
       shiny::HTML(details)
-    }) %>% shiny::bindEvent(input$apply, r$file_count)
+    }) %>% shiny::bindEvent(addr())
 
 
     # Open modal to edit address ----------------------------------------------
