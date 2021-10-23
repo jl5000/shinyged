@@ -4,7 +4,8 @@ function(input, output, session) {
     
     # The tidyged object and rows of structures that could occur multiple times
     r <- shiny::reactiveValues(ged = NULL,
-                               file_count = 0, # this increases every time r$ged changes and triggers re-population of inputs
+                               # this increases every time r$ged changes and triggers re-population of inputs
+                               file_count = 0, 
                                addr_rows = NULL,
                                citation_rows = NULL,
                                subm_rows = NULL,
@@ -116,7 +117,7 @@ function(input, output, session) {
         shinyjs::show("tabs")
         shinyjs::enable("export_gedcom")
     }) %>% 
-        shiny::bindEvent(r$ged)
+        shiny::bindEvent(r$ged, once = TRUE)
     
     # Export --------------------------------------------------------------
     output$export_gedcom <- shiny::downloadHandler(

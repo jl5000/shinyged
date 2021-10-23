@@ -19,6 +19,7 @@ ref_numbers_server <- function(id, r, section_rows) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
+    # Show popup ------------------------------------------------------
     shiny::observe({
       
       shiny::modalDialog(title = "Edit reference numbers",
@@ -39,7 +40,7 @@ ref_numbers_server <- function(id, r, section_rows) {
     }) %>% 
       shiny::bindEvent(input$ref_numbers)
     
-    # Derive a dataframe of ref numbers
+    # Derive a dataframe of ref numbers ------------------------------------
     ref_number_df <- shiny::reactive({
       req(r$ged, r[[section_rows]])
 
@@ -70,6 +71,7 @@ ref_numbers_server <- function(id, r, section_rows) {
       ref_num_df
     })
     
+    # Update button label ---------------------------------------------
     shiny::observe({
       req(ref_number_df)
       
@@ -79,7 +81,7 @@ ref_numbers_server <- function(id, r, section_rows) {
     }) %>% 
       shiny::bindEvent(ref_number_df())
     
-    # Show the dataframe of ref numbers
+    # Show the dataframe of ref numbers ------------------------------
     output$table <- DT::renderDataTable({
       req(ref_number_df)
       
@@ -88,7 +90,7 @@ ref_numbers_server <- function(id, r, section_rows) {
                                       options = list(searching = FALSE, paging = FALSE))
     })
     
-    # Validate ref num/type and enable/disable buttons
+    # Validate ref num/type and enable/disable buttons ---------------------------
     shiny::observe({
       ref_num <- process_input(input$ref_num)
       ref_type <- process_input(input$ref_type)
@@ -101,7 +103,7 @@ ref_numbers_server <- function(id, r, section_rows) {
       shinyjs::toggleState("update_ref_num", input$ref_num != "" && is.null(err1) && is.null(err2))
     })
     
-    
+    # Update inputs and enable/disable buttons on row selection -----------------------
     shiny::observe({
       if(length(input$table_rows_selected) > 0) {
         shiny::updateTextInput(inputId = "ref_num", value = ref_number_df()[input$table_rows_selected,1])
@@ -115,22 +117,29 @@ ref_numbers_server <- function(id, r, section_rows) {
     }) %>% 
       shiny::bindEvent(input$table_rows_selected, ignoreNULL = FALSE)
     
+    # Update selected rows in r$ged -------------------------------------------
     selected_ged_rows <- shiny::reactive({
+      req(ref_number_df, input$table_rows_selected)
+      print("triggered") # WHY NOT TRIGGERING??!?
       ref_num <- ref_number_df()[input$table_rows_selected,1]
       ref_type <- ref_number_df()[input$table_rows_selected,2]
-      
+
       rows <- tidyged.internals::identify_section(r$ged, 1, "REFN", ref_num,
                                                   xrefs = r$ged$record[r[[section_rows]][1]])
-      tags <- r$ged$tag[rows]
-      
-      if(sum(tags == "REFN") == 1) {
-        rows
+
+      num_rows <- rows[which(r$ged$tag[rows] == "REFN" & r$ged$value[rows] == ref_num)]
+
+      if(ref_type != ""){
+        type_rows <- rows[which(r$ged$tag[rows] == "TYPE" & r$ged$value[rows] == ref_type)]
+
+        rows[which(type_rows == num_rows + 1)][1] #TODO
       } else {
-        
+        num_rows[1]
       }
+      
     })
     
-    # Add ref number to tidyged object
+    # Add ref number to tidyged object -----------------------------------------
     shiny::observe({
 
       r$ged <- r$ged %>%
@@ -152,7 +161,7 @@ ref_numbers_server <- function(id, r, section_rows) {
     }) %>% 
       shiny::bindEvent(input$add_ref_num)
     
-    # Update ref number in tidyged object
+    # Update ref number in tidyged object ------------------------------------
     shiny::observe({
       r$ged$value[selected_ged_rows()[1]] <- input$ref_num
       
@@ -178,7 +187,7 @@ ref_numbers_server <- function(id, r, section_rows) {
     }) %>% 
       shiny::bindEvent(input$update_ref_num)
     
-    # Remove ref number from tidyged object
+    # Remove ref number from tidyged object -----------------------------------------
     shiny::observe({
       r$ged <- dplyr::slice(r$ged, -selected_ged_rows())
       
