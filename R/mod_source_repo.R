@@ -15,6 +15,7 @@ source_repo_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
+    # Show pop up ------------------------------------------------
     shiny::observe({
       
       repos <- tidyged::xrefs_repo(r$ged) %>% 
@@ -23,13 +24,14 @@ source_repo_server <- function(id, r) {
       shiny::modalDialog(title = "Edit source repositories",
                          
                          shiny::tagList(
-                           shiny::helpText("Each source may come from a number of repositories."),
+                           shiny::helpText("Each source may come from a number of repositories.",
+                                           "An optional reference can be defined which is used to file and retrieve items from the holdings of the repository."),
                            shiny::hr(),
                            DT::DTOutput(ns("table")),
                            shiny::br(),
                            shiny::selectizeInput(ns("repo"), label = NULL, choices = repos,
                                                  multiple = TRUE, width = "500px", options = list(maxItems = 1)),
-                           shiny::textInput(ns("call_number"), label = "Call number (optional)") %>% shinyjs::disabled(),
+                           shiny::textInput(ns("call_number"), label = "Reference (optional)") %>% shinyjs::disabled(),
                            shiny::actionButton(ns("add_repo"), "Add repository") %>% shinyjs::disabled(),
                            shiny::actionButton(ns("delete_repo"), "Delete repository") %>% shinyjs::disabled(),
                            shiny::actionButton(ns("update_repo"), "Update repository") %>% shinyjs::disabled(),
@@ -39,7 +41,7 @@ source_repo_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(input$repos)
     
-    # Derive a dataframe of repos
+    # Derive a dataframe of repos --------------------------------------------
     repo_df <- shiny::reactive({
       req(r$ged)
       
@@ -74,6 +76,7 @@ source_repo_server <- function(id, r) {
       repodf
     })
     
+    # Update button label -------------------------------------------
     shiny::observe({
       req(repo_df)
       
@@ -83,16 +86,16 @@ source_repo_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(repo_df())
     
-    # Show the dataframe of repos
+    # Show the dataframe of repos -----------------------------------
     output$table <- DT::renderDataTable({
       req(repo_df)
       
       DT::datatable(repo_df(), rownames = FALSE, selection = "single",
-                    filter = "none", colnames = c("Repository", "Call number"),
+                    filter = "none", colnames = c("Repository", "Reference"),
                     options = list(searching = FALSE, paging = FALSE))
     })
     
-    # Validate call num and enable/disable buttons
+    # Validate call num and enable/disable buttons ----------------------
     shiny::observe({
       call_num <- process_input(input$call_number)
       err <- tidyged.internals::chk_source_call_number(call_num, 1)
@@ -103,6 +106,7 @@ source_repo_server <- function(id, r) {
     })
     
     
+    # Update inputs with row selection ----------------------------------
     shiny::observe({
       if(length(input$table_rows_selected) > 0) {
         shiny::updateSelectizeInput(inputId = "repo", selected = repo_df()[input$table_rows_selected,1])
@@ -116,23 +120,23 @@ source_repo_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(input$table_rows_selected, ignoreNULL = FALSE)
     
+    # Selected rows in r$ged -----------------------------------------------
     selected_ged_rows <- shiny::reactive({
+      req(repo_df, input$table_rows_selected)
+      
       sel_repo <- repo_df()[input$table_rows_selected,1]
       repo <- stringr::str_extract(sel_repo, tidyged.internals::reg_xref(FALSE))
       call_num <- repo_df()[input$table_rows_selected,2]
       
-      rows <- tidyged.internals::identify_section(r$ged, 1, "REPO", repo,
-                                                  xrefs = r$ged$record[r$sour_rows[1]])
-      tags <- r$ged$tag[rows]
+      repo_rows <- which(r$ged$record == r$ged$record[r$sour_rows[1]] &
+                          r$ged$tag == "REPO")
       
-      if(sum(tags == "REPO") == 1) {
-        rows
-      } else {
-        #TODO
-      }
+      repo_row <- repo_rows[input$table_rows_selected]
+      
+      if(call_num == "") repo_row else c(repo_row, repo_row + 1)
     })
     
-    # Add repo to tidyged object
+    # Add repo to tidyged object ---------------------------------------
     shiny::observe({
       
       repo <- stringr::str_extract(input$repo, tidyged.internals::reg_xref(FALSE))
@@ -156,7 +160,7 @@ source_repo_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(input$add_repo)
     
-    # Update repo in tidyged object
+    # Update repo in tidyged object -----------------------------------------
     shiny::observe({
       repo <- stringr::str_extract(input$repo, tidyged.internals::reg_xref(FALSE))
       r$ged$value[selected_ged_rows()[1]] <- repo
@@ -183,7 +187,7 @@ source_repo_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(input$update_repo)
     
-    # Remove repo from tidyged object
+    # Remove repo from tidyged object -----------------------------------
     shiny::observe({
       r$ged <- dplyr::slice(r$ged, -selected_ged_rows())
       

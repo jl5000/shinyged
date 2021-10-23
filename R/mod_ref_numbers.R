@@ -120,23 +120,16 @@ ref_numbers_server <- function(id, r, section_rows) {
     # Update selected rows in r$ged -------------------------------------------
     selected_ged_rows <- shiny::reactive({
       req(ref_number_df, input$table_rows_selected)
-      print("triggered") # WHY NOT TRIGGERING??!?
+
       ref_num <- ref_number_df()[input$table_rows_selected,1]
       ref_type <- ref_number_df()[input$table_rows_selected,2]
 
-      rows <- tidyged.internals::identify_section(r$ged, 1, "REFN", ref_num,
-                                                  xrefs = r$ged$record[r[[section_rows]][1]])
+      ref_rows <- which(r$ged$record == r$ged$record[r[[section_rows]][1]] &
+                          r$ged$tag == "REFN")
 
-      num_rows <- rows[which(r$ged$tag[rows] == "REFN" & r$ged$value[rows] == ref_num)]
+      ref_row <- ref_rows[input$table_rows_selected]
 
-      if(ref_type != ""){
-        type_rows <- rows[which(r$ged$tag[rows] == "TYPE" & r$ged$value[rows] == ref_type)]
-
-        rows[which(type_rows == num_rows + 1)][1] #TODO
-      } else {
-        num_rows[1]
-      }
-      
+      if(ref_type == "") ref_row else c(ref_row, ref_row + 1)
     })
     
     # Add ref number to tidyged object -----------------------------------------
