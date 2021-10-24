@@ -9,6 +9,9 @@ individual_facts_ui <- function(id) {
   
   shiny::tagList(
     shiny::tags$br()
+    # table of facts, notes + media link buttons
+    # details, location, and citations tabs
+    # details - age, description, type, date agency, relig, cause
     
     
   )

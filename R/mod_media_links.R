@@ -13,11 +13,18 @@ media_links_server <- function(id, r, section_rows) {
     ns <- session$ns
     
 
-    # Disable media button if no media records to point to --------------------
+    # Update media links button ----------------------------------------------------
     shiny::observe({
-      shinyjs::toggleState("media_links", tidyged::num_media(r$ged) > 0)
-    }) %>% 
-      shiny::bindEvent(r$ged)
+      shinyjs::toggleState("media_links", tidyged::num_media(r$ged) > 0 &&
+                             !is.null(r[[section_rows]]))
+      
+      if(is.null(r[[section_rows]])){
+        shiny::updateActionButton(inputId = "media_links", label = "Media")
+      } else {
+        lbl <- paste0(length(media_xrefs()), " media")
+        shiny::updateActionButton(inputId = "media_links", label = lbl)
+      }
+    })
     
 
     # Click the button to show popup ------------------------------------------
@@ -61,16 +68,6 @@ media_links_server <- function(id, r, section_rows) {
         dplyr::filter(level == .$level[1] + 1, tag == "OBJE") %>% 
         dplyr::pull(value)
     })
-    
-
-    # Update button label with number of links --------------------------------   
-    shiny::observe({
-      req(media_xrefs)
-      
-      lbl <- paste0(length(media_xrefs()), " media")
-      shiny::updateActionButton(inputId = "media_links", label = lbl)
-    }) %>% 
-      shiny::bindEvent(media_xrefs())
     
 
     # The vector of media descriptions ----------------------------------------

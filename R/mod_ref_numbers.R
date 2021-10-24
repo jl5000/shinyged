@@ -99,7 +99,7 @@ ref_numbers_server <- function(id, r, section_rows) {
       shinyFeedback::feedbackDanger("ref_num", !is.null(err1), err1)
       shinyFeedback::feedbackDanger("ref_type", !is.null(err2), err2)
       shinyjs::toggleState("ref_type", input$ref_num != "" && is.null(err1))
-      shinyjs::toggleState("add_ref_num", input$ref_num != "" && is.null(err1) && is.null(err2))#nrow(merge(data.frame(a=ref_num,b=ref_type),ref_number_df()))==0
+      shinyjs::toggleState("add_ref_num", input$ref_num != "" && is.null(err1) && is.null(err2))
       shinyjs::toggleState("update_ref_num", input$ref_num != "" && is.null(err1) && is.null(err2))
     })
     

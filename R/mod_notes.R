@@ -14,13 +14,18 @@ notes_server <- function(id, r, section_rows) {
     ns <- session$ns
     
 
-    # Enable/disable notes button ---------------------------------------------
+    # Update notes button ------------------------------------------------------
     shiny::observe({
       shinyjs::toggleState("notes", !is.null(r[[section_rows]]))
-      if(is.null(r[[section_rows]]))
+      
+      if(is.null(r[[section_rows]])){
         shiny::updateActionButton(inputId = "notes", label = "Notes")
-    }) %>%
-      shiny::bindEvent(r[[section_rows]], ignoreNULL = FALSE)
+      } else {
+        lbl <- paste0(length(notes_raw()), " notes")
+        if(length(notes_raw()) == 1) lbl <- substr(lbl, 1, nchar(lbl) - 1)
+        shiny::updateActionButton(inputId = "notes", label = lbl)
+      }
+    })
     
     # Click the button to show popup ------------------------------------------
     shiny::observe({
@@ -64,16 +69,6 @@ notes_server <- function(id, r, section_rows) {
         dplyr::filter(level == .$level[1] + 1, tag == "NOTE") %>% 
         dplyr::pull(value)
     })
-    
-    # Update notes button label with number of notes -------------------------
-    shiny::observe({
-      req(notes_raw)
-      
-      lbl <- paste0(length(notes_raw()), " notes")
-      if(length(notes_raw()) == 1) lbl <- substr(lbl, 1, nchar(lbl) - 1)
-      shiny::updateActionButton(inputId = "notes", label = lbl)
-    }) %>% 
-      shiny::bindEvent(notes_raw())
     
     # The vector of notes, but with references to global notes replaced with note text ----
     notes_txt <- shiny::reactive({

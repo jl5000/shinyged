@@ -120,7 +120,7 @@ source_repo_server <- function(id, r) {
     }) %>% 
       shiny::bindEvent(input$table_rows_selected, ignoreNULL = FALSE)
     
-    # Selected rows in r$ged -----------------------------------------------
+    # Update selected rows in r$ged -----------------------------------------------
     selected_ged_rows <- shiny::reactive({
       req(repo_df, input$table_rows_selected)
       

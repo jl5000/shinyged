@@ -10,8 +10,9 @@ individual_names_ui <- function(id) {
   
   shiny::tagList(
     shiny::tags$br()
-    
-    
+    # table of names/types
+    # click on a name, updates a table of variations/types
+    # too much nesting
   )
 }
 

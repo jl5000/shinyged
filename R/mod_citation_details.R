@@ -62,40 +62,29 @@ citation_details_ui <- function(id) {
 citation_details_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     
-    shiny::observe(priority = 2, {
+    citation <- shiny::reactive({
       req(r$ged, r$citation_rows)
-      r$citation_rows <- tidyged.internals::identify_section(r$ged,
-                                                             r$ged$level[r$citation_rows[1]],
-                                                             "SOUR",
-                                                             r$ged$value[r$citation_rows[1]],
-                                                             r$ged$record[r$citation_rows[1]],
-                                                             first_only = TRUE)
-    }) %>% 
-      shiny::bindEvent(r$ged)
-    
-    sour_xref <- shiny::reactive({
-      req(r$ged, r$citation_rows)
-      r$ged$value[r$citation_rows[1]]
+      r$ged[r$citation_rows,]
     })
     
     shiny::observe({
       
       shiny::updateTextInput(session = session, "page", 
-                             value = tidyged.internals::gedcom_value(r$ged[r$citation_rows,], 
-                                                                     r$ged$record[r$citation_rows[1]], "PAGE", 
-                                                                     r$ged$level[r$citation_rows[1]] + 1))
+                             value = tidyged.internals::gedcom_value(citation(), 
+                                                                     citation()$record[1], "PAGE", 
+                                                                     citation()$level[1] + 1))
       shiny::updateTextInput(session = session, "entry_date",
-                             value = tidyged.internals::gedcom_value(r$ged[r$citation_rows,], 
-                                                                     r$ged$record[r$citation_rows[1]], "DATE", 
-                                                                     r$ged$level[r$citation_rows[1]] + 2))
+                             value = tidyged.internals::gedcom_value(citation(), 
+                                                                     citation()$record[1], "DATE", 
+                                                                     citation()$level[1] + 2))
       shiny::updateSelectizeInput(session = session, "event_type",
-                                  selected = tidyged.internals::gedcom_value(r$ged[r$citation_rows,], 
-                                                                             r$ged$record[r$citation_rows[1]], "EVEN", 
-                                                                             r$ged$level[r$citation_rows[1]] + 1))
+                                  selected = tidyged.internals::gedcom_value(citation(), 
+                                                                             citation()$record[1], "EVEN", 
+                                                                             citation()$level[1] + 1))
       
-      role <- tidyged.internals::gedcom_value(r$ged[r$citation_rows,], 
-                                              r$ged$record[r$citation_rows[1]], "ROLE", 
-                                              r$ged$level[r$citation_rows[1]] + 2)
+      role <- tidyged.internals::gedcom_value(citation(), 
+                                              citation()$record[1], "ROLE", 
+                                              citation()$level[1] + 2)
 
       if(role == "" | role %in% tidyged.internals::val_roles()) {
         shiny::updateSelectizeInput(session = session, "role",  selected = role)
@@ -106,15 +95,15 @@ citation_details_server <- function(id, r) {
       }
       
       shiny::updateTextAreaInput(session = session, "source_text",
-                                 value = tidyged.internals::gedcom_value(r$ged[r$citation_rows,], 
-                                                                         r$ged$record[r$citation_rows[1]], "TEXT", 
-                                                                         r$ged$level[r$citation_rows[1]] + 2))
+                                 value = tidyged.internals::gedcom_value(citation(), 
+                                                                         citation()$record[1], "TEXT", 
+                                                                         citation()$level[1] + 2))
       shiny::updateTextInput(session = session, "certainty",
-                                value = tidyged.internals::gedcom_value(r$ged[r$citation_rows,], 
-                                                                        r$ged$record[r$citation_rows[1]], "QUAY", 
-                                                                        r$ged$level[r$citation_rows[1]] + 1))
+                                value = tidyged.internals::gedcom_value(citation(), 
+                                                                        citation()$record[1], "QUAY", 
+                                                                        citation()$level[1] + 1))
     }) %>% 
-      shiny::bindEvent(sour_xref())
+      shiny::bindEvent(citation())
     
     shiny::observe({
       shinyjs::toggleState("role", !is.null(input$event_type))
@@ -127,8 +116,8 @@ citation_details_server <- function(id, r) {
       shinyFeedback::feedbackDanger("page", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, "citation_rows", 
-                       r$ged$record[r$citation_rows[1]],
-                       r$ged$level[r$citation_rows[1]] + 1, 
+                       citation()$record[1],
+                       citation()$level[1] + 1, 
                        "PAGE", page, .pkgenv$tags_sour_cit)
     }) %>% 
       shiny::bindEvent(input$page, ignoreNULL = FALSE, ignoreInit = TRUE)
@@ -139,8 +128,8 @@ citation_details_server <- function(id, r) {
       shinyFeedback::feedbackDanger("entry_date", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, "citation_rows", 
-                       r$ged$record[r$citation_rows[1]],
-                       r$ged$level[r$citation_rows[1]] + 2, 
+                       citation()$record[1],
+                       citation()$level[1] + 2, 
                        "DATE", entry_date, .pkgenv$tags_sour_cit)
     }) %>% 
       shiny::bindEvent(input$entry_date, ignoreNULL = FALSE, ignoreInit = TRUE)
@@ -154,8 +143,8 @@ citation_details_server <- function(id, r) {
       shinyFeedback::feedbackDanger("role", err1, "Event type is required for this input")
       req(is.null(err), !err1, cancelOutput = TRUE)
       update_ged_value(r, "citation_rows", 
-                       r$ged$record[r$citation_rows[1]],
-                       r$ged$level[r$citation_rows[1]] + 1, 
+                       citation()$record[1],
+                       citation()$level[1] + 1, 
                        "EVEN", event_type, .pkgenv$tags_sour_cit)
     }) %>% 
       shiny::bindEvent(input$event_type, ignoreNULL = FALSE, ignoreInit = TRUE)
@@ -174,8 +163,8 @@ citation_details_server <- function(id, r) {
       }
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, "citation_rows",
-                       r$ged$record[r$citation_rows[1]],
-                       r$ged$level[r$citation_rows[1]] + 2,
+                       citation()$record[1],
+                       citation()$level[1] + 2,
                        "ROLE", role, .pkgenv$tags_sour_cit)
     }) %>% 
       shiny::bindEvent(input$role, ignoreNULL = FALSE, ignoreInit = TRUE)
@@ -189,8 +178,8 @@ citation_details_server <- function(id, r) {
       shinyFeedback::feedbackWarning("custom_role", !is.null(err), "Enter a custom role")
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, "citation_rows",
-                       r$ged$record[r$citation_rows[1]],
-                       r$ged$level[r$citation_rows[1]] + 2,
+                       citation()$record[1],
+                       citation()$level[1] + 2,
                        "ROLE", custom_role, .pkgenv$tags_sour_cit)
     }) %>% 
       shiny::bindEvent(input$custom_role, ignoreNULL = FALSE, ignoreInit = TRUE)
@@ -201,8 +190,8 @@ citation_details_server <- function(id, r) {
       shinyFeedback::feedbackDanger("source_text", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, "citation_rows", 
-                       r$ged$record[r$citation_rows[1]],
-                       r$ged$level[r$citation_rows[1]] + 2, 
+                       citation()$record[1],
+                       citation()$level[1] + 2, 
                        "TEXT", source_text, .pkgenv$tags_sour_cit)
     }) %>% 
       shiny::bindEvent(input$source_text, ignoreNULL = FALSE, ignoreInit = TRUE)
@@ -213,8 +202,8 @@ citation_details_server <- function(id, r) {
       shinyFeedback::feedbackDanger("certainty", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, "citation_rows", 
-                       r$ged$record[r$citation_rows[1]],
-                       r$ged$level[r$citation_rows[1]] + 1, 
+                       citation()$record[1],
+                       citation()$level[1] + 1, 
                        "QUAY", certainty, .pkgenv$tags_sour_cit)
     }) %>% 
       shiny::bindEvent(input$certainty, ignoreNULL = FALSE, ignoreInit = TRUE)
