@@ -93,9 +93,9 @@ individual_server <- function(id, r) {
           current_selection <- r$indi_to_select
         }
         
-        shiny::updateSelectizeInput(session = session, inputId = "record", choices = records(), selected = current_selection)
+        shiny::updateSelectizeInput(inputId = "record", choices = records(), selected = current_selection)
       } else {
-        shiny::updateSelectizeInput(session = session, inputId = "record", choices = character(), selected = character())
+        shiny::updateSelectizeInput(inputId = "record", choices = character(), selected = character())
       }
       r$indi_to_select <- NULL
     }) %>% 
@@ -116,7 +116,7 @@ individual_server <- function(id, r) {
       shinyjs::toggleState("delete", !is.null(input$record))
       if(!is.null(input$record)){
         sex <- tidyged.internals::gedcom_value(r$ged, r$ged$record[r$indi_rows[1]], "SEX", 1)
-        shiny::updateSelectizeInput(session = session, inputId = "sex", selected = sex)
+        shiny::updateSelectizeInput(inputId = "sex", selected = sex)
       }
     }) %>% 
       shiny::bindEvent(input$record, ignoreNULL = FALSE)

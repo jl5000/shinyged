@@ -26,11 +26,11 @@ file_data_server <- function(id, r) {
     # Load in data from gedcom object -----------------------------------------
     shiny::observe({
       req(r$ged)
-      shiny::updateTextInput(session = session, "ged_source_name", 
+      shiny::updateTextInput(inputId = "ged_source_name", 
                              value = tidyged.internals::gedcom_value(r$ged, "HD", "DATA", 2))
-      shiny::updateTextInput(session = session, "ged_source_date", 
+      shiny::updateTextInput(inputId = "ged_source_date", 
                              value = tidyged.internals::gedcom_value(r$ged, "HD", "DATE", 3))
-      shiny::updateTextAreaInput(session = session, "ged_source_copy", 
+      shiny::updateTextAreaInput(inputId = "ged_source_copy", 
                                  value = tidyged.internals::gedcom_value(r$ged, "HD", "COPR", 3))
 
     }) %>% 

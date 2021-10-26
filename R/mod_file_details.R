@@ -26,13 +26,13 @@ file_details_server <- function(id, r) {
     # Load in data from gedcom object -----------------------------------------
     shiny::observe({
       req(r$ged)
-      shiny::updateTextInput(session = session, "receiving_sys", 
+      shiny::updateTextInput(inputId = "receiving_sys", 
                              value = tidyged.internals::gedcom_value(r$ged, "HD", "DEST", 1))
-      shiny::updateSelectInput(session = session, "language", 
+      shiny::updateSelectInput(inputId = "language", 
                              selected = tidyged.internals::gedcom_value(r$ged, "HD", "LANG", 1))
-      shiny::updateTextAreaInput(session = session, "ged_desc", 
+      shiny::updateTextAreaInput(inputId = "ged_desc", 
                                value = tidyged.internals::gedcom_value(r$ged, "HD", "NOTE", 1))
-      shiny::updateTextAreaInput(session = session, "ged_copy", 
+      shiny::updateTextAreaInput(inputId = "ged_copy", 
                                  value = tidyged.internals::gedcom_value(r$ged, "HD", "COPR", 1))
     }) %>% 
       shiny::bindEvent(r$file_count)

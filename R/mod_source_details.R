@@ -45,15 +45,15 @@ source_details_server <- function(id, r) {
       
       sour_xref <- r$ged$record[r$sour_rows[1]]
       
-      shiny::updateTextInput(session = session, "originator", 
+      shiny::updateTextInput(inputId = "originator", 
                              value = tidyged.internals::gedcom_value(r$ged, sour_xref, "AUTH", 1))
-      shiny::updateTextInput(session = session, "title", 
+      shiny::updateTextInput(inputId = "title", 
                              value = tidyged.internals::gedcom_value(r$ged, sour_xref, "TITL", 1))
-      shiny::updateTextInput(session = session, "abbr_title", 
+      shiny::updateTextInput(inputId = "abbr_title", 
                              value = tidyged.internals::gedcom_value(r$ged, sour_xref, "ABBR", 1))
-      shiny::updateTextAreaInput(session = session, "pub_details", 
+      shiny::updateTextAreaInput(inputId = "pub_details", 
                                  value = tidyged.internals::gedcom_value(r$ged, sour_xref, "PUBL", 1))
-      shiny::updateTextAreaInput(session = session, "text", 
+      shiny::updateTextAreaInput(inputId = "text", 
                                  value = tidyged.internals::gedcom_value(r$ged, sour_xref, "TEXT", 1))
     }) %>% 
       shiny::bindEvent(r$file_count)

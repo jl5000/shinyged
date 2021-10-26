@@ -88,9 +88,9 @@ family_server <- function(id, r) {
           current_selection <- r$famg_to_select
         }
         
-        shiny::updateSelectizeInput(session = session, inputId = "record", choices = records(), selected = current_selection)
+        shiny::updateSelectizeInput(inputId = "record", choices = records(), selected = current_selection)
       } else {
-        shiny::updateSelectizeInput(session = session, inputId = "record", choices = character(), selected = character())
+        shiny::updateSelectizeInput(inputId = "record", choices = character(), selected = character())
       }
       r$famg_to_select <- NULL
     }) %>% 

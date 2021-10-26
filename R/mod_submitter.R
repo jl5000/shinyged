@@ -44,7 +44,7 @@ submitter_server <- function(id, r) {
     
     shiny::observe({
       req(subm)
-      shiny::updateTextInput(session = session, "subm_name",
+      shiny::updateTextInput(inputId = "subm_name",
                              value = dplyr::filter(subm(), tag == "NAME")$value)
     }) %>% 
       shiny::bindEvent(r$file_count)
