@@ -274,42 +274,32 @@ citations_server <- function(id, r, section_rows) {
       # some events have had a space added to make them unique
       event_type <- process_input(input$event_type) %>% stringr::str_trim()
       err <- tidyged.internals::chk_event_type_cited_from(event_type, 1)
-      err1 <- is.null(input$event_type) & !is.null(input$role)
       shinyFeedback::feedbackDanger("event_type", !is.null(err), err)
-      shinyFeedback::feedbackDanger("role", err1, "Event type is required for this input")
       valid_cit$input$event <- is.null(err)
-      valid_cit$input$role <- is.null(err1)
-    }) %>% 
-      shiny::bindEvent(input$event_type, ignoreNULL = FALSE, ignoreInit = TRUE)
-    
-    # Validate role -----------------------------------------------------------
-    shiny::observe({
-      role <- process_input(input$role)
-      if(!is.null(input$role) && input$role == "Other") {
-        role <- paste0("(", input$custom_role, ")")
-      }
-      err <- tidyged.internals::chk_role_in_event(role, 1)
-      if(!is.null(input$role) && input$role == "Other") {
-        shinyFeedback::feedbackWarning("custom_role", !is.null(err), "Enter a custom role")
-        valid_cit$input$custom_role <- is.null(err)
-      } else {
-        shinyFeedback::feedbackDanger("role", !is.null(err), err)
+      
+      # Role has event
+      err <- is.null(input$event_type) & !is.null(input$role)
+      shinyFeedback::feedbackDanger("role", err, "Event type is required for this input")
+      valid_cit$input$role <- !err
+      
+      # Check role/custom role
+      if(valid_cit$input$role){
+        if(!is.null(input$role) && input$role == "Other") {
+          role <- paste0("(", process_input(input$custom_role), ")")
+          err <- tidyged.internals::chk_role_in_event(role, 1)
+          shinyFeedback::feedbackWarning("custom_role", !is.null(err), "Enter a custom role")
+        } else {
+          role <- process_input(input$role)
+          err <- tidyged.internals::chk_role_in_event(role, 1)
+          shinyFeedback::feedbackDanger("role", !is.null(err), err)
+        }
         valid_cit$input$role <- is.null(err)
       }
+
     }) %>% 
-      shiny::bindEvent(input$role, ignoreNULL = FALSE, ignoreInit = TRUE)
+      shiny::bindEvent(input$event_type, input$role, input$custom_role,
+                       ignoreNULL = FALSE, ignoreInit = TRUE)
     
-    # Validate custom role ----------------------------------------------------
-    shiny::observe({
-      custom_role <- process_input(input$custom_role)
-      if(!is.null(input$role) && input$role == "Other") {
-        role <- paste0("(", input$custom_role, ")")
-      }
-      err <- tidyged.internals::chk_role_in_event(custom_role, 1)
-      shinyFeedback::feedbackWarning("custom_role", !is.null(err), "Enter a custom role")
-      valid_cit$input$custom_role <- is.null(err)
-    }) %>% 
-      shiny::bindEvent(input$custom_role, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     # Validate source text -----------------------------------------------------
     shiny::observe({
@@ -340,8 +330,13 @@ citations_server <- function(id, r, section_rows) {
     # Update citation -------------------------------------------------------------
     shiny::observe({
       cit <- r$ged[r$citation_rows,]
-      
-      #event <- process_input(input$event_type) %>% stringr::str_trim()
+
+      event <- process_input(input$event_type) %>% stringr::str_trim()
+      if(!is.null(input$role) && input$role == "Other"){
+        role <- paste0("(", process_input(input$custom_role), ")")
+      } else {
+        role <- process_input(input$role)
+      }
       
       cert <- process_input(input$certainty)
       cert_val <- switch(cert, 
@@ -355,8 +350,8 @@ citations_server <- function(id, r, section_rows) {
       
       cit_structure <- tidyged::source_citation(r$ged, cit$value[1], 
                                                 process_input(input$page),
-                                                #event, role,#TODO
-                                                process_input(input$entry_date), 
+                                                event, role,
+                                                process_input(input$entry_date),
                                                 process_input(input$source_text),
                                                 cert_val, notes, media) %>% 
         dplyr::mutate(record = cit$record[1], level = level + cit$level[1])
