@@ -49,13 +49,13 @@ media_links_server <- function(id, r, section_rows) {
         shiny::fluidRow(
           shiny::column(12,
                         shiny::actionButton(ns("add_link"), "Add multimedia link"),
-                        shiny::actionButton(ns("remove_link"), "Remove multimedia link") %>% 
+                        shiny::actionButton(ns("remove_link"), "Remove multimedia link") |> 
                           shinyjs::disabled()
                         
           )
         ),
-      ) %>% shiny::showModal()
-    }) %>% 
+      ) |> shiny::showModal()
+    }) |> 
       shiny::bindEvent(input$media_links)
     
 
@@ -64,8 +64,8 @@ media_links_server <- function(id, r, section_rows) {
     media_xrefs <- shiny::reactive({
       req(r$ged, r[[section_rows]])
       
-      dplyr::slice(r$ged, r[[section_rows]]) %>%
-        dplyr::filter(level == .$level[1] + 1, tag == "OBJE") %>% 
+      dplyr::slice(r$ged, r[[section_rows]]) |>
+        dplyr::filter(level == .$level[1] + 1, tag == "OBJE") |> 
         dplyr::pull(value)
     })
     
@@ -81,12 +81,12 @@ media_links_server <- function(id, r, section_rows) {
     selected_ged_row <- shiny::reactive({
       req(r$ged, r[[section_rows]], input$media_list_rows_selected)
       
-      dplyr::mutate(r$ged, row = dplyr::row_number()) %>% 
-        dplyr::slice(r[[section_rows]]) %>%
-        dplyr::filter(level == .$level[1] + 1, tag == "OBJE") %>% 
-        dplyr::slice(input$media_list_rows_selected) %>% 
+      dplyr::mutate(r$ged, row = dplyr::row_number()) |> 
+        dplyr::slice(r[[section_rows]]) |>
+        dplyr::filter(level == .$level[1] + 1, tag == "OBJE") |> 
+        dplyr::slice(input$media_list_rows_selected) |> 
         dplyr::pull(row)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(r$ged, r[[section_rows]], input$media_list_rows_selected)
     
     # Update table with media links -------------------------------------------
@@ -98,7 +98,7 @@ media_links_server <- function(id, r, section_rows) {
     # Disable remove_link button if nothing selected --------------------------
     shiny::observe({
       shinyjs::toggleState("remove_link", !is.null(input$media_list_rows_selected))
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$media_list_rows_selected, ignoreNULL = FALSE)
     
 
@@ -121,13 +121,13 @@ media_links_server <- function(id, r, section_rows) {
                                # doesn't shift existing row numbers
                                .after = max(r[[section_rows]]))
       
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$add_link)
     
     # Remove media link ----------------------------------------------------------
     shiny::observe({
       r$ged <- dplyr::slice(r$ged, -selected_ged_row())
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$remove_link)
     
 

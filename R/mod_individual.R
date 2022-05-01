@@ -27,7 +27,7 @@ individual_ui <- function(id) {
                                   media_links_ui(ns("indi_media")),
                     ),
 
-    ) %>% shinyjs::hidden(),
+    ) |> shinyjs::hidden(),
     
     shiny::br(),
     
@@ -42,7 +42,7 @@ individual_ui <- function(id) {
                                                      shiny::tabPanel("Citations", citations_ui(ns("indi_citations"))),
                                                      shiny::tabPanel("Raw data", record_ui(ns("indi_raw"))))
                     )
-    ) %>% shinyjs::hidden()
+    ) |> shinyjs::hidden()
     
   )
 }
@@ -56,22 +56,22 @@ individual_server <- function(id, r) {
     notes_server("indi_notes", r, "indi_rows")
     media_links_server("indi_media", r, "indi_rows")
     
-    shiny::observe(timeline_server("indi_timeline", r, "indi_rows")) %>%
+    shiny::observe(timeline_server("indi_timeline", r, "indi_rows")) |>
       shiny::bindEvent(input$tabset == "Timeline", once = TRUE, ignoreInit = TRUE)
     
-    shiny::observe(individual_names_server("indi_names", r)) %>%
+    shiny::observe(individual_names_server("indi_names", r)) |>
       shiny::bindEvent(input$tabset == "Names", once = TRUE, ignoreInit = TRUE)
     
-    shiny::observe(individual_facts_server("indi_facts", r)) %>%
+    shiny::observe(individual_facts_server("indi_facts", r)) |>
       shiny::bindEvent(input$tabset == "Facts", once = TRUE, ignoreInit = TRUE)
     
-    shiny::observe(individual_links_server("indi_links", r)) %>%
+    shiny::observe(individual_links_server("indi_links", r)) |>
       shiny::bindEvent(input$tabset == "Links", once = TRUE, ignoreInit = TRUE)
     
-    shiny::observe(record_server("indi_raw", r, "indi_rows")) %>%
+    shiny::observe(record_server("indi_raw", r, "indi_rows")) |>
       shiny::bindEvent(input$tabset == "Raw data", once = TRUE, ignoreInit = TRUE)
     
-    shiny::observe(citations_server("indi_citations", r, "indi_rows")) %>%
+    shiny::observe(citations_server("indi_citations", r, "indi_rows")) |>
       shiny::bindEvent(input$tabset == "Citations", once = TRUE, ignoreInit = TRUE)
     
 
@@ -79,7 +79,7 @@ individual_server <- function(id, r) {
     records <- shiny::reactive({
       req(r$ged)
 
-      tidyged::xrefs_indi(r$ged) %>% 
+      tidyged::xrefs_indi(r$ged) |> 
         tidyged::describe_records(r$ged, ., short_desc = TRUE)
     })
     
@@ -98,7 +98,7 @@ individual_server <- function(id, r) {
         shiny::updateSelectizeInput(inputId = "record", choices = character(), selected = character())
       }
       r$indi_to_select <- NULL
-    }) %>% 
+    }) |> 
       shiny::bindEvent(records())
     
     # Update indi_rows ----------------------------------------------------------
@@ -106,7 +106,7 @@ individual_server <- function(id, r) {
       req(input$record)
       indi_xref <- stringr::str_extract(input$record, tidyged.internals::reg_xref(FALSE))
       r$indi_rows <- which(r$ged$record == indi_xref)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$record, r$ged)
     
     # Show/hide tabs and toggle delete button ----------------------------------
@@ -118,7 +118,7 @@ individual_server <- function(id, r) {
         sex <- tidyged.internals::gedcom_value(r$ged, r$ged$record[r$indi_rows[1]], "SEX", 1)
         shiny::updateSelectizeInput(inputId = "sex", selected = sex)
       }
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$record, ignoreNULL = FALSE)
     
     # Add individual and set a flag to ensure it is selected -------------------
@@ -127,7 +127,7 @@ individual_server <- function(id, r) {
       indi_xrefs <- tidyged::xrefs_indi(r$ged)
       last_indi <- tail(indi_xrefs, 1)
       r$indi_to_select <- tidyged::describe_records(r$ged, last_indi, short_desc = TRUE)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$add)
     
     # Remove individual and set a flag to ensure no individual is selected --------
@@ -136,7 +136,7 @@ individual_server <- function(id, r) {
       r$ged <- tidyged::remove_indi(r$ged, indi_xref)
       shiny::showNotification("Individual deleted")
       r$indi_to_select <- NULL
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$delete)
     
     # Update sex value ------------------------------------------------------------
@@ -146,7 +146,7 @@ individual_server <- function(id, r) {
       shinyFeedback::feedbackDanger("sex", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, "indi_rows", r$ged$record[r$indi_rows[1]], 1, "SEX", sex)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$sex, ignoreNULL = FALSE, ignoreInit = TRUE)
     
 

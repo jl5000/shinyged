@@ -21,10 +21,10 @@ source_details_ui <- function(id) {
       )
     ),
     
-    shiny::textAreaInput(ns("pub_details"), "Publication details", resize = "vertical") %>%
+    shiny::textAreaInput(ns("pub_details"), "Publication details", resize = "vertical") |>
       shiny::tagAppendAttributes(style = 'width: 85%;'),
     
-    shiny::textAreaInput(ns("text"), "Source text", resize = "vertical") %>%
+    shiny::textAreaInput(ns("text"), "Source text", resize = "vertical") |>
       shiny::tagAppendAttributes(style = 'width: 85%;'),
     
     source_repo_ui(ns("repos"))
@@ -55,7 +55,7 @@ source_details_server <- function(id, r) {
                                  value = tidyged.internals::gedcom_value(r$ged, sour_xref, "PUBL", 1))
       shiny::updateTextAreaInput(inputId = "text", 
                                  value = tidyged.internals::gedcom_value(r$ged, sour_xref, "TEXT", 1))
-    }) %>% 
+    }) |> 
       shiny::bindEvent(r$file_count)
     
     
@@ -66,7 +66,7 @@ source_details_server <- function(id, r) {
       shinyFeedback::feedbackDanger("originator", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, "sour_rows", r$ged$record[r$sour_rows[1]], 1, "AUTH", originator)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$originator, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     # Title ---------------------------------------------------------------------
@@ -76,7 +76,7 @@ source_details_server <- function(id, r) {
       shinyFeedback::feedbackDanger("title", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, "sour_rows", r$ged$record[r$sour_rows[1]], 1, "TITL", title)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$title, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     # Abbreviated title -----------------------------------------------------------
@@ -86,7 +86,7 @@ source_details_server <- function(id, r) {
       shinyFeedback::feedbackDanger("abbr_title", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, "sour_rows", r$ged$record[r$sour_rows[1]], 1, "ABBR", abbr_title)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$abbr_title, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     # Publication details -----------------------------------------------------------
@@ -96,7 +96,7 @@ source_details_server <- function(id, r) {
       shinyFeedback::feedbackDanger("pub_details", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, "sour_rows", r$ged$record[r$sour_rows[1]], 1, "PUBL", pub_details)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$pub_details, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     # Source text -----------------------------------------------------------------
@@ -106,7 +106,7 @@ source_details_server <- function(id, r) {
       shinyFeedback::feedbackDanger("text", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, "sour_rows", r$ged$record[r$sour_rows[1]], 1, "TEXT", text)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$text, ignoreNULL = FALSE, ignoreInit = TRUE)
     
   })

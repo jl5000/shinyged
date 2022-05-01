@@ -18,7 +18,7 @@ source_repo_server <- function(id, r) {
     # Show pop up ------------------------------------------------
     shiny::observe({
       
-      repos <- tidyged::xrefs_repo(r$ged) %>% 
+      repos <- tidyged::xrefs_repo(r$ged) |> 
         tidyged::describe_records(r$ged, ., short_desc = TRUE)
       
       shiny::modalDialog(title = "Edit source repositories",
@@ -31,14 +31,14 @@ source_repo_server <- function(id, r) {
                            shiny::br(),
                            shiny::selectizeInput(ns("repo"), label = NULL, choices = repos,
                                                  multiple = TRUE, width = "500px", options = list(maxItems = 1)),
-                           shiny::textInput(ns("call_number"), label = "Reference (optional)") %>% shinyjs::disabled(),
-                           shiny::actionButton(ns("add_repo"), "Add repository") %>% shinyjs::disabled(),
-                           shiny::actionButton(ns("delete_repo"), "Delete repository") %>% shinyjs::disabled(),
-                           shiny::actionButton(ns("update_repo"), "Update repository") %>% shinyjs::disabled(),
+                           shiny::textInput(ns("call_number"), label = "Reference (optional)") |> shinyjs::disabled(),
+                           shiny::actionButton(ns("add_repo"), "Add repository") |> shinyjs::disabled(),
+                           shiny::actionButton(ns("delete_repo"), "Delete repository") |> shinyjs::disabled(),
+                           shiny::actionButton(ns("update_repo"), "Update repository") |> shinyjs::disabled(),
                            
                          ) 
-      ) %>% shiny::showModal()
-    }) %>% 
+      ) |> shiny::showModal()
+    }) |> 
       shiny::bindEvent(input$repos)
     
     # Derive a dataframe of repos --------------------------------------------
@@ -51,12 +51,12 @@ source_repo_server <- function(id, r) {
       
       if(length(rows) > 0) {
 
-        repodf <- r$ged %>%
-          dplyr::slice(rows) %>% 
-          dplyr::select(tag, value) %>% 
-          dplyr::mutate(id1 = cumsum(tag == "REPO")) %>% 
-          as.data.frame() %>% 
-          reshape(direction = "wide", idvar = "id1", v.names = "value", timevar = "tag") %>% 
+        repodf <- r$ged |>
+          dplyr::slice(rows) |> 
+          dplyr::select(tag, value) |> 
+          dplyr::mutate(id1 = cumsum(tag == "REPO")) |> 
+          as.data.frame() |> 
+          reshape(direction = "wide", idvar = "id1", v.names = "value", timevar = "tag") |> 
           dplyr::select(-id1)
         
         if(ncol(repodf) == 1) repodf <- dplyr::mutate(repodf, b = "")
@@ -83,7 +83,7 @@ source_repo_server <- function(id, r) {
       lbl <- paste0(nrow(repo_df()), " repositories")
       if(nrow(repo_df()) == 1) lbl <- paste0(nrow(repo_df()), " repository")
       shiny::updateActionButton(inputId = "repos", label = lbl)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(repo_df())
     
     # Show the dataframe of repos -----------------------------------
@@ -117,7 +117,7 @@ source_repo_server <- function(id, r) {
       }
       shinyjs::toggleState("delete_repo", !is.null(input$table_rows_selected))
       shinyjs::toggleState("update_repo", !is.null(input$table_rows_selected))
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$table_rows_selected, ignoreNULL = FALSE)
     
     # Update selected rows in r$ged -----------------------------------------------
@@ -141,14 +141,14 @@ source_repo_server <- function(id, r) {
       
       repo <- stringr::str_extract(input$repo, tidyged.internals::reg_xref(FALSE))
       
-      r$ged <- r$ged %>%
+      r$ged <- r$ged |>
         tibble::add_row(tibble::tibble(record = r$ged$record[r$sour_rows[1]], 
                                        level = 1, tag = "REPO", value = repo),
                         .after = max(r$sour_rows))
       
       if(input$call_number != ""){
         
-        r$ged <- r$ged %>%
+        r$ged <- r$ged |>
           tibble::add_row(tibble::tibble(record = r$ged$record[r$sour_rows[1]], 
                                          level = 2, tag = "CALN", value = input$call_number),
                           .after = max(r$sour_rows) + 1)
@@ -157,7 +157,7 @@ source_repo_server <- function(id, r) {
       
       shiny::updateSelectizeInput(inputId = "repo", selected = NULL)
       shiny::updateTextInput(inputId = "call_number", value = "")
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$add_repo)
     
     # Update repo in tidyged object -----------------------------------------
@@ -174,7 +174,7 @@ source_repo_server <- function(id, r) {
         
       } else if(!caln_exists & caln_given) {
         
-        r$ged <- r$ged %>%
+        r$ged <- r$ged |>
           tibble::add_row(tibble::tibble(record = r$ged$record[selected_ged_rows()[1]], 
                                          level = 2, tag = "CALN", value = input$call_number),
                           .after = selected_ged_rows()[1])
@@ -184,7 +184,7 @@ source_repo_server <- function(id, r) {
         r$ged <- dplyr::slice(r$ged, -selected_ged_rows()[2])
       }
       
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$update_repo)
     
     # Remove repo from tidyged object -----------------------------------
@@ -193,7 +193,7 @@ source_repo_server <- function(id, r) {
       
       shiny::updateSelectizeInput(inputId = "repo", selected = NULL)
       shiny::updateTextInput(inputId = "call_number", value = "")
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$delete_repo)
     
     

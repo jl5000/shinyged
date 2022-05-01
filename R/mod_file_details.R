@@ -10,9 +10,9 @@ file_details_ui <- function(id) {
     shiny::tags$br(),
     
     shiny::textInput(ns("receiving_sys"), "Receiving system"),
-    shiny::textAreaInput(ns("ged_desc"), "Description", resize = "vertical") %>%
+    shiny::textAreaInput(ns("ged_desc"), "Description", resize = "vertical") |>
       shiny::tagAppendAttributes(style = 'width: 85%;'),
-    shiny::textAreaInput(ns("ged_copy"), "Copyright statement", resize = "vertical") %>%
+    shiny::textAreaInput(ns("ged_copy"), "Copyright statement", resize = "vertical") |>
       shiny::tagAppendAttributes(style = 'width: 85%;'),
     shiny::selectInput(ns("language"), "Language", 
                        choices = tidyged.internals::val_languages(), selected = character())
@@ -34,7 +34,7 @@ file_details_server <- function(id, r) {
                                value = tidyged.internals::gedcom_value(r$ged, "HD", "NOTE", 1))
       shiny::updateTextAreaInput(inputId = "ged_copy", 
                                  value = tidyged.internals::gedcom_value(r$ged, "HD", "COPR", 1))
-    }) %>% 
+    }) |> 
       shiny::bindEvent(r$file_count)
     
     # Edit receiving system --------------------------------------------------
@@ -44,7 +44,7 @@ file_details_server <- function(id, r) {
       shinyFeedback::feedbackDanger("receiving_sys", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, "head_rows", "HD", 1, "DEST", receiving_sys)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$receiving_sys, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     # Edit language ----------------------------------------------------------
@@ -54,7 +54,7 @@ file_details_server <- function(id, r) {
       shinyFeedback::feedbackDanger("language", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, "head_rows", "HD", 1, "LANG", language)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$language, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     # Edit description --------------------------------------------------------
@@ -64,7 +64,7 @@ file_details_server <- function(id, r) {
       shinyFeedback::feedbackDanger("ged_desc", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, "head_rows", "HD", 1, "NOTE", ged_desc)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$ged_desc, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     # Edit copyright -----------------------------------------------------------
@@ -74,7 +74,7 @@ file_details_server <- function(id, r) {
       shinyFeedback::feedbackDanger("ged_copy", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, "head_rows", "HD", 1, "COPR", ged_copy)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$ged_copy, ignoreNULL = FALSE, ignoreInit = TRUE)
     
   })

@@ -23,9 +23,9 @@ repository_ui <- function(id) {
                     ref_numbers_ui(ns("repo_ref_numbers")),
                     notes_ui(ns("repo_notes")),
       )
-    ) %>% shinyjs::hidden(),
+    ) |> shinyjs::hidden(),
     
-    address_ui(ns("repo_address")) %>% shinyjs::hidden(),
+    address_ui(ns("repo_address")) |> shinyjs::hidden(),
     
     
   )
@@ -44,7 +44,7 @@ repository_server <- function(id, r) {
     records <- shiny::reactive({
       req(r$ged)
 
-      tidyged::xrefs_repo(r$ged) %>% 
+      tidyged::xrefs_repo(r$ged) |> 
         tidyged::describe_records(r$ged, ., short_desc = TRUE)
     })
     
@@ -63,7 +63,7 @@ repository_server <- function(id, r) {
         shiny::updateSelectizeInput(inputId = "record", choices = character(), selected = character())
       }
       r$repo_to_select <- NULL
-    }) %>% 
+    }) |> 
       shiny::bindEvent(records())
     
     # Update repo_rows
@@ -71,7 +71,7 @@ repository_server <- function(id, r) {
       req(input$record)
       repo_xref <- stringr::str_extract(input$record, tidyged.internals::reg_xref(FALSE))
       r$repo_rows <- which(r$ged$record == repo_xref)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$record, r$ged)
     
     # Show/hide tabs and toggle delete button
@@ -79,7 +79,7 @@ repository_server <- function(id, r) {
       shinyjs::toggle("repo_data", condition = !is.null(input$record))
       shinyjs::toggle("repo_address", condition = !is.null(input$record))
       shinyjs::toggleState("delete", !is.null(input$record))
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$record, ignoreNULL = FALSE)
     
     # Popup to to give repository name
@@ -93,9 +93,9 @@ repository_server <- function(id, r) {
           shiny::modalButton("Cancel"),
           shinyjs::disabled(shiny::actionButton(ns("add_repo"), "Add repository"))
         )
-      ) %>% shiny::showModal()
+      ) |> shiny::showModal()
       
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$add)
     
     # Disable add_repo button if no valid name
@@ -105,7 +105,7 @@ repository_server <- function(id, r) {
       err <- tidyged.internals::chk_name_of_repository(repo_name, 1)
       shinyFeedback::feedbackDanger("repo_name", !is.null(err), err)
       shinyjs::toggleState("add_repo", is.null(err) & input$repo_name != "")
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$repo_name, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     # Add repository
@@ -115,7 +115,7 @@ repository_server <- function(id, r) {
       last_repo <- tail(repo_xrefs, 1)
       r$repo_to_select <- tidyged::describe_records(r$ged, last_repo, short_desc = TRUE)
       shiny::removeModal()
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$add_repo)
     
     # Remove repository and set a flag to ensure no repository is selected
@@ -124,7 +124,7 @@ repository_server <- function(id, r) {
       r$ged <- tidyged::remove_repo(r$ged, repo_xref)
       shiny::showNotification("Repository deleted")
       r$repo_to_select <- NULL
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$delete)
     
  

@@ -30,14 +30,14 @@ ref_numbers_server <- function(id, r, section_rows) {
                            DT::DTOutput(ns("table")),
                            shiny::br(),
                            shiny::textInput(ns("ref_num"), label = "Reference number"),
-                           shiny::textInput(ns("ref_type"), label = "Reference type (optional)") %>% shinyjs::disabled(),
-                           shiny::actionButton(ns("add_ref_num"), "Add reference number") %>% shinyjs::disabled(),
-                           shiny::actionButton(ns("delete_ref_num"), "Delete reference number") %>% shinyjs::disabled(),
-                           shiny::actionButton(ns("update_ref_num"), "Update reference number") %>% shinyjs::disabled(),
+                           shiny::textInput(ns("ref_type"), label = "Reference type (optional)") |> shinyjs::disabled(),
+                           shiny::actionButton(ns("add_ref_num"), "Add reference number") |> shinyjs::disabled(),
+                           shiny::actionButton(ns("delete_ref_num"), "Delete reference number") |> shinyjs::disabled(),
+                           shiny::actionButton(ns("update_ref_num"), "Update reference number") |> shinyjs::disabled(),
                            
                          ) 
-      ) %>% shiny::showModal()
-    }) %>% 
+      ) |> shiny::showModal()
+    }) |> 
       shiny::bindEvent(input$ref_numbers)
     
     # Derive a dataframe of ref numbers ------------------------------------
@@ -50,12 +50,12 @@ ref_numbers_server <- function(id, r, section_rows) {
       
       if(length(rows) > 0) {
 
-      ref_num_df <- r$ged %>%
-        dplyr::slice(rows) %>% 
-        dplyr::select(tag, value) %>% 
-        dplyr::mutate(id1 = cumsum(tag == "REFN")) %>% 
-        as.data.frame() %>% 
-        reshape(direction = "wide", idvar = "id1", v.names = "value", timevar = "tag") %>% 
+      ref_num_df <- r$ged |>
+        dplyr::slice(rows) |> 
+        dplyr::select(tag, value) |> 
+        dplyr::mutate(id1 = cumsum(tag == "REFN")) |> 
+        as.data.frame() |> 
+        reshape(direction = "wide", idvar = "id1", v.names = "value", timevar = "tag") |> 
         dplyr::select(-id1)
 
       if(ncol(ref_num_df) == 1) ref_num_df <- dplyr::mutate(ref_num_df, b = "")
@@ -78,7 +78,7 @@ ref_numbers_server <- function(id, r, section_rows) {
       lbl <- paste0(nrow(ref_number_df()), " reference numbers")
       if(nrow(ref_number_df()) == 1) lbl <- substr(lbl, 1, nchar(lbl) - 1)
       shiny::updateActionButton(inputId = "ref_numbers", label = lbl)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(ref_number_df())
     
     # Show the dataframe of ref numbers ------------------------------
@@ -114,7 +114,7 @@ ref_numbers_server <- function(id, r, section_rows) {
       }
       shinyjs::toggleState("delete_ref_num", !is.null(input$table_rows_selected))
       shinyjs::toggleState("update_ref_num", !is.null(input$table_rows_selected))
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$table_rows_selected, ignoreNULL = FALSE)
     
     # Update selected rows in r$ged -------------------------------------------
@@ -135,14 +135,14 @@ ref_numbers_server <- function(id, r, section_rows) {
     # Add ref number to tidyged object -----------------------------------------
     shiny::observe({
 
-      r$ged <- r$ged %>%
+      r$ged <- r$ged |>
         tibble::add_row(tibble::tibble(record = r$ged$record[r[[section_rows]][1]], 
                                        level = 1, tag = "REFN", value = input$ref_num),
                         .after = max(r[[section_rows]]))
       
       if(input$ref_type != ""){
         
-        r$ged <- r$ged %>%
+        r$ged <- r$ged |>
           tibble::add_row(tibble::tibble(record = r$ged$record[r[[section_rows]][1]], 
                                          level = 2, tag = "TYPE", value = input$ref_type),
                           .after = max(r[[section_rows]]) + 1)
@@ -151,7 +151,7 @@ ref_numbers_server <- function(id, r, section_rows) {
       
       shiny::updateTextInput(inputId = "ref_num", value = "")
       shiny::updateTextInput(inputId = "ref_type", value = "")
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$add_ref_num)
     
     # Update ref number in tidyged object ------------------------------------
@@ -167,7 +167,7 @@ ref_numbers_server <- function(id, r, section_rows) {
         
       } else if(!type_exists & type_given) {
         
-        r$ged <- r$ged %>%
+        r$ged <- r$ged |>
           tibble::add_row(tibble::tibble(record = r$ged$record[selected_ged_rows()[1]], 
                                          level = 2, tag = "TYPE", value = input$ref_type),
                           .after = selected_ged_rows()[1])
@@ -177,7 +177,7 @@ ref_numbers_server <- function(id, r, section_rows) {
         r$ged <- dplyr::slice(r$ged, -selected_ged_rows()[2])
       }
       
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$update_ref_num)
     
     # Remove ref number from tidyged object -----------------------------------------
@@ -186,7 +186,7 @@ ref_numbers_server <- function(id, r, section_rows) {
       
       shiny::updateTextInput(inputId = "ref_num", value = "")
       shiny::updateTextInput(inputId = "ref_type", value = "")
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$delete_ref_num)
     
   })

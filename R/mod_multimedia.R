@@ -21,7 +21,7 @@ multimedia_ui <- function(id) {
                                   ref_numbers_ui(ns("media_ref_numbers")),
                                   notes_ui(ns("media_notes")),
                     )
-    ) %>% shinyjs::hidden(),
+    ) |> shinyjs::hidden(),
     
     shiny::br(),
     
@@ -48,20 +48,20 @@ multimedia_server <- function(id, r) {
     ref_numbers_server("media_ref_numbers", r, "media_rows")
     notes_server("media_notes", r, "media_rows")
 
-    shiny::observe(multimedia_description_server("media_description", r)) %>%
+    shiny::observe(multimedia_description_server("media_description", r)) |>
       shiny::bindEvent(input$tabset == "Description", once = TRUE, ignoreInit = TRUE)
     
-    shiny::observe(record_server("media_raw", r, "media_rows")) %>%
+    shiny::observe(record_server("media_raw", r, "media_rows")) |>
       shiny::bindEvent(input$tabset == "Raw data", once = TRUE, ignoreInit = TRUE)
     
-    shiny::observe(citations_server("media_citations", r, "media_rows")) %>%
+    shiny::observe(citations_server("media_citations", r, "media_rows")) |>
       shiny::bindEvent(input$tabset == "Citations", once = TRUE, ignoreInit = TRUE)
     
     # Update list of media
     records <- shiny::reactive({
       req(r$ged)
       
-      tidyged::xrefs_media(r$ged) %>% 
+      tidyged::xrefs_media(r$ged) |> 
         tidyged::describe_records(r$ged, ., short_desc = TRUE)
     })
     
@@ -80,7 +80,7 @@ multimedia_server <- function(id, r) {
         shiny::updateSelectizeInput(inputId = "record", choices = character(), selected = character())
       }
       r$media_to_select <- NULL
-    }) %>% 
+    }) |> 
       shiny::bindEvent(records())
     
     # Update media_rows
@@ -88,7 +88,7 @@ multimedia_server <- function(id, r) {
       req(input$record)
       media_xref <- stringr::str_extract(input$record, tidyged.internals::reg_xref(FALSE))
       r$media_rows <- which(r$ged$record == media_xref)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$record, r$ged)
     
     # Show/hide tabs and toggle delete button
@@ -96,7 +96,7 @@ multimedia_server <- function(id, r) {
       shinyjs::toggle("media_tabs", condition = !is.null(input$record))
       shinyjs::toggle("media_data", condition = !is.null(input$record))
       shinyjs::toggleState("delete", !is.null(input$record))
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$record, ignoreNULL = FALSE)
     
     # Add media and set a flag to ensure it is selected
@@ -105,7 +105,7 @@ multimedia_server <- function(id, r) {
       media_xrefs <- tidyged::xrefs_media(r$ged)
       last_media <- tail(media_xrefs, 1)
       r$media_to_select <- tidyged::describe_records(r$ged, last_media, short_desc = TRUE)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$add)
     
     # Remove media and set a flag to ensure no media is selected
@@ -114,7 +114,7 @@ multimedia_server <- function(id, r) {
       r$ged <- tidyged::remove_media(r$ged, media_xref)
       shiny::showNotification("Multimedia deleted")
       r$media_to_select <- NULL
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$delete)
     
  

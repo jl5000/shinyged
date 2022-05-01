@@ -26,25 +26,25 @@ function(input, output, session) {
     tools_server("tools", r)
     
 
-    shiny::observe(individual_server("indi", r)) %>%
+    shiny::observe(individual_server("indi", r)) |>
         shiny::bindEvent(input$tabset == "Individuals", once = TRUE, ignoreInit = TRUE)
 
-    shiny::observe(family_server("famg", r)) %>%
+    shiny::observe(family_server("famg", r)) |>
         shiny::bindEvent(input$tabset == "Families", once = TRUE, ignoreInit = TRUE)
 
-    shiny::observe(source_server("sour", r)) %>%
+    shiny::observe(source_server("sour", r)) |>
         shiny::bindEvent(input$tabset == "Sources", once = TRUE, ignoreInit = TRUE)
 
-    shiny::observe(repository_server("repo", r)) %>%
+    shiny::observe(repository_server("repo", r)) |>
         shiny::bindEvent(input$tabset == "Repositories", once = TRUE, ignoreInit = TRUE)
 
-    # shiny::observe(note_server("note", r)) %>%
+    # shiny::observe(note_server("note", r)) |>
     #     shiny::bindEvent(input$tabset == "Notes", once = TRUE, ignoreInit = TRUE)
 
-    shiny::observe(multimedia_server("media", r)) %>%
+    shiny::observe(multimedia_server("media", r)) |>
         shiny::bindEvent(input$tabset == "Multimedia", once = TRUE, ignoreInit = TRUE)
 
-    shiny::observe(ged_debug_server("debug", r)) %>%
+    shiny::observe(ged_debug_server("debug", r)) |>
         shiny::bindEvent(input$tabset == "GEDCOM", once = TRUE, ignoreInit = TRUE)
     
 
@@ -63,13 +63,13 @@ function(input, output, session) {
                     shiny::modalButton("Cancel"),
                     shiny::actionButton("discard_and_read", "Discard")
                 )
-            ) %>% shiny::showModal()
+            ) |> shiny::showModal()
             
         } else {
             r$ged <- tidyged.io::read_gedcom(input$read_file$datapath)
             r$file_count <- r$file_count + 1
         }
-    }) %>% 
+    }) |> 
         shiny::bindEvent(input$read_file)
     
     # Discard previous and import new ----------------------------------------
@@ -77,7 +77,7 @@ function(input, output, session) {
         shiny::removeModal()
         r$ged <- tidyged.io::read_gedcom(input$read_file$datapath)
         r$file_count <- r$file_count + 1
-    }) %>% 
+    }) |> 
         shiny::bindEvent(input$discard_and_read)
     
     # Create new -------------------------------------------------------------
@@ -95,13 +95,13 @@ function(input, output, session) {
                     shiny::modalButton("Cancel"),
                     shiny::actionButton("discard_and_create", "Discard")
                 )
-            ) %>% shiny::showModal()
+            ) |> shiny::showModal()
             
         } else {
             r$ged <- tidyged::gedcom()
             r$file_count <- r$file_count + 1
         }
-    }) %>% 
+    }) |> 
         shiny::bindEvent(input$create_gedcom)
     
     # Discard previous and create new --------------------------------------
@@ -109,14 +109,14 @@ function(input, output, session) {
         shiny::removeModal()
         r$ged <- tidyged::gedcom()
         r$file_count <- r$file_count + 1
-    }) %>% 
+    }) |> 
         shiny::bindEvent(input$discard_and_create)
     
     # Show tabs -----------------------------------------------------------
     shiny::observe({
         shinyjs::show("tabs")
         shinyjs::enable("export_gedcom")
-    }) %>% 
+    }) |> 
         shiny::bindEvent(r$ged, once = TRUE)
     
     # Export --------------------------------------------------------------

@@ -53,7 +53,7 @@ citations_ui <- function(id) {
                                   ),
                                   shiny::fluidRow(
                                     shiny::column(12, 
-                                                  shiny::textAreaInput(ns("source_text"), "Source text", resize = "vertical") %>%
+                                                  shiny::textAreaInput(ns("source_text"), "Source text", resize = "vertical") |>
                                                     shiny::tagAppendAttributes(style = 'width: 85%;')
                                     )
                                   ),
@@ -79,7 +79,7 @@ citations_ui <- function(id) {
                                     )
                                   )
                     )
-    ) %>% shinyjs::hidden()
+    ) |> shinyjs::hidden()
     
     
     
@@ -116,19 +116,19 @@ citations_server <- function(id, r, section_rows) {
       
       rows <- as.integer(unlist(citations_rows()))
       
-      titles <- sapply(citations_rows(), `[`, 1) %>% 
-        dplyr::slice(r$ged, .) %>% 
-        dplyr::pull(value) %>% 
+      titles <- sapply(citations_rows(), `[`, 1) |> 
+        dplyr::slice(r$ged, .) |> 
+        dplyr::pull(value) |> 
         sapply(tidyged.internals::gedcom_value, gedcom = r$ged, tag = "TITL", level = 1)
       
-      cit_df <- r$ged %>%
-        dplyr::slice(rows) %>% 
-        dplyr::select(tag, value) %>% 
-        dplyr::filter(tag %in% c("SOUR","PAGE","QUAY")) %>% 
-        dplyr::mutate(id1 = cumsum(tag == "SOUR")) %>% 
-        as.data.frame() %>% 
-        reshape(direction = "wide", idvar = "id1", v.names = "value", timevar = "tag") %>% 
-        dplyr::select(-id1) %>% 
+      cit_df <- r$ged |>
+        dplyr::slice(rows) |> 
+        dplyr::select(tag, value) |> 
+        dplyr::filter(tag %in% c("SOUR","PAGE","QUAY")) |> 
+        dplyr::mutate(id1 = cumsum(tag == "SOUR")) |> 
+        as.data.frame() |> 
+        reshape(direction = "wide", idvar = "id1", v.names = "value", timevar = "tag") |> 
+        dplyr::select(-id1) |> 
         dplyr::mutate(titl = titles, .after = 1)
       
       if(!"value.PAGE" %in% names(cit_df)) cit_df <- dplyr::mutate(cit_df, C = "", .after = 2)
@@ -162,15 +162,15 @@ citations_server <- function(id, r, section_rows) {
           shiny::modalButton("Cancel"),
           shiny::actionButton(ns("add_sour_citation"), "Add source citation")
         )
-      ) %>% shiny::showModal()
+      ) |> shiny::showModal()
       
-    }) %>%
+    }) |>
       shiny::bindEvent(input$add_citation)
     
     # Disable add_sour_citation button if nothing selected --------------------
     shiny::observe({
       shinyjs::toggleState("add_sour_citation", !is.null(input$source_select))
-    }) %>%
+    }) |>
       shiny::bindEvent(input$source_select, ignoreNULL = FALSE)
     
     # Add source citation ------------------------------------------------------
@@ -188,7 +188,7 @@ citations_server <- function(id, r, section_rows) {
       
       r$cit_to_select <- nrow(cit_table())
       shiny::removeModal()
-    }) %>%
+    }) |>
       shiny::bindEvent(input$add_sour_citation)
     
     # Select a citation ---------------------------------------------
@@ -240,7 +240,7 @@ citations_server <- function(id, r, section_rows) {
         
       }
       
-    }) %>%
+    }) |>
       shiny::bindEvent(input$table_rows_selected, ignoreNULL = FALSE)
     
     # Enable/disable role inputs ------------------------------------------------
@@ -257,7 +257,7 @@ citations_server <- function(id, r, section_rows) {
       err <- tidyged.internals::chk_where_within_source(page, 1)
       shinyFeedback::feedbackDanger("page", !is.null(err), err)
       valid_cit$input$page <- is.null(err)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$page, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     # Validate entry date ----------------------------------------------------
@@ -266,13 +266,13 @@ citations_server <- function(id, r, section_rows) {
       err <- tidyged.internals::chk_date_value(entry_date, 1)
       shinyFeedback::feedbackDanger("entry_date", !is.null(err), err)
       valid_cit$input$date <- is.null(err)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$entry_date, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     # Validate event type / role ---------------------------------------------
     shiny::observe({
       # some events have had a space added to make them unique
-      event_type <- process_input(input$event_type) %>% stringr::str_trim()
+      event_type <- process_input(input$event_type) |> stringr::str_trim()
       err <- tidyged.internals::chk_event_type_cited_from(event_type, 1)
       shinyFeedback::feedbackDanger("event_type", !is.null(err), err)
       valid_cit$input$event <- is.null(err)
@@ -296,7 +296,7 @@ citations_server <- function(id, r, section_rows) {
         valid_cit$input$role <- is.null(err)
       }
 
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$event_type, input$role, input$custom_role,
                        ignoreNULL = FALSE, ignoreInit = TRUE)
     
@@ -307,7 +307,7 @@ citations_server <- function(id, r, section_rows) {
       err <- tidyged.internals::chk_text_from_source(source_text, 1)
       shinyFeedback::feedbackDanger("source_text", !is.null(err), err)
       valid_cit$input$text <- is.null(err)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$source_text, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     # Validate certainty --------------------------------------------------------
@@ -316,7 +316,7 @@ citations_server <- function(id, r, section_rows) {
       err <- tidyged.internals::chk_certainty_assessment(certainty, 1)
       shinyFeedback::feedbackDanger("certainty", !is.null(err), err)
       valid_cit$input$certainty <- is.null(err)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$certainty, ignoreNULL = FALSE, ignoreInit = TRUE)
 
     
@@ -324,14 +324,14 @@ citations_server <- function(id, r, section_rows) {
     shiny::observe({
       r$ged <- dplyr::slice(r$ged, -r$citation_rows)
       r$cit_to_select <- NULL
-    }) %>%
+    }) |>
       shiny::bindEvent(input$remove_citation)
     
     # Update citation -------------------------------------------------------------
     shiny::observe({
       cit <- r$ged[r$citation_rows,]
 
-      event <- process_input(input$event_type) %>% stringr::str_trim()
+      event <- process_input(input$event_type) |> stringr::str_trim()
       if(!is.null(input$role) && input$role == "Other"){
         role <- paste0("(", process_input(input$custom_role), ")")
       } else {
@@ -353,14 +353,14 @@ citations_server <- function(id, r, section_rows) {
                                                 event, role,
                                                 process_input(input$entry_date),
                                                 process_input(input$source_text),
-                                                cert_val, notes, media) %>% 
+                                                cert_val, notes, media) |> 
         dplyr::mutate(record = cit$record[1], level = level + cit$level[1])
       
-      r$ged <- r$ged %>% 
-        dplyr::slice(-r$citation_rows) %>% 
+      r$ged <- r$ged |> 
+        dplyr::slice(-r$citation_rows) |> 
         dplyr::add_row(cit_structure, .before = r$citation_rows[1])
       
-    }) %>%
+    }) |>
       shiny::bindEvent(input$update_citation)
     
   })

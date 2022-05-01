@@ -16,8 +16,8 @@ family_members_ui <- function(id) {
       shiny::column(12,
                     shiny::actionButton(ns("add_partner"), "Add partner"),
                     shiny::actionButton(ns("add_child"), "Add child"),
-                    shiny::actionButton(ns("delete_member"), "Remove member") %>% shinyjs::disabled(),
-                    shiny::actionButton(ns("update_relationship"), "Update child relationship") %>% shinyjs::disabled(),
+                    shiny::actionButton(ns("delete_member"), "Remove member") |> shinyjs::disabled(),
+                    shiny::actionButton(ns("update_relationship"), "Update child relationship") |> shinyjs::disabled(),
                     notes_ui(ns("member_notes"))
                     ),
     ),
@@ -40,9 +40,9 @@ family_members_server <- function(id, r) {
 
       famg_xref <- r$ged$record[r$famg_rows][1]
       
-      mtab <- dplyr::filter(r$ged[r$famg_rows,], level == 1, tag %in% c("HUSB","WIFE","CHIL")) %>% 
-        dplyr::mutate(tag = factor(tag, levels = c("HUSB","WIFE","CHIL"), ordered = TRUE)) %>% 
-        dplyr::arrange(tag) %>% 
+      mtab <- dplyr::filter(r$ged[r$famg_rows,], level == 1, tag %in% c("HUSB","WIFE","CHIL")) |> 
+        dplyr::mutate(tag = factor(tag, levels = c("HUSB","WIFE","CHIL"), ordered = TRUE)) |> 
+        dplyr::arrange(tag) |> 
         dplyr::mutate(tag = as.character(tag))
       
       marr_type <- tidyged.internals::gedcom_value(r$ged[r$famg_rows,], famg_xref, "TYPE", 2, "MARR")
@@ -77,7 +77,7 @@ family_members_server <- function(id, r) {
       
       shinyjs::toggleState("add_child", tidyged::num_indi(r$ged) > 0)
       shinyjs::toggleState("add_partner", sum(members_table()$type == "Partner") < 2)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(members_table())
     
 
@@ -85,7 +85,7 @@ family_members_server <- function(id, r) {
     indis <- shiny::reactive({
       req(r$ged)
       
-      tidyged::xrefs_indi(r$ged) %>% 
+      tidyged::xrefs_indi(r$ged) |> 
         tidyged::describe_records(r$ged, ., short_desc = TRUE)
     })
     
@@ -98,7 +98,7 @@ family_members_server <- function(id, r) {
         title = "Add a child to a family group",
         
         footer = shiny::tagList(
-          shiny::actionButton(ns("add_child_now"), "Add") %>% shinyjs::disabled(),
+          shiny::actionButton(ns("add_child_now"), "Add") |> shinyjs::disabled(),
           modalButton("Cancel")
         ),
         
@@ -119,11 +119,11 @@ family_members_server <- function(id, r) {
                         shiny::column(12,
                                       individual_summary_ui(ns("new_child_summary"))
                         )
-        ) %>% shinyjs::hidden()
+        ) |> shinyjs::hidden()
         
-      ) %>% shiny::showModal()
+      ) |> shiny::showModal()
       
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$add_child)
     
 
@@ -141,7 +141,7 @@ family_members_server <- function(id, r) {
         individual_summary_server("new_child_summary", r)
       } 
       
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$new_child, ignoreNULL = FALSE)
     
 
@@ -154,7 +154,7 @@ family_members_server <- function(id, r) {
                                                    child_linkage_type = input$pedigree)
       
       shiny::removeModal()
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$add_child_now)
     
 
@@ -166,7 +166,7 @@ family_members_server <- function(id, r) {
         title = "Add a partner to a family group",
         
         footer = shiny::tagList(
-          shiny::actionButton(ns("add_partner_now"), "Add") %>% shinyjs::disabled(),
+          shiny::actionButton(ns("add_partner_now"), "Add") |> shinyjs::disabled(),
           modalButton("Cancel")
         ),
         
@@ -185,11 +185,11 @@ family_members_server <- function(id, r) {
                         shiny::column(12,
                                       individual_summary_ui(ns("new_partner_summary"))
                         )
-        ) %>% shinyjs::hidden()
+        ) |> shinyjs::hidden()
         
-      ) %>% shiny::showModal()
+      ) |> shiny::showModal()
       
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$add_partner)
     
 
@@ -206,7 +206,7 @@ family_members_server <- function(id, r) {
         r$indi_rows <- which(r$ged$record == xref)
         individual_summary_server("new_partner_summary", r)
       } 
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$new_partner, ignoreNULL = FALSE)
     
 
@@ -218,7 +218,7 @@ family_members_server <- function(id, r) {
       r$ged <- tidyged::add_indi_links_to_families(r$ged, xref = spou_xref, famg_xref_spou = famg_xref)
                                                    
       shiny::removeModal()
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$add_partner_now)
     
 
@@ -245,14 +245,14 @@ family_members_server <- function(id, r) {
                                                                   famg_xref, xref, TRUE)
       }
  
-    }) %>% 
+    }) |> 
       shiny::bindEvent(r$ged, input$table_rows_selected)
     
 
     # Record selected row for when table updates ------------------------------
     shiny::observe({ 
       r$member_row_selected <- input$table_rows_selected
-    }) %>% 
+    }) |> 
       shiny::bindEvent(r$ged)
     
 
@@ -261,7 +261,7 @@ family_members_server <- function(id, r) {
       shinyjs::toggleState("delete_member", !is.null(input$table_rows_selected))
       shinyjs::toggleState("update_relationship", !is.null(input$table_rows_selected) &&
                              members_table()$type[input$table_rows_selected] == "Child")
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$table_rows_selected, ignoreNULL = FALSE)
     
 
@@ -270,10 +270,10 @@ family_members_server <- function(id, r) {
       xref <- members_table()$xref[input$table_rows_selected]
       famg_xref <- r$ged$record[r$famg_rows][1]
       
-      r$ged <- r$ged %>% 
-        dplyr::filter(!(record == famg_xref & level == 1 & value == xref)) %>% 
+      r$ged <- r$ged |> 
+        dplyr::filter(!(record == famg_xref & level == 1 & value == xref)) |> 
         tidyged.internals::remove_section(1, family_link_tag(), famg_xref, xref, TRUE)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$delete_member)
     
     
@@ -289,7 +289,7 @@ family_members_server <- function(id, r) {
         title = "Update a child's relationship to a family",
         
         footer = shiny::tagList(
-          shiny::actionButton(ns("update_relationship_now"), "Update") %>% shinyjs::disabled(),
+          shiny::actionButton(ns("update_relationship_now"), "Update") |> shinyjs::disabled(),
           modalButton("Cancel")
         ),
         
@@ -300,9 +300,9 @@ family_members_server <- function(id, r) {
           )
         ),
         
-      ) %>% shiny::showModal()
+      ) |> shiny::showModal()
       
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$update_relationship)
     
 
@@ -312,7 +312,7 @@ family_members_server <- function(id, r) {
       famg_xref <- r$ged$record[r$famg_rows][1]
       current_rel <- get_pedi(r$ged, famg_xref, xref)
       shinyjs::toggleState("update_relationship_now", current_rel != input$updated_pedigree)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$updated_pedigree, ignoreNULL = FALSE)
     
 
@@ -321,7 +321,7 @@ family_members_server <- function(id, r) {
       xref <- members_table()$xref[input$table_rows_selected]
       update_ged_value(r, "family_link_rows", xref, 2, "PEDI", input$updated_pedigree)
       shiny::removeModal()
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$update_relationship_now)
     
   })
@@ -330,7 +330,7 @@ family_members_server <- function(id, r) {
 
 get_pedi <- function(ged, fam_xref, chil_xref){
   # need to get section first as they might be a child of multiple families
-  tidyged.internals::identify_section(ged, 1, "FAMC", fam_xref, chil_xref, TRUE) %>% 
-    dplyr::slice(ged, .) %>% 
+  tidyged.internals::identify_section(ged, 1, "FAMC", fam_xref, chil_xref, TRUE) |> 
+    dplyr::slice(ged, .) |> 
     tidyged.internals::gedcom_value(chil_xref, "PEDI", 2, "FAMC")
 }

@@ -22,16 +22,16 @@ file_server <- function(id, r) {
     
     file_summary_server("file_summary", r)
     
-    shiny::observe(file_details_server("file_details", r)) %>%
+    shiny::observe(file_details_server("file_details", r)) |>
       shiny::bindEvent(input$tabset == "File details", once = TRUE, ignoreInit = TRUE)
     
-    shiny::observe(file_records_server("file_records", r)) %>%
+    shiny::observe(file_records_server("file_records", r)) |>
       shiny::bindEvent(input$tabset == "Records", once = TRUE, ignoreInit = TRUE)
     
-    shiny::observe(submitter_server("subm", r)) %>%
+    shiny::observe(submitter_server("subm", r)) |>
       shiny::bindEvent(input$tabset == "Submitter", once = TRUE, ignoreInit = TRUE)
     
-    shiny::observe(file_data_server("file_data", r)) %>%
+    shiny::observe(file_data_server("file_data", r)) |>
       shiny::bindEvent(input$tabset == "Source data details", once = TRUE, ignoreInit = TRUE)
 
     shiny::observe(priority = 2, { # want this to fire first
@@ -39,7 +39,7 @@ file_server <- function(id, r) {
       r$head_rows <- which(r$ged$record == "HD")
       r$head_file_sour_rows <- tidyged.internals::identify_section(r$ged, 1, "SOUR", 
                                                                    xrefs = "HD", first_only = TRUE)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(r$ged)
     
 

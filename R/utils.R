@@ -33,18 +33,18 @@ update_ged_value <- function(r, rows_name, xref, lvl, tags, new_value = characte
   if(length(tags) > length(new_value)) length(tags) <- length(new_value)
   
     # Add again
-  new_sec <- new_sec %>% 
-    tibble::add_row(tibble::tibble(record = xref, level = lvl, tag = tags, value = new_value)) %>% 
+  new_sec <- new_sec |> 
+    tibble::add_row(tibble::tibble(record = xref, level = lvl, tag = tags, value = new_value)) |> 
     deal_with_crap()
   
   # Order by tags
   if(!is.null(tag_order)) {
-    new_sec <- dplyr::mutate(new_sec, tag = factor(tag, levels = tag_order, ordered = TRUE)) %>% 
-      dplyr::arrange(tag) %>% 
+    new_sec <- dplyr::mutate(new_sec, tag = factor(tag, levels = tag_order, ordered = TRUE)) |> 
+      dplyr::arrange(tag) |> 
       dplyr::mutate(tag = as.character(tag))
   }
   
-  r$ged <- ged %>% 
+  r$ged <- ged |> 
     tibble::add_row(new_sec, .before = section_rows[1])
   
   invisible(TRUE)
@@ -92,7 +92,7 @@ crap_function <- function(section, tag_order){
   
   #if one or more and no header, insert header
   if(nrow(subsection) > 0 && !containing_tag %in% subsection$tag)
-    subsection <- subsection %>% 
+    subsection <- subsection |> 
       tibble::add_row(tibble::tibble(record = section$record[1],
                                      level = section$level[1] + 1,
                                      tag = containing_tag, value = ""),
@@ -102,8 +102,8 @@ crap_function <- function(section, tag_order){
   section <- dplyr::filter(section, !tag %in% tag_order)
   
   #order rows
-  subsection <- dplyr::mutate(subsection, tag = factor(tag, levels = tag_order, ordered = TRUE)) %>% 
-    dplyr::arrange(tag) %>% 
+  subsection <- dplyr::mutate(subsection, tag = factor(tag, levels = tag_order, ordered = TRUE)) |> 
+    dplyr::arrange(tag) |> 
     dplyr::mutate(tag = as.character(tag))
   
   #add to main

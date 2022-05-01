@@ -23,8 +23,7 @@ Imports:
     stringr,
     tidyged,
     tidyged.io,
-    visged,
-    magrittr
+    visged
 Suggests: 
     testthat (>= 3.0.0),
     roxytest

@@ -28,7 +28,7 @@ shiny::fluidPage(
     ),
     
     shiny::column(3,
-                  shiny::downloadButton("export_gedcom", "Export to GEDCOM file") %>% 
+                  shiny::downloadButton("export_gedcom", "Export to GEDCOM file") |> 
                     shinyjs::disabled()
     )
     
@@ -47,6 +47,6 @@ shiny::fluidPage(
                                                    shiny::tabPanel("Tools", tools_ui("tools")),
                                                    shiny::tabPanel("GEDCOM", ged_debug_ui("debug")))
                   ) 
-  ) %>% shinyjs::hidden()
+  ) |> shinyjs::hidden()
   
 )

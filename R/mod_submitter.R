@@ -34,7 +34,7 @@ submitter_server <- function(id, r) {
       req(r$ged)
       subm_xref <- tidyged::xrefs_subm(r$ged)
       r$subm_rows <- which(r$ged$record == subm_xref)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(r$ged)
 
     subm <- shiny::reactive({
@@ -46,7 +46,7 @@ submitter_server <- function(id, r) {
       req(subm)
       shiny::updateTextInput(inputId = "subm_name",
                              value = dplyr::filter(subm(), tag == "NAME")$value)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(r$file_count)
     
     shiny::observe({
@@ -55,7 +55,7 @@ submitter_server <- function(id, r) {
       shinyFeedback::feedbackDanger("subm_name", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, "subm_rows", subm()$record[1], 1, "NAME", subm_name)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$subm_name, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     

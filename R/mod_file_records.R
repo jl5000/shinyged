@@ -55,7 +55,7 @@ file_records_server <- function(id, r) {
       }
         
       DT::datatable(tbl, rownames = FALSE)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$refresh)
     
   })

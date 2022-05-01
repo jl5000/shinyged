@@ -56,7 +56,7 @@ address_server <- function(id, r, section_rows) {
         details <- "None defined"
       }
       shiny::HTML(details)
-    }) %>% shiny::bindEvent(addr())
+    }) |> shiny::bindEvent(addr())
 
 
     # Open modal to edit address ----------------------------------------------
@@ -68,7 +68,7 @@ address_server <- function(id, r, section_rows) {
                          shiny::fluidRow(
                            shiny::column(6,
                                          shiny::textAreaInput(ns("adr"), "Initial address lines (max 3 lines, no separator)",
-                                                              dplyr::filter(addr(), tag %in% paste0("ADR",1:3))$value %>%
+                                                              dplyr::filter(addr(), tag %in% paste0("ADR",1:3))$value |>
                                                                 paste(collapse = "\n"), rows = 3),
                                          shiny::textInput(ns("city"), "City",
                                                           dplyr::filter(addr(), tag == "CITY")$value),
@@ -90,25 +90,25 @@ address_server <- function(id, r, section_rows) {
                          shiny::fluidRow(
                            shiny::column(6,
                                          shiny::textAreaInput(ns("phones"), "Phone numbers", 
-                                                              dplyr::filter(addr(), tag == "PHON")$value %>%
+                                                              dplyr::filter(addr(), tag == "PHON")$value |>
                                                                 paste(collapse = "\n"), rows = 3),
                                          shiny::textAreaInput(ns("emails"), "Email addresses", 
-                                                              dplyr::filter(addr(), tag == "EMAIL")$value %>%
+                                                              dplyr::filter(addr(), tag == "EMAIL")$value |>
                                                                 paste(collapse = "\n"), rows = 3)
                            ),
                            shiny::column(6,
                                          shiny::textAreaInput(ns("faxes"), "Fax numbers", 
-                                                              dplyr::filter(addr(), tag == "FAX")$value %>%
+                                                              dplyr::filter(addr(), tag == "FAX")$value |>
                                                                 paste(collapse = "\n"), rows = 3),
                                          shiny::textAreaInput(ns("websites"), "Websites", 
-                                                              dplyr::filter(addr(), tag == "WWW")$value %>%
+                                                              dplyr::filter(addr(), tag == "WWW")$value |>
                                                                 paste(collapse = "\n"), rows = 3)
                            )
                          ),
                          
-      ) %>% shiny::showModal()
+      ) |> shiny::showModal()
     
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$edit_address)
     
 
@@ -120,7 +120,7 @@ address_server <- function(id, r, section_rows) {
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, section_rows, r$ged$record[r[[section_rows]][1]],
                        r$ged$level[r[[section_rows]][1]] + 2, paste0("ADR", 1:3), adr)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$adr, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     # Edit city ----------------------------------------------------------------
@@ -131,7 +131,7 @@ address_server <- function(id, r, section_rows) {
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, section_rows, r$ged$record[r[[section_rows]][1]],
                        r$ged$level[r[[section_rows]][1]] + 2, "CITY", city)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$city, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     # Edit state --------------------------------------------------------------
@@ -142,7 +142,7 @@ address_server <- function(id, r, section_rows) {
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, section_rows, r$ged$record[r[[section_rows]][1]],
                        r$ged$level[r[[section_rows]][1]] + 2, "STAE", state)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$state, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     # Edit postcode -----------------------------------------------------------
@@ -153,7 +153,7 @@ address_server <- function(id, r, section_rows) {
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, section_rows, r$ged$record[r[[section_rows]][1]],
                        r$ged$level[r[[section_rows]][1]] + 2, "POST", postcode)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$postcode, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     # Edit country -----------------------------------------------------------
@@ -164,7 +164,7 @@ address_server <- function(id, r, section_rows) {
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, section_rows, r$ged$record[r[[section_rows]][1]],
                        r$ged$level[r[[section_rows]][1]] + 2, "CTRY", country)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$country, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     # Edit emails ------------------------------------------------------------
@@ -175,7 +175,7 @@ address_server <- function(id, r, section_rows) {
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, section_rows, r$ged$record[r[[section_rows]][1]],
                        r$ged$level[r[[section_rows]][1]] + 1, "EMAIL", emails)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$emails, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     # Edit phone numbers ------------------------------------------------------
@@ -186,7 +186,7 @@ address_server <- function(id, r, section_rows) {
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, section_rows, r$ged$record[r[[section_rows]][1]],
                        r$ged$level[r[[section_rows]][1]] + 1, "PHON", phones)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$phones, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     # Edit faxes --------------------------------------------------------------
@@ -197,7 +197,7 @@ address_server <- function(id, r, section_rows) {
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, section_rows, r$ged$record[r[[section_rows]][1]],
                        r$ged$level[r[[section_rows]][1]] + 1, "FAX", faxes)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$faxes, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     # Edit websites -----------------------------------------------------------
@@ -208,7 +208,7 @@ address_server <- function(id, r, section_rows) {
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, section_rows, r$ged$record[r[[section_rows]][1]],
                        r$ged$level[r[[section_rows]][1]] + 1, "WWW", websites)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$websites, ignoreNULL = FALSE, ignoreInit = TRUE)
     
   })

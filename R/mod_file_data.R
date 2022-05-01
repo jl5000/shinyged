@@ -13,7 +13,7 @@ file_data_ui <- function(id) {
       shiny::textInput(ns("ged_source_name"), "Source name"),
       shiny::textInput(ns("ged_source_date"), "Publication date (e.g. 6 APR 1983)")
     ),
-    shiny::textAreaInput(ns("ged_source_copy"), "Copyright", resize = "vertical") %>%
+    shiny::textAreaInput(ns("ged_source_copy"), "Copyright", resize = "vertical") |>
       shiny::tagAppendAttributes(style = 'width: 85%;')
     
   )
@@ -33,7 +33,7 @@ file_data_server <- function(id, r) {
       shiny::updateTextAreaInput(inputId = "ged_source_copy", 
                                  value = tidyged.internals::gedcom_value(r$ged, "HD", "COPR", 3))
 
-    }) %>% 
+    }) |> 
       shiny::bindEvent(r$file_count)
     
     # Edit source name --------------------------------------------------------
@@ -47,7 +47,7 @@ file_data_server <- function(id, r) {
       shinyFeedback::feedbackDanger("ged_source_copy", err2, "Source name is required for this input")
       req(is.null(err), !err1, !err2, cancelOutput = TRUE)
       update_ged_value(r, "head_file_sour_rows", "HD", 2, "DATA", ged_source_name, .pkgenv$tags_file_sour)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$ged_source_name, ignoreNULL = FALSE, ignoreInit = TRUE)
       
     # Edit source date -------------------------------------------------------
@@ -57,7 +57,7 @@ file_data_server <- function(id, r) {
       shinyFeedback::feedbackDanger("ged_source_date", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, "head_file_sour_rows", "HD", 3, "DATE", ged_source_date, .pkgenv$tags_file_sour)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$ged_source_date, ignoreNULL = FALSE, ignoreInit = TRUE)
     
     # Edit data copyright ---------------------------------------------------
@@ -67,14 +67,14 @@ file_data_server <- function(id, r) {
       shinyFeedback::feedbackDanger("ged_source_copy", !is.null(err), err)
       req(is.null(err), cancelOutput = TRUE)
       update_ged_value(r, "head_file_sour_rows", "HD", 3, "COPR", ged_source_copy, .pkgenv$tags_file_sour)
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$ged_source_copy, ignoreNULL = FALSE, ignoreInit = TRUE)
     
      # Enable/disable date and copyright ------------------------------------
     shiny::observe({
       shinyjs::toggleState("ged_source_date", input$ged_source_name != "")
       shinyjs::toggleState("ged_source_copy", input$ged_source_name != "")
-    }) %>% 
+    }) |> 
       shiny::bindEvent(input$ged_source_name)
     
   })
