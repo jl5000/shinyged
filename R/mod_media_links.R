@@ -64,8 +64,10 @@ media_links_server <- function(id, r, section_rows) {
     media_xrefs <- shiny::reactive({
       req(r$ged, r[[section_rows]])
       
-      dplyr::slice(r$ged, r[[section_rows]]) |>
-        dplyr::filter(level == .$level[1] + 1, tag == "OBJE") |> 
+      media_rows <- dplyr::slice(r$ged, r[[section_rows]])
+      
+      media_rows |>
+        dplyr::filter(level == media_rows$level[1] + 1, tag == "OBJE") |> 
         dplyr::pull(value)
     })
     
@@ -81,9 +83,11 @@ media_links_server <- function(id, r, section_rows) {
     selected_ged_row <- shiny::reactive({
       req(r$ged, r[[section_rows]], input$media_list_rows_selected)
       
-      dplyr::mutate(r$ged, row = dplyr::row_number()) |> 
-        dplyr::slice(r[[section_rows]]) |>
-        dplyr::filter(level == .$level[1] + 1, tag == "OBJE") |> 
+      media_rows <- dplyr::mutate(r$ged, row = dplyr::row_number()) |> 
+        dplyr::slice(r[[section_rows]])
+      
+      media_rows |>
+        dplyr::filter(level == media_rows$level[1] + 1, tag == "OBJE") |> 
         dplyr::slice(input$media_list_rows_selected) |> 
         dplyr::pull(row)
     }) |> 

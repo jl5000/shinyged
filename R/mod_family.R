@@ -74,8 +74,7 @@ family_server <- function(id, r) {
     records <- shiny::reactive({
       req(r$ged)
 
-      tidyged::xrefs_famg(r$ged) |> 
-        tidyged::describe_records(r$ged, ., short_desc = TRUE)
+      tidyged::describe_records(r$ged, tidyged::xrefs_famg(r$ged), short_desc = TRUE)
     })
     
     # Update choices with list of families and select one --------------------------

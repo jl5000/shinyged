@@ -61,8 +61,7 @@ multimedia_server <- function(id, r) {
     records <- shiny::reactive({
       req(r$ged)
       
-      tidyged::xrefs_media(r$ged) |> 
-        tidyged::describe_records(r$ged, ., short_desc = TRUE)
+      tidyged::describe_records(r$ged, tidyged::xrefs_media(r$ged), short_desc = TRUE)
     })
     
     # Update choices with list of media and select one

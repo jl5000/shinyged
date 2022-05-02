@@ -116,8 +116,8 @@ citations_server <- function(id, r, section_rows) {
       
       rows <- as.integer(unlist(citations_rows()))
       
-      titles <- sapply(citations_rows(), `[`, 1) |> 
-        dplyr::slice(r$ged, .) |> 
+      titles <- r$ged |> 
+        dplyr::slice(sapply(citations_rows(), `[`, 1)) |> 
         dplyr::pull(value) |> 
         sapply(tidyged.internals::gedcom_value, gedcom = r$ged, tag = "TITL", level = 1)
       

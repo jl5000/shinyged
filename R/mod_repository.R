@@ -44,8 +44,7 @@ repository_server <- function(id, r) {
     records <- shiny::reactive({
       req(r$ged)
 
-      tidyged::xrefs_repo(r$ged) |> 
-        tidyged::describe_records(r$ged, ., short_desc = TRUE)
+      tidyged::describe_records(r$ged, tidyged::xrefs_repo(r$ged), short_desc = TRUE)
     })
     
     # Update choices with list of repositories and select one

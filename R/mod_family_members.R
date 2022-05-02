@@ -85,8 +85,7 @@ family_members_server <- function(id, r) {
     indis <- shiny::reactive({
       req(r$ged)
       
-      tidyged::xrefs_indi(r$ged) |> 
-        tidyged::describe_records(r$ged, ., short_desc = TRUE)
+      tidyged::describe_records(r$ged, tidyged::xrefs_indi(r$ged), short_desc = TRUE)
     })
     
 
@@ -330,7 +329,8 @@ family_members_server <- function(id, r) {
 
 get_pedi <- function(ged, fam_xref, chil_xref){
   # need to get section first as they might be a child of multiple families
-  tidyged.internals::identify_section(ged, 1, "FAMC", fam_xref, chil_xref, TRUE) |> 
-    dplyr::slice(ged, .) |> 
+  famc_sec <- tidyged.internals::identify_section(ged, 1, "FAMC", fam_xref, chil_xref, TRUE) 
+  
+  dplyr::slice(ged, famc_sec) |> 
     tidyged.internals::gedcom_value(chil_xref, "PEDI", 2, "FAMC")
 }

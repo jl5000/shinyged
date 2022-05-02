@@ -18,8 +18,7 @@ source_repo_server <- function(id, r) {
     # Show pop up ------------------------------------------------
     shiny::observe({
       
-      repos <- tidyged::xrefs_repo(r$ged) |> 
-        tidyged::describe_records(r$ged, ., short_desc = TRUE)
+      repos <- tidyged::describe_records(r$ged, tidyged::xrefs_repo(r$ged), short_desc = TRUE)
       
       shiny::modalDialog(title = "Edit source repositories",
                          
